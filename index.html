@@ -1,0 +1,498 @@
+## used an LLM to write the code
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rewiring Connections</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #fff;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: 20px 36px 14px;
+  background: rgba(255,255,255,0.95);
+}
+.title {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 17px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: #111;
+  text-transform: none;
+}
+#canvas-wrap {
+  position: fixed;
+  inset: 0;
+  top: 54px;
+}
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(255,255,255,0.96);
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox-inner {
+  position: relative;
+  max-width: min(88vw, 720px);
+  max-height: 88vh;
+  animation: lbIn 0.18s ease;
+}
+@keyframes lbIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.lightbox img {
+  display: block;
+  max-width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+}
+.lightbox-close {
+  position: absolute;
+  top: -36px; right: 0;
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: 200;
+  color: #bbb;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.15s;
+  font-family: 'Courier New', monospace;
+}
+.lightbox-close:hover { color: #333; }
+#error-banner {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #fff9f5;
+  border: 0.5px solid #e8d0c0;
+  border-radius: 3px;
+  padding: 10px 22px;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+  color: #a06040;
+  z-index: 200;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<header><p class="title">Rewiring Connections</p></header>
+<div id="canvas-wrap"></div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lbClose">×</button>
+    <img id="lbImg" src="" alt="">
+  </div>
+</div>
+<div id="error-banner"></div>
+
+<script>
+// ── CONFIG ─────────────────────────────────────────────────────────────────
+// Place all images in one folder named `illustrations/`
+// File naming convention:
+//   {order}_{event-name}_bad.jpg       → bad memory of that event
+//   {order}_{event-name}_bad2.jpg      → second bad memory (bad3, bad4 etc.)
+//   {order}_{event-name}_good.jpg      → good memory
+//   {order}_{event-name}_good2.jpg     → second good memory (good3 etc.)
+//
+// Examples:
+//   1_losing-my-job_bad.jpg
+//   1_losing-my-job_good.jpg
+//   1_losing-my-job_good2.jpg
+//   2_the-accident_bad.jpg
+//   2_the-accident_bad2.jpg
+//   2_the-accident_good.jpg
+
+const CONFIG = {
+  folder:      'illustrations',
+  extensions:  ['jpg', 'jpeg', 'png', 'webp'],
+  maxEvents:   30,   // max number of events to probe
+  maxPerSide:  8,    // max bad or good images per event
+  branchAngle: 30,   // degrees between event branches off trunk
+  splitAngle:  28,   // degrees for bad/good split within an event
+  subAngle:    22,   // degrees for multiple bad or good images
+  trunkRatio:  0.22, // trunk length as fraction of canvas H
+  eventDecay:  0.82, // length multiplier per event branch
+  leafDecay:   0.72, // length multiplier for bad/good sub-branches
+};
+
+// ── PARSE FILENAME ─────────────────────────────────────────────────────────
+// "1_losing-my-job_bad.jpg" → { order:1, event:"losing my job", side:"bad", idx:1 }
+// "2_the-accident_good2.jpg" → { order:2, event:"the accident", side:"good", idx:2 }
+function parseFilename(filename) {
+  const noExt = filename.replace(/\.[^.]+$/, '');
+  const parts  = noExt.split('_');
+  if (parts.length < 3) return null;
+
+  const order = parseInt(parts[0]);
+  if (isNaN(order)) return null;
+
+  // last part is side+optional index: "bad", "bad2", "good", "good3"
+  const sideRaw = parts[parts.length - 1];
+  const sideMatch = sideRaw.match(/^(bad|good)(\d*)$/);
+  if (!sideMatch) return null;
+
+  const side  = sideMatch[1];
+  const idx   = sideMatch[2] ? parseInt(sideMatch[2]) : 1;
+  const event = parts.slice(1, parts.length - 1).join(' ').replace(/-/g, ' ');
+
+  return { order, event, side, idx };
+}
+
+// ── PROBE MANIFEST ─────────────────────────────────────────────────────────
+// Reads manifest.json from the illustrations folder.
+// manifest.json = array of filenames: ["1_losing-my-job_bad.jpg", ...]
+// If no manifest, falls back to brute-force probing known name patterns.
+function testImage(src) {
+  return new Promise(resolve => {
+    const img = new Image();
+    img.onload  = () => resolve(true);
+    img.onerror = () => resolve(false);
+    img.src = src;
+  });
+}
+
+async function loadManifest() {
+  try {
+    const res = await fetch(`${CONFIG.folder}/manifest.json`);
+    if (res.ok) return await res.json(); // array of filenames
+  } catch (_) {}
+  return null;
+}
+
+async function probeFiles() {
+  // Try manifest first
+  const manifest = await loadManifest();
+  if (manifest) {
+    const srcs = [];
+    for (const f of manifest) {
+      const src = `${CONFIG.folder}/${f}`;
+      if (await testImage(src)) srcs.push(src);
+    }
+    return srcs;
+  }
+
+  // Fallback: brute-force probe
+  const srcs = [];
+  for (let e = 1; e <= CONFIG.maxEvents; e++) {
+    let foundAny = false;
+    // We don't know event names ahead of time without a manifest,
+    // so the fallback just tells the user to add manifest.json
+    // We try a simple numbered pattern as last resort
+    for (const ext of CONFIG.extensions) {
+      const src = `${CONFIG.folder}/${e}.${ext}`;
+      if (await testImage(src)) { srcs.push(src); foundAny = true; break; }
+    }
+    if (!foundAny && e > 1) break;
+  }
+  return srcs;
+}
+
+// ── BUILD EVENT MAP ────────────────────────────────────────────────────────
+// Groups image srcs by event, preserving order.
+// Returns: [ { order, event, bad:[srcs], good:[srcs] }, … ] sorted by order
+function buildEventMap(srcs) {
+  const map = {}; // keyed by order
+
+  for (const src of srcs) {
+    const filename = src.split('/').pop();
+    const parsed   = parseFilename(filename);
+    if (!parsed) continue;
+
+    const { order, event, side, idx } = parsed;
+    if (!map[order]) map[order] = { order, event, bad: [], good: [] };
+    map[order][side].push({ src, idx });
+  }
+
+  // Sort each side by idx
+  return Object.values(map)
+    .sort((a, b) => a.order - b.order)
+    .map(ev => ({
+      ...ev,
+      bad:  ev.bad.sort((a, b) => a.idx - b.idx).map(x => x.src),
+      good: ev.good.sort((a, b) => a.idx - b.idx).map(x => x.src),
+    }));
+}
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
+let leafNodes = [];
+let myP5 = null;
+
+async function boot() {
+  const srcs   = await probeFiles();
+  const events = buildEventMap(srcs);
+
+  if (!events.length) {
+    const el = document.getElementById('error-banner');
+    el.textContent = 'No images found. Add manifest.json to illustrations/ folder.';
+    el.style.display = 'block';
+  }
+
+  startSketch(events);
+}
+
+// ── SKETCH ─────────────────────────────────────────────────────────────────
+function startSketch(events) {
+  if (myP5) { myP5.remove(); myP5 = null; }
+  leafNodes = [];
+
+  const sketch = p => {
+    // Pre-load all images
+    const allImgs = {}; // src → p5 image
+    const allSrcs = [];
+    events.forEach(ev => {
+      ev.bad.forEach(s  => allSrcs.push(s));
+      ev.good.forEach(s => allSrcs.push(s));
+    });
+
+    let W, H;
+
+    p.preload = () => {
+      allSrcs.forEach(src => { allImgs[src] = p.loadImage(src); });
+    };
+
+    p.setup = () => {
+      const wrap = document.getElementById('canvas-wrap');
+      W = wrap.offsetWidth;
+      H = wrap.offsetHeight;
+      p.createCanvas(W, H).parent('canvas-wrap');
+      p.angleMode(p.DEGREES);
+      p.textFont('Courier New');
+      p.noLoop();
+    };
+
+    p.draw = () => {
+      p.background(255);
+      leafNodes = [];
+
+      drawBrainOutline(p, W, H);
+
+      if (!events.length) return;
+
+      const trunkLen   = H * CONFIG.trunkRatio;
+      const n          = events.length;
+
+      // Fan event branches out from trunk tip
+      // Total spread angle based on number of events
+      const totalSpread = Math.min(n * 18, 140);
+      const step        = n > 1 ? totalSpread / (n - 1) : 0;
+      const startAngle  = -totalSpread / 2;
+
+      p.push();
+      p.translate(W / 2, H - 10);
+
+      // Trunk
+      p.stroke(195, 182, 170);
+      p.strokeWeight(5.5);
+      p.line(0, 0, 0, -trunkLen);
+      p.translate(0, -trunkLen);
+
+      events.forEach((ev, i) => {
+        const angle = startAngle + i * step;
+        const evLen = trunkLen * CONFIG.eventDecay;
+        p.push();
+        p.rotate(angle);
+        drawEventBranch(p, ev, evLen, allImgs, W, H);
+        p.pop();
+      });
+
+      p.pop();
+    };
+
+    // ── event branch: neutral colour, label, then splits red/blue ─────────
+    function drawEventBranch(p, ev, len, allImgs, W, H) {
+      // Neutral shared branch
+      p.stroke(175, 162, 150);
+      p.strokeWeight(3);
+      p.line(0, 0, 0, -len);
+
+      // Label along the shared branch — drawn at midpoint, rotated with branch
+      if (ev.event) {
+        p.push();
+        p.translate(0, -len * 0.5);
+        // rotate text to read left-to-right regardless of branch angle
+        const xf  = p.drawingContext.getTransform();
+        const ang = Math.atan2(xf.b, xf.a) * (180 / Math.PI);
+        p.rotate(-ang); // counter-rotate to keep text upright
+
+        p.noStroke();
+        p.fill(100, 90, 80, 200);
+        p.textSize(9);
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.text(ev.event, 0, -4);
+        p.pop();
+      }
+
+      p.translate(0, -len);
+
+      const subLen = len * CONFIG.leafDecay;
+
+      // Bad sub-branches (red) — fan left
+      if (ev.bad.length > 0) {
+        const badAngles = fanAngles(ev.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
+        ev.bad.forEach((src, i) => {
+          p.push();
+          p.rotate(badAngles[i]);
+          drawLeafBranch(p, src, allImgs[src], subLen, 'bad', W, H);
+          p.pop();
+        });
+      }
+
+      // Good sub-branches (blue) — fan right
+      if (ev.good.length > 0) {
+        const goodAngles = fanAngles(ev.good.length, CONFIG.splitAngle, CONFIG.subAngle);
+        ev.good.forEach((src, i) => {
+          p.push();
+          p.rotate(goodAngles[i]);
+          drawLeafBranch(p, src, allImgs[src], subLen, 'good', W, H);
+          p.pop();
+        });
+      }
+    }
+
+    // ── single leaf branch ending in an illustration ───────────────────────
+    function drawLeafBranch(p, src, img, len, side, W, H) {
+      const isBad = side === 'bad';
+      p.stroke(isBad ? p.color(185, 45, 45, 180) : p.color(28, 92, 175, 180));
+      p.strokeWeight(1.4);
+      p.line(0, 0, 0, -len);
+      p.translate(0, -len);
+
+      const nodeSize = Math.max(Math.min(W, H) * 0.07, 40);
+      const r = nodeSize / 2;
+
+      const xf = p.drawingContext.getTransform();
+      const wx = xf.e;
+      const wy = xf.f;
+
+      p.noStroke();
+      p.imageMode(p.CENTER);
+
+      if (img) {
+        p.image(img, 0, 0, nodeSize, nodeSize);
+      } else {
+        p.fill(isBad ? p.color(185,45,45,100) : p.color(28,92,175,100));
+        p.ellipse(0, 0, nodeSize * 0.5, nodeSize * 0.5);
+      }
+
+      leafNodes.push({ x: wx, y: wy, r, src });
+    }
+
+    // ── helpers ───────────────────────────────────────────────────────────
+    // Returns an array of angles to fan `n` branches around a centre angle
+    function fanAngles(n, centre, spread) {
+      if (n === 1) return [centre];
+      const half = (spread * (n - 1)) / 2;
+      return Array.from({ length: n }, (_, i) => centre - half + i * spread);
+    }
+
+    // ── brain outline ─────────────────────────────────────────────────────
+    function drawBrainOutline(p, W, H) {
+      p.noFill();
+      p.stroke(235, 231, 227);
+      p.strokeWeight(0.8);
+      const cx = W / 2;
+      const lw = Math.min(W * 0.41, 315);
+      const topY = H * 0.05;
+      const botY = H - 10;
+
+      p.beginShape();
+      p.vertex(cx - 12, botY);
+      p.bezierVertex(cx - lw*0.9, botY-16, cx - lw*1.08, H*0.48, cx - lw*0.88, topY + H*0.18);
+      p.bezierVertex(cx - lw*0.62, topY, cx - lw*0.18, topY*0.75, cx - 12, topY + H*0.13);
+      p.endShape();
+
+      p.beginShape();
+      p.vertex(cx + 12, botY);
+      p.bezierVertex(cx + lw*0.9, botY-16, cx + lw*1.08, H*0.48, cx + lw*0.88, topY + H*0.18);
+      p.bezierVertex(cx + lw*0.62, topY, cx + lw*0.18, topY*0.75, cx + 12, topY + H*0.13);
+      p.endShape();
+
+      p.stroke(243, 240, 237);
+      p.strokeWeight(0.5);
+      p.line(cx - lw*0.52, topY + H*0.11, cx - lw*0.72, H*0.44);
+      p.line(cx - lw*0.23, topY + H*0.08, cx - lw*0.33, H*0.38);
+      p.line(cx + lw*0.52, topY + H*0.11, cx + lw*0.72, H*0.44);
+      p.line(cx + lw*0.23, topY + H*0.08, cx + lw*0.33, H*0.38);
+    }
+  };
+
+  myP5 = new p5(sketch);
+  setupInteraction();
+}
+
+// ── INTERACTION ────────────────────────────────────────────────────────────
+function setupInteraction() {
+  const wrap = document.getElementById('canvas-wrap');
+
+  wrap.addEventListener('click', e => {
+    const canvas = wrap.querySelector('canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    for (const node of leafNodes) {
+      const dx = mx - node.x, dy = my - node.y;
+      if (Math.sqrt(dx*dx + dy*dy) <= node.r + 8 && node.src) {
+        openLightbox(node.src);
+        return;
+      }
+    }
+  });
+
+  wrap.addEventListener('mousemove', e => {
+    const canvas = wrap.querySelector('canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const mx = e.clientX - rect.left;
+    const my = e.clientY - rect.top;
+    const hit = leafNodes.some(n => {
+      const dx = mx - n.x, dy = my - n.y;
+      return Math.sqrt(dx*dx+dy*dy) <= n.r + 8 && n.src;
+    });
+    canvas.style.cursor = hit ? 'zoom-in' : 'default';
+  });
+}
+
+// ── LIGHTBOX ───────────────────────────────────────────────────────────────
+function openLightbox(src) {
+  document.getElementById('lbImg').src = src;
+  document.getElementById('lightbox').classList.add('open');
+}
+
+document.getElementById('lbClose').addEventListener('click', () => {
+  document.getElementById('lightbox').classList.remove('open');
+});
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox'))
+    document.getElementById('lightbox').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
+});
+
+boot();
+</script>
+</body>
+</html>
