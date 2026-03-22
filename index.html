@@ -8,7 +8,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: #fff;
+  background: #f5f0e8;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -18,7 +18,7 @@ header {
   top: 0; left: 0; right: 0;
   z-index: 10;
   padding: 20px 36px 14px;
-  background: rgba(255,255,255,0.95);
+  background: rgba(245,240,232,0.95);
 }
 .title {
   font-family: 'Courier New', Courier, monospace;
@@ -106,164 +106,154 @@ header {
 <div id="error-banner"></div>
 
 <script>
-// ── CONFIG ─────────────────────────────────────────────────────────────────
-// Place all images in one folder named `illustrations/`
-// File naming convention:
-//   {order}_{event-name}_bad.jpg       → bad memory of that event
-//   {order}_{event-name}_bad2.jpg      → second bad memory (bad3, bad4 etc.)
-//   {order}_{event-name}_good.jpg      → good memory
-//   {order}_{event-name}_good2.jpg     → second good memory (good3 etc.)
+// ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
 //
-// Examples:
-//   1_losing-my-job_bad.jpg
-//   1_losing-my-job_good.jpg
-//   1_losing-my-job_good2.jpg
-//   2_the-accident_bad.jpg
-//   2_the-accident_bad2.jpg
-//   2_the-accident_good.jpg
+// Everything lives in an `illustrations/` folder next to this HTML file.
+// You need a `manifest.json` that describes the full tree structure.
+//
+// FOLDER STRUCTURE EXAMPLE:
+//   illustrations/
+//     manifest.json
+//     1_school/
+//       1_music-class_bad.jpg
+//       1_music-class_good.jpg
+//       2_failing-exam_bad.jpg
+//       2_failing-exam_good.jpg
+//       3_best-friend/
+//         1_the-fight_bad.jpg
+//         1_the-fight_good.jpg
+//     2_losing-my-job/
+//       1_the-day_bad.jpg
+//       1_the-day_good.jpg
+//       2_aftermath/
+//         1_depression_bad.jpg
+//         1_new-start_good.jpg
+//
+// MANIFEST FORMAT:
+// The manifest describes the tree as nested JSON.
+// Each node has: label, children (sub-branches), bad (image files), good (image files)
+//
+// {
+//   "children": [
+//     {
+//       "label": "school",
+//       "children": [
+//         { "label": "music class", "bad": ["1_music-class_bad.jpg"], "good": ["1_music-class_good.jpg"], "path": "1_school" },
+//         { "label": "failing exam", "bad": ["2_failing-exam_bad.jpg"], "good": [], "path": "1_school" },
+//         {
+//           "label": "best friend",
+//           "path": "1_school/3_best-friend",
+//           "children": [
+//             { "label": "the fight", "bad": ["1_the-fight_bad.jpg"], "good": ["1_the-fight_good.jpg"], "path": "1_school/3_best-friend" }
+//           ]
+//         }
+//       ],
+//       "path": "1_school"
+//     },
+//     {
+//       "label": "losing my job",
+//       "bad": ["1_the-day_bad.jpg"],
+//       "good": ["1_the-day_good.jpg"],
+//       "path": "2_losing-my-job"
+//     }
+//   ]
+// }
+//
+// RULES:
+// - A node with `children` draws a neutral branch that fans into sub-branches
+// - A node with `bad`/`good` arrays draws leaf branches directly
+// - A node can have BOTH children and bad/good images
+// - `path` is the folder path relative to `illustrations/`
+// - image filenames in bad/good are just the filename (no folder prefix)
 
-const CONFIG = {
-  folder:      'illustrations',
-  extensions:  ['jpg', 'jpeg', 'png', 'webp'],
-  maxEvents:   30,   // max number of events to probe
-  maxPerSide:  8,    // max bad or good images per event
-  branchAngle: 30,   // degrees between event branches off trunk
-  splitAngle:  28,   // degrees for bad/good split within an event
-  subAngle:    22,   // degrees for multiple bad or good images
-  trunkRatio:  0.22, // trunk length as fraction of canvas H
-  eventDecay:  0.82, // length multiplier per event branch
-  leafDecay:   0.72, // length multiplier for bad/good sub-branches
-};
+const ROOT_FOLDER = 'illustrations';
 
-// ── PARSE FILENAME ─────────────────────────────────────────────────────────
-// "1_losing-my-job_bad.jpg" → { order:1, event:"losing my job", side:"bad", idx:1 }
-// "2_the-accident_good2.jpg" → { order:2, event:"the accident", side:"good", idx:2 }
-function parseFilename(filename) {
-  const noExt = filename.replace(/\.[^.]+$/, '');
-  const parts  = noExt.split('_');
-  if (parts.length < 3) return null;
-
-  const order = parseInt(parts[0]);
-  if (isNaN(order)) return null;
-
-  // last part is side+optional index: "bad", "bad2", "good", "good3"
-  const sideRaw = parts[parts.length - 1];
-  const sideMatch = sideRaw.match(/^(bad|good)(\d*)$/);
-  if (!sideMatch) return null;
-
-  const side  = sideMatch[1];
-  const idx   = sideMatch[2] ? parseInt(sideMatch[2]) : 1;
-  const event = parts.slice(1, parts.length - 1).join(' ').replace(/-/g, ' ');
-
-  return { order, event, side, idx };
-}
-
-// ── PROBE MANIFEST ─────────────────────────────────────────────────────────
-// Reads manifest.json from the illustrations folder.
-// manifest.json = array of filenames: ["1_losing-my-job_bad.jpg", ...]
-// If no manifest, falls back to brute-force probing known name patterns.
-function testImage(src) {
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload  = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = src;
-  });
-}
-
-async function loadManifest() {
-  try {
-    const res = await fetch(`${CONFIG.folder}/manifest.json`);
-    if (res.ok) return await res.json(); // array of filenames
-  } catch (_) {}
-  return null;
-}
-
-async function probeFiles() {
-  // Try manifest first
-  const manifest = await loadManifest();
-  if (manifest) {
-    const srcs = [];
-    for (const f of manifest) {
-      const src = `${CONFIG.folder}/${f}`;
-      if (await testImage(src)) srcs.push(src);
-    }
-    return srcs;
-  }
-
-  // Fallback: brute-force probe
-  const srcs = [];
-  for (let e = 1; e <= CONFIG.maxEvents; e++) {
-    let foundAny = false;
-    // We don't know event names ahead of time without a manifest,
-    // so the fallback just tells the user to add manifest.json
-    // We try a simple numbered pattern as last resort
-    for (const ext of CONFIG.extensions) {
-      const src = `${CONFIG.folder}/${e}.${ext}`;
-      if (await testImage(src)) { srcs.push(src); foundAny = true; break; }
-    }
-    if (!foundAny && e > 1) break;
-  }
-  return srcs;
-}
-
-// ── BUILD EVENT MAP ────────────────────────────────────────────────────────
-// Groups image srcs by event, preserving order.
-// Returns: [ { order, event, bad:[srcs], good:[srcs] }, … ] sorted by order
-function buildEventMap(srcs) {
-  const map = {}; // keyed by order
-
-  for (const src of srcs) {
-    const filename = src.split('/').pop();
-    const parsed   = parseFilename(filename);
-    if (!parsed) continue;
-
-    const { order, event, side, idx } = parsed;
-    if (!map[order]) map[order] = { order, event, bad: [], good: [] };
-    map[order][side].push({ src, idx });
-  }
-
-  // Sort each side by idx
-  return Object.values(map)
-    .sort((a, b) => a.order - b.order)
-    .map(ev => ({
-      ...ev,
-      bad:  ev.bad.sort((a, b) => a.idx - b.idx).map(x => x.src),
-      good: ev.good.sort((a, b) => a.idx - b.idx).map(x => x.src),
-    }));
-}
-
-// ── BOOT ───────────────────────────────────────────────────────────────────
 let leafNodes = [];
 let myP5 = null;
 
+// ── LOAD MANIFEST ──────────────────────────────────────────────────────────
 async function boot() {
-  const srcs   = await probeFiles();
-  const events = buildEventMap(srcs);
+  let tree = null;
+  try {
+    const res = await fetch(`${ROOT_FOLDER}/manifest.json`);
+    if (res.ok) tree = await res.json();
+  } catch (_) {}
 
-  if (!events.length) {
-    const el = document.getElementById('error-banner');
-    el.textContent = 'No images found. Add manifest.json to illustrations/ folder.';
-    el.style.display = 'block';
+  if (!tree) {
+    showError('manifest.json not found in illustrations/ folder. See comments in source for format.');
+    tree = { children: [] };
   }
 
-  startSketch(events);
+  startSketch(tree);
+}
+
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+
+
+// ── PRE-LOAD ALL IMAGES FROM TREE ──────────────────────────────────────────
+function collectSrcs(node, srcs = []) {
+  if (node.bad)  node.bad.forEach(f  => srcs.push(`${ROOT_FOLDER}/${node.path}/${f}`));
+  if (node.good) node.good.forEach(f => srcs.push(`${ROOT_FOLDER}/${node.path}/${f}`));
+  if (node.children) node.children.forEach(c => collectSrcs(c, srcs));
+  return srcs;
+}
+
+// Walk tree and annotate each node with a `tint` value:
+//   -1 = only bad leaves below,  1 = only good,  0 = mixed or none
+// Also annotate `maxDepth` — how many levels below this node.
+function annotateTints(node) {
+  const hasBad  = node.bad  && node.bad.length  > 0;
+  const hasGood = node.good && node.good.length > 0;
+
+  if (!node.children || node.children.length === 0) {
+    // leaf node
+    node.tint     = hasBad && !hasGood ? -1 : !hasBad && hasGood ? 1 : 0;
+    node.maxDepth = 0;
+    return;
+  }
+
+  node.children.forEach(c => annotateTints(c));
+
+  const childTints = node.children.map(c => c.tint);
+  const allBad     = childTints.every(t => t === -1);
+  const allGood    = childTints.every(t => t ===  1);
+
+  // own bad/good images also count
+  if (hasBad)  childTints.push(-1);
+  if (hasGood) childTints.push( 1);
+
+  node.tint     = allBad ? -1 : allGood ? 1 : 0;
+  node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
 }
 
 // ── SKETCH ─────────────────────────────────────────────────────────────────
-function startSketch(events) {
+const CONFIG = {
+  trunkRatio:    0.22,  // trunk as fraction of canvas H
+  branchDecay:   0.72,  // length multiplier per tree level
+  spreadBase:    38,    // degrees of spread per child at top level
+  spreadDecay:   0.80,  // spread shrinks at deeper levels
+  splitAngle:    26,    // angle for bad/good split
+  subAngle:      20,    // angle between multiple bad or good images
+  neutralColor:  [175, 162, 150],
+  badColor:      [185, 45, 45],
+  goodColor:     [28, 92, 175],
+};
+
+function startSketch(tree) {
   if (myP5) { myP5.remove(); myP5 = null; }
   leafNodes = [];
 
-  const sketch = p => {
-    // Pre-load all images
-    const allImgs = {}; // src → p5 image
-    const allSrcs = [];
-    events.forEach(ev => {
-      ev.bad.forEach(s  => allSrcs.push(s));
-      ev.good.forEach(s => allSrcs.push(s));
-    });
+  annotateTints(tree);
+  const totalDepth = tree.maxDepth || 4;
+  const allSrcs    = collectSrcs(tree);
 
+  const sketch = p => {
+    const allImgs = {};
     let W, H;
 
     p.preload = () => {
@@ -277,108 +267,147 @@ function startSketch(events) {
       p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
       p.textFont('Courier New');
-      p.noLoop();
     };
 
     p.draw = () => {
-      p.background(255);
+      p.background(245, 240, 232);
       leafNodes = [];
 
       drawBrainOutline(p, W, H);
 
-      if (!events.length) return;
-
-      const trunkLen   = H * CONFIG.trunkRatio;
-      const n          = events.length;
-
-      // Fan event branches out from trunk tip
-      // Total spread angle based on number of events
-      const totalSpread = Math.min(n * 18, 140);
-      const step        = n > 1 ? totalSpread / (n - 1) : 0;
-      const startAngle  = -totalSpread / 2;
+      const trunkLen = H * CONFIG.trunkRatio;
+      const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
 
       p.push();
       p.translate(W / 2, H - 10);
 
       // Trunk
-      p.stroke(195, 182, 170);
+      p.stroke(...CONFIG.neutralColor);
       p.strokeWeight(5.5);
       p.line(0, 0, 0, -trunkLen);
       p.translate(0, -trunkLen);
 
-      events.forEach((ev, i) => {
-        const angle = startAngle + i * step;
-        const evLen = trunkLen * CONFIG.eventDecay;
+      // Draw root children fanned out
+      const children = tree.children || [];
+      const n        = children.length;
+      const spread   = Math.min(n * CONFIG.spreadBase, 150);
+      const step     = n > 1 ? spread / (n - 1) : 0;
+      const start    = -spread / 2;
+
+      children.forEach((child, i) => {
+        const angle  = start + i * step + sway;
+        const brLen  = trunkLen * CONFIG.branchDecay;
         p.push();
         p.rotate(angle);
-        drawEventBranch(p, ev, evLen, allImgs, W, H);
+        drawNode(p, child, brLen, 1, totalDepth, allImgs, W, H);
         p.pop();
       });
 
       p.pop();
     };
 
-    // ── event branch: neutral colour, label, then splits red/blue ─────────
-    function drawEventBranch(p, ev, len, allImgs, W, H) {
-      // Neutral shared branch
-      p.stroke(175, 162, 150);
-      p.strokeWeight(3);
+    // ── recursive node drawing ─────────────────────────────────────────────
+    // depth: how deep we are (1 = first level off trunk)
+    // totalDepth: total depth of entire tree (for colour interpolation)
+    function drawNode(p, node, len, depth, totalDepth, allImgs, W, H) {
+      const hasChildren = node.children && node.children.length > 0;
+      const hasBad      = node.bad  && node.bad.length  > 0;
+      const hasGood     = node.good && node.good.length > 0;
+
+      // Colour: interpolate from neutral (depth 0) toward red/blue (full depth)
+      // t goes 0→1 as depth increases relative to total tree depth
+      const t     = Math.min(depth / totalDepth, 1);
+      const tint  = node.tint || 0; // -1=bad, 1=good, 0=mixed
+      const nr    = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
+      const tr    = tint < 0 ? CONFIG.badColor[0]  : tint > 0 ? CONFIG.goodColor[0]  : nr;
+      const tg    = tint < 0 ? CONFIG.badColor[1]  : tint > 0 ? CONFIG.goodColor[1]  : ng;
+      const tb    = tint < 0 ? CONFIG.badColor[2]  : tint > 0 ? CONFIG.goodColor[2]  : nb;
+      const r     = nr + (tr - nr) * t;
+      const g     = ng + (tg - ng) * t;
+      const b     = nb + (tb - nb) * t;
+      const alpha = Math.max(210 - depth * 18, 80);
+      const sw    = Math.max(4 - depth * 0.45, 0.7);
+
+      p.stroke(r, g, b, alpha);
+      p.strokeWeight(sw);
       p.line(0, 0, 0, -len);
 
-      // Label along the shared branch — drawn at midpoint, rotated with branch
-      if (ev.event) {
+      // Label alongside the branch
+      if (node.label) {
         p.push();
-        p.translate(0, -len * 0.5);
-        // rotate text to read left-to-right regardless of branch angle
-        const xf  = p.drawingContext.getTransform();
-        const ang = Math.atan2(xf.b, xf.a) * (180 / Math.PI);
-        p.rotate(-ang); // counter-rotate to keep text upright
-
         p.noStroke();
-        p.fill(100, 90, 80, 200);
-        p.textSize(9);
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.text(ev.event, 0, -4);
+        // label colour also tinted
+        p.fill(r * 0.75, g * 0.75, b * 0.75, 200 - depth * 12);
+        p.textSize(Math.max(9 - depth * 0.4, 7));
+        p.textAlign(p.LEFT, p.CENTER);
+        p.translate(7, -len * 0.5);
+        p.text(node.label, 0, 0);
         p.pop();
       }
 
       p.translate(0, -len);
 
-      const subLen = len * CONFIG.leafDecay;
+      const childLen = len * CONFIG.branchDecay;
+      const spread   = CONFIG.spreadBase * Math.pow(CONFIG.spreadDecay, depth);
 
-      // Bad sub-branches (red) — fan left
-      if (ev.bad.length > 0) {
-        const badAngles = fanAngles(ev.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
-        ev.bad.forEach((src, i) => {
+      // ── draw sub-branches (children) ──────────────────────────────────
+      if (hasChildren) {
+        const n     = node.children.length;
+        const total = Math.min(n * spread, 120);
+        const step  = n > 1 ? total / (n - 1) : 0;
+        const start = -total / 2;
+
+        node.children.forEach((child, i) => {
+          const angle = start + i * step;
           p.push();
-          p.rotate(badAngles[i]);
-          drawLeafBranch(p, src, allImgs[src], subLen, 'bad', W, H);
+          p.rotate(angle);
+          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, W, H);
           p.pop();
         });
       }
 
-      // Good sub-branches (blue) — fan right
-      if (ev.good.length > 0) {
-        const goodAngles = fanAngles(ev.good.length, CONFIG.splitAngle, CONFIG.subAngle);
-        ev.good.forEach((src, i) => {
-          p.push();
-          p.rotate(goodAngles[i]);
-          drawLeafBranch(p, src, allImgs[src], subLen, 'good', W, H);
-          p.pop();
-        });
+      // ── draw bad/good leaf images ──────────────────────────────────────
+      if (hasBad || hasGood) {
+        const leafLen = len * CONFIG.branchDecay * 0.85;
+
+        if (hasBad) {
+          const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
+          node.bad.forEach((f, i) => {
+            const src = `${ROOT_FOLDER}/${node.path}/${f}`;
+            p.push();
+            p.rotate(angles[i]);
+            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H);
+            p.pop();
+          });
+        }
+
+        if (hasGood) {
+          const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
+          node.good.forEach((f, i) => {
+            const src = `${ROOT_FOLDER}/${node.path}/${f}`;
+            p.push();
+            p.rotate(angles[i]);
+            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H);
+            p.pop();
+          });
+        }
       }
     }
 
-    // ── single leaf branch ending in an illustration ───────────────────────
-    function drawLeafBranch(p, src, img, len, side, W, H) {
-      const isBad = side === 'bad';
-      p.stroke(isBad ? p.color(185, 45, 45, 180) : p.color(28, 92, 175, 180));
-      p.strokeWeight(1.4);
+    // ── leaf: coloured branch ending in illustration ───────────────────────
+    function drawLeaf(p, src, img, len, side, depth, W, H) {
+      const isBad  = side === 'bad';
+      const col    = isBad ? CONFIG.badColor : CONFIG.goodColor;
+      const alpha  = Math.max(190 - depth * 15, 90);
+      const sw     = Math.max(1.6 - depth * 0.1, 0.6);
+
+      p.stroke(...col, alpha);
+      p.strokeWeight(sw);
       p.line(0, 0, 0, -len);
       p.translate(0, -len);
 
-      const nodeSize = Math.max(Math.min(W, H) * 0.07, 40);
-      const r = nodeSize / 2;
+      const nodeSize = Math.max(Math.min(W, H) * 0.065 - depth * 4, 28);
+      const r        = nodeSize / 2;
 
       const xf = p.drawingContext.getTransform();
       const wx = xf.e;
@@ -390,15 +419,14 @@ function startSketch(events) {
       if (img) {
         p.image(img, 0, 0, nodeSize, nodeSize);
       } else {
-        p.fill(isBad ? p.color(185,45,45,100) : p.color(28,92,175,100));
+        p.fill(...col, 110);
         p.ellipse(0, 0, nodeSize * 0.5, nodeSize * 0.5);
       }
 
       leafNodes.push({ x: wx, y: wy, r, src });
     }
 
-    // ── helpers ───────────────────────────────────────────────────────────
-    // Returns an array of angles to fan `n` branches around a centre angle
+    // ── fan angles ────────────────────────────────────────────────────────
     function fanAngles(n, centre, spread) {
       if (n === 1) return [centre];
       const half = (spread * (n - 1)) / 2;
@@ -408,10 +436,10 @@ function startSketch(events) {
     // ── brain outline ─────────────────────────────────────────────────────
     function drawBrainOutline(p, W, H) {
       p.noFill();
-      p.stroke(235, 231, 227);
-      p.strokeWeight(0.8);
-      const cx = W / 2;
-      const lw = Math.min(W * 0.41, 315);
+      p.stroke(195, 182, 165);
+      p.strokeWeight(1.2);
+      const cx   = W / 2;
+      const lw   = Math.min(W * 0.41, 315);
       const topY = H * 0.05;
       const botY = H - 10;
 
@@ -427,8 +455,8 @@ function startSketch(events) {
       p.bezierVertex(cx + lw*0.62, topY, cx + lw*0.18, topY*0.75, cx + 12, topY + H*0.13);
       p.endShape();
 
-      p.stroke(243, 240, 237);
-      p.strokeWeight(0.5);
+      p.stroke(210, 198, 180);
+      p.strokeWeight(0.7);
       p.line(cx - lw*0.52, topY + H*0.11, cx - lw*0.72, H*0.44);
       p.line(cx - lw*0.23, topY + H*0.08, cx - lw*0.33, H*0.38);
       p.line(cx + lw*0.52, topY + H*0.11, cx + lw*0.72, H*0.44);
@@ -447,12 +475,15 @@ function setupInteraction() {
   wrap.addEventListener('click', e => {
     const canvas = wrap.querySelector('canvas');
     if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx     = (e.clientX - rect.left) * scaleX;
+    const my     = (e.clientY - rect.top)  * scaleY;
+
     for (const node of leafNodes) {
       const dx = mx - node.x, dy = my - node.y;
-      if (Math.sqrt(dx*dx + dy*dy) <= node.r + 8 && node.src) {
+      if (Math.sqrt(dx*dx + dy*dy) <= node.r + 10 && node.src) {
         openLightbox(node.src);
         return;
       }
@@ -462,12 +493,14 @@ function setupInteraction() {
   wrap.addEventListener('mousemove', e => {
     const canvas = wrap.querySelector('canvas');
     if (!canvas) return;
-    const rect = canvas.getBoundingClientRect();
-    const mx = e.clientX - rect.left;
-    const my = e.clientY - rect.top;
-    const hit = leafNodes.some(n => {
+    const rect   = canvas.getBoundingClientRect();
+    const scaleX = canvas.width  / rect.width;
+    const scaleY = canvas.height / rect.height;
+    const mx     = (e.clientX - rect.left) * scaleX;
+    const my     = (e.clientY - rect.top)  * scaleY;
+    const hit    = leafNodes.some(n => {
       const dx = mx - n.x, dy = my - n.y;
-      return Math.sqrt(dx*dx+dy*dy) <= n.r + 8 && n.src;
+      return Math.sqrt(dx*dx+dy*dy) <= n.r + 10 && n.src;
     });
     canvas.style.cursor = hit ? 'zoom-in' : 'default';
   });
