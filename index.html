@@ -49,6 +49,13 @@ header {
   max-height: 88vh;
   animation: lbIn 0.18s ease;
 }
+.lightbox-tint {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.22;
+  mix-blend-mode: multiply;
+}
 @keyframes lbIn {
   from { opacity: 0; transform: scale(0.95); }
   to   { opacity: 1; transform: scale(1); }
@@ -335,7 +342,7 @@ function startSketch(tree) {
       if (node.label) {
         p.push();
         p.noStroke();
-        p.fill(r * 0.75, g * 0.75, b * 0.75, 200 - depth * 12);
+        p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Courier New');
         p.textSize(Math.max(9 - depth * 0.4, 7));
         p.textAlign(p.CENTER, p.BOTTOM);
@@ -417,13 +424,16 @@ function startSketch(tree) {
       p.imageMode(p.CENTER);
 
       if (img) {
+        // draw image then overlay a semi-transparent colour tint
         p.image(img, 0, 0, nodeSize, nodeSize);
+        p.fill(...col, 80);
+        p.rect(-r, -r, nodeSize, nodeSize);
       } else {
         p.fill(...col, 110);
         p.ellipse(0, 0, nodeSize * 0.5, nodeSize * 0.5);
       }
 
-      leafNodes.push({ x: wx, y: wy, r, src });
+      leafNodes.push({ x: wx, y: wy, r, src, side });
     }
 
     // ── fan angles ────────────────────────────────────────────────────────
@@ -485,7 +495,7 @@ function setupInteraction() {
     for (const node of leafNodes) {
       const dx = mx - node.x, dy = my - node.y;
       if (Math.sqrt(dx*dx + dy*dy) <= node.r + 10 && node.src) {
-        openLightbox(node.src);
+        openLightbox(node.src, node.side);
         return;
       }
     }
@@ -508,7 +518,7 @@ function setupInteraction() {
 }
 
 // ── LIGHTBOX ───────────────────────────────────────────────────────────────
-function openLightbox(src) {
+function openLightbox(src, side) {
   document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
 }
