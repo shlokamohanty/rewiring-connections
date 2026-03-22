@@ -8,7 +8,7 @@
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
-  background: #f5f0e8;
+  background: #0a0a0a;
   overflow: hidden;
   height: 100vh;
   width: 100vw;
@@ -18,15 +18,14 @@ header {
   top: 0; left: 0; right: 0;
   z-index: 10;
   padding: 20px 36px 14px;
-  background: rgba(245,240,232,0.95);
+  background: rgba(10,10,10,0.95);
 }
 .title {
   font-family: 'Courier New', Courier, monospace;
   font-size: 17px;
   font-weight: 400;
   letter-spacing: 0.06em;
-  color: #111;
-  text-transform: none;
+  color: #fff;
 }
 #canvas-wrap {
   position: fixed;
@@ -38,7 +37,7 @@ header {
   position: fixed;
   inset: 0;
   z-index: 100;
-  background: rgba(255,255,255,0.96);
+  background: rgba(10,10,10,0.96);
   align-items: center;
   justify-content: center;
   cursor: zoom-out;
@@ -67,7 +66,7 @@ header {
   border: none;
   font-size: 28px;
   font-weight: 200;
-  color: #bbb;
+  color: #666;
   cursor: pointer;
   line-height: 1;
   transition: color 0.15s;
@@ -239,7 +238,7 @@ const CONFIG = {
   spreadDecay:   0.80,  // spread shrinks at deeper levels
   splitAngle:    26,    // angle for bad/good split
   subAngle:      20,    // angle between multiple bad or good images
-  neutralColor:  [175, 162, 150],
+  neutralColor:  [120, 120, 120],
   badColor:      [185, 45, 45],
   goodColor:     [28, 92, 175],
 };
@@ -270,7 +269,7 @@ function startSketch(tree) {
     };
 
     p.draw = () => {
-      p.background(245, 240, 232);
+      p.background(10, 10, 10);
       leafNodes = [];
 
       drawBrainOutline(p, W, H);
@@ -332,16 +331,17 @@ function startSketch(tree) {
       p.strokeWeight(sw);
       p.line(0, 0, 0, -len);
 
-      // Label alongside the branch
+      // Label along the branch line — rotated -90° so it reads along the branch
       if (node.label) {
         p.push();
         p.noStroke();
-        // label colour also tinted
         p.fill(r * 0.75, g * 0.75, b * 0.75, 200 - depth * 12);
+        p.textFont('Courier New');
         p.textSize(Math.max(9 - depth * 0.4, 7));
-        p.textAlign(p.LEFT, p.CENTER);
-        p.translate(7, -len * 0.5);
-        p.text(node.label, 0, 0);
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.translate(0, -len * 0.5);
+        p.rotate(-90);  // rotate so text runs along the branch direction
+        p.text(node.label, 0, -4);
         p.pop();
       }
 
@@ -436,31 +436,32 @@ function startSketch(tree) {
     // ── brain outline ─────────────────────────────────────────────────────
     function drawBrainOutline(p, W, H) {
       p.noFill();
-      p.stroke(195, 182, 165);
-      p.strokeWeight(1.2);
+      p.stroke(60, 60, 60);
+      p.strokeWeight(3);
       const cx   = W / 2;
       const lw   = Math.min(W * 0.41, 315);
       const topY = H * 0.05;
       const botY = H - 10;
 
+      // left lobe — jagged with extra vertices
       p.beginShape();
       p.vertex(cx - 12, botY);
-      p.bezierVertex(cx - lw*0.9, botY-16, cx - lw*1.08, H*0.48, cx - lw*0.88, topY + H*0.18);
-      p.bezierVertex(cx - lw*0.62, topY, cx - lw*0.18, topY*0.75, cx - 12, topY + H*0.13);
+      p.bezierVertex(cx - lw*0.5, botY + 8, cx - lw*0.85, botY - 30, cx - lw*0.95, H*0.72);
+      p.bezierVertex(cx - lw*1.12, H*0.58, cx - lw*0.98, H*0.42, cx - lw*1.05, H*0.32);
+      p.bezierVertex(cx - lw*1.1,  H*0.22, cx - lw*0.95, topY + H*0.12, cx - lw*0.82, topY + H*0.08);
+      p.bezierVertex(cx - lw*0.65, topY - 4, cx - lw*0.42, topY + 2, cx - lw*0.28, topY + H*0.04);
+      p.bezierVertex(cx - lw*0.15, topY + H*0.06, cx - lw*0.05, topY + H*0.1, cx - 12, topY + H*0.13);
       p.endShape();
 
+      // right lobe — jagged with extra vertices
       p.beginShape();
       p.vertex(cx + 12, botY);
-      p.bezierVertex(cx + lw*0.9, botY-16, cx + lw*1.08, H*0.48, cx + lw*0.88, topY + H*0.18);
-      p.bezierVertex(cx + lw*0.62, topY, cx + lw*0.18, topY*0.75, cx + 12, topY + H*0.13);
+      p.bezierVertex(cx + lw*0.5, botY + 8, cx + lw*0.85, botY - 30, cx + lw*0.95, H*0.72);
+      p.bezierVertex(cx + lw*1.12, H*0.58, cx + lw*0.98, H*0.42, cx + lw*1.05, H*0.32);
+      p.bezierVertex(cx + lw*1.1,  H*0.22, cx + lw*0.95, topY + H*0.12, cx + lw*0.82, topY + H*0.08);
+      p.bezierVertex(cx + lw*0.65, topY - 4, cx + lw*0.42, topY + 2, cx + lw*0.28, topY + H*0.04);
+      p.bezierVertex(cx + lw*0.15, topY + H*0.06, cx + lw*0.05, topY + H*0.1, cx + 12, topY + H*0.13);
       p.endShape();
-
-      p.stroke(210, 198, 180);
-      p.strokeWeight(0.7);
-      p.line(cx - lw*0.52, topY + H*0.11, cx - lw*0.72, H*0.44);
-      p.line(cx - lw*0.23, topY + H*0.08, cx - lw*0.33, H*0.38);
-      p.line(cx + lw*0.52, topY + H*0.11, cx + lw*0.72, H*0.44);
-      p.line(cx + lw*0.23, topY + H*0.08, cx + lw*0.33, H*0.38);
     }
   };
 
