@@ -6,6 +6,30 @@
 <title>Rewiring Connections</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 <style>
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: #0a0a0a;
@@ -24,7 +48,7 @@ header {
   gap: clamp(16px, 2.5vw, 32px);
 }
 .title {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(13px, 1.4vw, 17px);
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -35,7 +59,7 @@ header {
   gap: clamp(12px, 1.5vw, 20px);
 }
 .legend-item {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 0.9vw, 11px);
   letter-spacing: 0.08em;
   opacity: 0.85;
@@ -47,7 +71,10 @@ header {
   right: 0;
   bottom: 0;
   z-index: 1;
+  transition: left 0.35s ease;
 }
+#canvas-wrap.collapsed { left: 0; }
+
 #sidebar {
   position: fixed;
   top: 54px;
@@ -59,9 +86,33 @@ header {
   border-right: 0.5px solid #1e1e1e;
   z-index: 2;
   background: #0a0a0a;
+  transition: transform 0.35s ease;
 }
+#sidebar.collapsed { transform: translateX(-100%); }
+
+#toggle-sidebar {
+  position: fixed;
+  top: 50%;
+  left: clamp(200px, 22vw, 320px);
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: #0a0a0a;
+  border: 0.5px solid #2a2a2a;
+  color: #555;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 5px;
+  line-height: 1;
+  border-radius: 2px;
+  transition: left 0.35s ease, color 0.15s, border-color 0.15s;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.1em;
+}
+#toggle-sidebar:hover { color: #aaa; border-color: #555; }
+#toggle-sidebar.collapsed { left: 0; transform: translate(-50%, -50%); }
 #sidebar p {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 1vw, 11px);
   line-height: 1.9;
   color: #888;
@@ -118,7 +169,7 @@ header {
   cursor: pointer;
   line-height: 1;
   transition: color 0.15s;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
 }
 .lightbox-close:hover { color: #333; }
 #error-banner {
@@ -132,7 +183,7 @@ header {
   border-radius: 3px;
   padding: 10px 22px;
   font-size: 11px;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   color: #a06040;
   z-index: 200;
   white-space: nowrap;
@@ -154,6 +205,7 @@ header {
   <p class="bullet">* If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
   <p class="bullet">* I'll mark if I feel a physical sensation as I sketch: a wave symbol for calming/pleasant feelings, a zigzag for knots/shivers/uncomfortable feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
+<button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
 
 <div class="lightbox" id="lightbox">
@@ -233,6 +285,20 @@ const ROOT_FOLDER = 'illustrations';
 
 let leafNodes = [];
 let myP5 = null;
+
+// ── SIDEBAR TOGGLE ─────────────────────────────────────────────────────────
+const toggleBtn  = document.getElementById('toggle-sidebar');
+const sidebar    = document.getElementById('sidebar');
+const canvasWrap = document.getElementById('canvas-wrap');
+let sidebarOpen  = true;
+
+toggleBtn.addEventListener('click', () => {
+  sidebarOpen = !sidebarOpen;
+  sidebar.classList.toggle('collapsed', !sidebarOpen);
+  canvasWrap.classList.toggle('collapsed', !sidebarOpen);
+  toggleBtn.classList.toggle('collapsed', !sidebarOpen);
+  toggleBtn.textContent = sidebarOpen ? 'hide' : 'show';
+});
 
 // ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
 // In manifest.json, each bad/good entry can have a "sensation" field:
@@ -346,7 +412,7 @@ function startSketch(tree) {
       H = wrap.offsetHeight;
       p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
-      p.textFont('Courier New');
+      p.textFont('Space Mono');
     };
 
     p.windowResized = () => {
@@ -448,7 +514,7 @@ function startSketch(tree) {
         p.push();
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
-        p.textFont('Courier New');
+        p.textFont('Space Mono');
         p.textSize(Math.max(9 - depth * 0.4, 7));
         p.textAlign(p.CENTER, p.BOTTOM);
         p.translate(0, -len * 0.5);
