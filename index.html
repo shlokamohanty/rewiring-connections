@@ -6,6 +6,30 @@
 <title>Rewiring Connections</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 <style>
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body {
   background: #0a0a0a;
@@ -17,14 +41,14 @@ header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 10;
-  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px);
+  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px) 16px;
   background: rgba(10,10,10,0.95);
   display: flex;
   align-items: baseline;
   gap: clamp(16px, 2.5vw, 32px);
 }
 .title {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(13px, 1.4vw, 17px);
   font-weight: 400;
   letter-spacing: 0.06em;
@@ -35,7 +59,7 @@ header {
   gap: clamp(12px, 1.5vw, 20px);
 }
 .legend-item {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 0.9vw, 11px);
   letter-spacing: 0.08em;
   opacity: 0.85;
@@ -47,7 +71,14 @@ header {
   right: 0;
   bottom: 0;
   z-index: 1;
+  transition: left 0.35s ease;
+  border-left: 0.5px solid #1e1e1e;
 }
+#canvas-wrap.collapsed {
+  left: 0;
+  border-left: none;
+}
+
 #sidebar {
   position: fixed;
   top: 54px;
@@ -55,22 +86,50 @@ header {
   width: clamp(200px, 22vw, 320px);
   bottom: 0;
   overflow-y: auto;
-  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px;
+  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px 16px;
   border-right: 0.5px solid #1e1e1e;
   z-index: 2;
   background: #0a0a0a;
+  transition: transform 0.35s ease;
 }
+#sidebar.collapsed { transform: translateX(-100%); }
+
+#toggle-sidebar {
+  position: fixed;
+  top: 50%;
+  left: clamp(200px, 22vw, 320px);
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: #0a0a0a;
+  border: 0.5px solid #2a2a2a;
+  color: #555;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 5px;
+  line-height: 1;
+  border-radius: 2px;
+  transition: left 0.35s ease, color 0.15s, border-color 0.15s;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.1em;
+}
+#toggle-sidebar:hover { color: #aaa; border-color: #555; }
+#toggle-sidebar.collapsed {
+  left: 12px;
+  transform: translateY(-50%);
+}
+
 #sidebar p {
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 1vw, 11px);
   line-height: 1.9;
-  color: #888;
+  color: #b0b0b0;
   letter-spacing: 0.02em;
   margin-bottom: clamp(10px, 1.4vh, 16px);
 }
 #sidebar p.bullet {
   padding-left: 12px;
-  color: #666;
+  color: #b0b0b0;
   border-left: 1px solid #2a2a2a;
 }
 .lightbox {
@@ -89,13 +148,6 @@ header {
   max-width: min(88vw, 720px);
   max-height: 88vh;
   animation: lbIn 0.18s ease;
-}
-.lightbox-tint {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0.22;
-  mix-blend-mode: multiply;
 }
 @keyframes lbIn {
   from { opacity: 0; transform: scale(0.95); }
@@ -118,22 +170,22 @@ header {
   cursor: pointer;
   line-height: 1;
   transition: color 0.15s;
-  font-family: 'Courier New', Courier, monospace;
+  font-family: 'Space Mono', monospace;
 }
-.lightbox-close:hover { color: #333; }
+.lightbox-close:hover { color: #ccc; }
 #error-banner {
   display: none;
   position: fixed;
   bottom: 24px;
   left: 50%;
   transform: translateX(-50%);
-  background: #fff9f5;
-  border: 0.5px solid #e8d0c0;
+  background: #111;
+  border: 0.5px solid #333;
   border-radius: 3px;
   padding: 10px 22px;
   font-size: 11px;
-  font-family: 'Courier New', Courier, monospace;
-  color: #a06040;
+  font-family: 'Space Mono', monospace;
+  color: #888;
   z-index: 200;
   white-space: nowrap;
 }
@@ -144,16 +196,18 @@ header {
 <header>
   <p class="title">Rewiring Connections</p>
   <div class="legend">
-    <span class="legend-item" style="color:#FFD600;">&#9679; high activity</span>
+    <span class="legend-item" style="color:#fcd494;">&#9679; high activity</span>
     <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
   </div>
 </header>
+
 <div id="sidebar">
   <p>I sometimes reflect on my childhood experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my childhood.</p>
   <p>Every day, the intent is to sketch a new memory from my childhood. The sketch could be mixed media or just as is.</p>
-  <p class="bullet">* If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
-  <p class="bullet">* I'll mark if I feel a physical sensation as I sketch: a wave symbol for calming/pleasant feelings, a zigzag for knots/shivers/uncomfortable feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+  <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
+  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low intensity feelings, a zigzag for strong/high intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
+<button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
 
 <div class="lightbox" id="lightbox">
@@ -191,14 +245,13 @@ header {
 //    Add "sensation" to any bad/good entry:
 //
 //      no sensation field     → no strong feeling
-//                               → LOWEST opacity (most faded neuron)
+//                               → LOWEST opacity (0.50)
 //
-//      "sensation": "wave"    → calming / medium emotion
-//                               → MID opacity
+//      "sensation": "wave"    → weak / low intensity feeling
+//                               → MID opacity (0.65)
 //
-//      "sensation": "zigzag"  → strong feeling — really happy, really
-//                               uncomfortable, intense, visceral
-//                               → FULL opacity (most visible neuron)
+//      "sensation": "zigzag"  → strong / high intensity feeling
+//                               → HIGHEST opacity (0.85)
 //
 // 4. FULL EXAMPLE
 // {
@@ -230,28 +283,46 @@ header {
 // }
 
 const ROOT_FOLDER = 'illustrations';
-
 let leafNodes = [];
 let myP5 = null;
 
-// ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
-// In manifest.json, each bad/good entry can have a "sensation" field:
-//
-//   no sensation field  → no strong feeling → LOWEST opacity (0.30)
-//   "sensation": "wave" → calming / medium emotion → MID opacity (0.65)
-//   "sensation": "zigzag" → strong / uncomfortable / intense → FULL opacity (1.0)
+// ── SIDEBAR TOGGLE ─────────────────────────────────────────────────────────
+const toggleBtn  = document.getElementById('toggle-sidebar');
+const sidebar    = document.getElementById('sidebar');
+const canvasWrap = document.getElementById('canvas-wrap');
+let sidebarOpen  = true;
 
+const SIDEBAR_W = () => parseFloat(getComputedStyle(sidebar).width);
+
+toggleBtn.addEventListener('click', () => {
+  sidebarOpen = !sidebarOpen;
+  sidebar.classList.toggle('collapsed', !sidebarOpen);
+  canvasWrap.classList.toggle('collapsed', !sidebarOpen);
+  toggleBtn.classList.toggle('collapsed', !sidebarOpen);
+  toggleBtn.textContent = sidebarOpen ? 'hide' : 'show';
+
+  // After transition completes, resize canvas to fill new space
+  setTimeout(() => {
+    if (myP5) myP5.windowResized();
+  }, 370);
+});
+
+// ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
+// no sensation  → 0.50 (default, no strong feeling)
+// "wave"        → 0.65 (weak / low intensity)
+// "zigzag"      → 0.85 (strong / high intensity)
 function sensationOpacity(sensation) {
   if (sensation === 'zigzag') return 0.85;
   if (sensation === 'wave')   return 0.65;
-  return 0.50; // no sensation = barely visible
+  return 0.50;
 }
 
-// Normalise a bad/good entry to { file, sensation }
 function normaliseEntry(entry) {
   if (typeof entry === 'string') return { file: entry, sensation: null };
   return { file: entry.file || entry, sensation: entry.sensation || null };
 }
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
 async function boot() {
   let tree = null;
   try {
@@ -260,7 +331,7 @@ async function boot() {
   } catch (_) {}
 
   if (!tree) {
-    showError('manifest.json not found in illustrations/ folder. See comments in source for format.');
+    showError('manifest.json not found in illustrations/ folder.');
     tree = { children: [] };
   }
 
@@ -273,9 +344,7 @@ function showError(msg) {
   el.style.display = 'block';
 }
 
-
-
-// ── PRE-LOAD ALL IMAGES FROM TREE ──────────────────────────────────────────
+// ── TREE HELPERS ───────────────────────────────────────────────────────────
 function collectSrcs(node, srcs = []) {
   if (node.bad)  node.bad.forEach(e  => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
   if (node.good) node.good.forEach(e => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
@@ -283,15 +352,11 @@ function collectSrcs(node, srcs = []) {
   return srcs;
 }
 
-// Walk tree and annotate each node with a `tint` value:
-//   -1 = only bad leaves below,  1 = only good,  0 = mixed or none
-// Also annotate `maxDepth` — how many levels below this node.
 function annotateTints(node) {
   const hasBad  = node.bad  && node.bad.length  > 0;
   const hasGood = node.good && node.good.length > 0;
 
   if (!node.children || node.children.length === 0) {
-    // leaf node
     node.tint     = hasBad && !hasGood ? -1 : !hasBad && hasGood ? 1 : 0;
     node.maxDepth = 0;
     return;
@@ -303,7 +368,6 @@ function annotateTints(node) {
   const allBad     = childTints.every(t => t === -1);
   const allGood    = childTints.every(t => t ===  1);
 
-  // own bad/good images also count
   if (hasBad)  childTints.push(-1);
   if (hasGood) childTints.push( 1);
 
@@ -311,19 +375,20 @@ function annotateTints(node) {
   node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
 }
 
-// ── SKETCH ─────────────────────────────────────────────────────────────────
+// ── SKETCH CONFIG ──────────────────────────────────────────────────────────
 const CONFIG = {
-  trunkRatio:    0.22,  // trunk as fraction of canvas H
-  branchDecay:   0.72,  // length multiplier per tree level
-  spreadBase:    38,    // degrees of spread per child at top level
-  spreadDecay:   0.80,  // spread shrinks at deeper levels
-  splitAngle:    26,    // angle for bad/good split
-  subAngle:      20,    // angle between multiple bad or good images
-  neutralColor:  [120, 120, 120],
-  badColor:      [255, 214, 0],
-  goodColor:     [75, 163, 195],
+  trunkRatio:   0.22,
+  branchDecay:  0.72,
+  spreadBase:   38,
+  spreadDecay:  0.80,
+  splitAngle:   26,
+  subAngle:     20,
+  neutralColor: [120, 120, 120],
+  badColor:     [252, 212, 148],
+  goodColor:    [75, 163, 195],
 };
 
+// ── SKETCH ─────────────────────────────────────────────────────────────────
 function startSketch(tree) {
   if (myP5) { myP5.remove(); myP5 = null; }
   leafNodes = [];
@@ -346,7 +411,7 @@ function startSketch(tree) {
       H = wrap.offsetHeight;
       p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
-      p.textFont('Courier New');
+      p.textFont('Space Mono');
     };
 
     p.windowResized = () => {
@@ -366,9 +431,9 @@ function startSketch(tree) {
       const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
 
       p.push();
+      // always centred on the canvas-wrap, which resizes on toggle
       p.translate(W / 2, H - 10);
 
-      // Trunk — curvy bezier
       p.stroke(...CONFIG.neutralColor);
       p.strokeWeight(5.5);
       p.noFill();
@@ -379,21 +444,19 @@ function startSketch(tree) {
       p.endShape();
       p.translate(0, -trunkLen);
 
-      // Draw root children fanned out
       const children = tree.children || [];
       const n        = children.length;
       const spread   = Math.min(n * CONFIG.spreadBase, 150);
       const step     = n > 1 ? spread / (n - 1) : 0;
       const start    = -spread / 2;
 
-      // soma at trunk tip
       p.noStroke();
       p.fill(...CONFIG.neutralColor, 180);
       p.ellipse(0, 0, 10, 10);
 
       children.forEach((child, i) => {
-        const angle  = start + i * step + sway;
-        const brLen  = trunkLen * CONFIG.branchDecay;
+        const angle = start + i * step + sway;
+        const brLen = trunkLen * CONFIG.branchDecay;
         p.push();
         p.rotate(angle);
         drawNode(p, child, brLen, 1, totalDepth, allImgs, W, H);
@@ -403,52 +466,44 @@ function startSketch(tree) {
       p.pop();
     };
 
-    // ── recursive node drawing ─────────────────────────────────────────────
-    // depth: how deep we are (1 = first level off trunk)
-    // totalDepth: total depth of entire tree (for colour interpolation)
     function drawNode(p, node, len, depth, totalDepth, allImgs, W, H) {
       const hasChildren = node.children && node.children.length > 0;
       const hasBad      = node.bad  && node.bad.length  > 0;
       const hasGood     = node.good && node.good.length > 0;
 
-      // Colour: interpolate from neutral (depth 0) toward red/blue (full depth)
-      // t goes 0→1 as depth increases relative to total tree depth
-      const t     = Math.min(depth / totalDepth, 1);
-      const tint  = node.tint || 0; // -1=bad, 1=good, 0=mixed
-      const nr    = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
-      const tr    = tint < 0 ? CONFIG.badColor[0]  : tint > 0 ? CONFIG.goodColor[0]  : nr;
-      const tg    = tint < 0 ? CONFIG.badColor[1]  : tint > 0 ? CONFIG.goodColor[1]  : ng;
-      const tb    = tint < 0 ? CONFIG.badColor[2]  : tint > 0 ? CONFIG.goodColor[2]  : nb;
-      const r     = nr + (tr - nr) * t;
-      const g     = ng + (tg - ng) * t;
-      const b     = nb + (tb - nb) * t;
+      const t    = Math.min(depth / totalDepth, 1);
+      const tint = node.tint || 0;
+      const nr   = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
+      const tr   = tint < 0 ? CONFIG.badColor[0]  : tint > 0 ? CONFIG.goodColor[0]  : nr;
+      const tg   = tint < 0 ? CONFIG.badColor[1]  : tint > 0 ? CONFIG.goodColor[1]  : ng;
+      const tb   = tint < 0 ? CONFIG.badColor[2]  : tint > 0 ? CONFIG.goodColor[2]  : nb;
+      const r    = nr + (tr - nr) * t;
+      const g    = ng + (tg - ng) * t;
+      const b    = nb + (tb - nb) * t;
       const alpha = Math.max(210 - depth * 18, 80);
       const sw    = Math.max(4 - depth * 0.45, 0.7);
 
       p.stroke(r, g, b, alpha);
       p.strokeWeight(sw);
       p.noFill();
-      // curvy axon — control points wobble perpendicular to branch direction
-      const seed  = depth * 13.7 + (node.label ? node.label.charCodeAt(0) : 0);
-      const cx1   = p.noise(seed)       * len * 0.5 - len * 0.25;
-      const cx2   = p.noise(seed + 1.3) * len * 0.5 - len * 0.25;
+      const seed = depth * 13.7 + (node.label ? node.label.charCodeAt(0) : 0);
+      const cx1  = p.noise(seed)       * len * 0.5 - len * 0.25;
+      const cx2  = p.noise(seed + 1.3) * len * 0.5 - len * 0.25;
       p.beginShape();
       p.vertex(0, 0);
       p.bezierVertex(cx1, -len * 0.33, cx2, -len * 0.66, 0, -len);
       p.endShape();
 
-      // soma bulge at start of this branch
       p.noStroke();
       p.fill(r, g, b, alpha * 0.7);
       const somaR = Math.max(sw * 2.2, 2.5);
       p.ellipse(0, 0, somaR * 2, somaR * 2);
 
-      // Label along the branch line — rotated -90° so it reads along the branch
       if (node.label) {
         p.push();
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
-        p.textFont('Courier New');
+        p.textFont('Space Mono');
         p.textSize(Math.max(9 - depth * 0.4, 7));
         p.textAlign(p.CENTER, p.BOTTOM);
         p.translate(0, -len * 0.5);
@@ -462,45 +517,37 @@ function startSketch(tree) {
       const childLen = len * CONFIG.branchDecay;
       const spread   = CONFIG.spreadBase * Math.pow(CONFIG.spreadDecay, depth);
 
-      // ── draw sub-branches (children) ──────────────────────────────────
       if (hasChildren) {
         const n     = node.children.length;
         const total = Math.min(n * spread, 120);
         const step  = n > 1 ? total / (n - 1) : 0;
         const start = -total / 2;
-
         node.children.forEach((child, i) => {
-          const angle = start + i * step;
           p.push();
-          p.rotate(angle);
+          p.rotate(start + i * step);
           drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, W, H);
           p.pop();
         });
       }
 
-      // ── draw bad/good leaf images ──────────────────────────────────────
       if (hasBad || hasGood) {
         const leafLen = len * CONFIG.branchDecay * 0.85;
-
         if (hasBad) {
           const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
           node.bad.forEach((e, i) => {
             const { file, sensation } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
-            p.push();
-            p.rotate(angles[i]);
+            p.push(); p.rotate(angles[i]);
             drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, sensation);
             p.pop();
           });
         }
-
         if (hasGood) {
           const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
           node.good.forEach((e, i) => {
             const { file, sensation } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
-            p.push();
-            p.rotate(angles[i]);
+            p.push(); p.rotate(angles[i]);
             drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, sensation);
             p.pop();
           });
@@ -508,15 +555,13 @@ function startSketch(tree) {
       }
     }
 
-    // ── leaf: curvy axon strand ending in circular illustration node ──────
     function drawLeaf(p, src, img, len, side, depth, W, H, sensation) {
       const isBad   = side === 'bad';
       const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
-      const opacity = sensationOpacity(sensation);  // 0.52 / 0.75 / 1.0
+      const opacity = sensationOpacity(sensation);
       const alpha   = Math.max(190 - depth * 15, 90) * opacity;
       const sw      = Math.max(1.6 - depth * 0.1, 0.6);
 
-      // curvy axon
       p.stroke(...col, alpha);
       p.strokeWeight(sw);
       p.noFill();
@@ -530,7 +575,6 @@ function startSketch(tree) {
 
       p.translate(0, -len);
 
-      // node size — circular like a synaptic terminal
       const nodeSize = Math.max(Math.min(W, H) * 0.065 - depth * 4, 28);
       const r        = nodeSize / 2;
 
@@ -542,10 +586,9 @@ function startSketch(tree) {
       p.imageMode(p.CENTER);
 
       if (img) {
-        const ctx = p.drawingContext;
+        const ctx   = p.drawingContext;
         const seed2 = src.length * 0.3 + depth;
 
-        // ── cell body — irregular organic blob ────────────────────────────
         p.noStroke();
         p.fill(...col, 12 * opacity);
         drawBlob(p, 0, 0, nodeSize * 1.6, nodeSize * 1.4, 8, seed2, 0.32);
@@ -556,20 +599,18 @@ function startSketch(tree) {
         p.strokeWeight(0.5);
         drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
 
-        // ── short dendrite stubs ──────────────────────────────────────────
         p.stroke(...col, 35 * opacity);
         p.strokeWeight(0.5);
-        const numDendrites = 5;
-        for (let d = 0; d < numDendrites; d++) {
-          const dAngle  = (d / numDendrites) * 360 + p.noise(seed2 + d) * 40;
-          const dLen    = nodeSize * (0.35 + p.noise(seed2 + d + 5) * 0.3);
-          const dRad    = nodeSize * 0.55;
-          const sx      = p.cos(dAngle) * dRad;
-          const sy      = p.sin(dAngle) * dRad;
-          const ex      = p.cos(dAngle) * (dRad + dLen);
-          const ey      = p.sin(dAngle) * (dRad + dLen);
-          const mx      = (sx + ex) / 2 + (p.noise(seed2 + d + 10) - 0.5) * dLen * 0.5;
-          const my2     = (sy + ey) / 2 + (p.noise(seed2 + d + 15) - 0.5) * dLen * 0.5;
+        for (let d = 0; d < 5; d++) {
+          const dAngle = (d / 5) * 360 + p.noise(seed2 + d) * 40;
+          const dLen   = nodeSize * (0.35 + p.noise(seed2 + d + 5) * 0.3);
+          const dRad   = nodeSize * 0.55;
+          const sx     = p.cos(dAngle) * dRad;
+          const sy     = p.sin(dAngle) * dRad;
+          const ex     = p.cos(dAngle) * (dRad + dLen);
+          const ey     = p.sin(dAngle) * (dRad + dLen);
+          const mx     = (sx + ex) / 2 + (p.noise(seed2 + d + 10) - 0.5) * dLen * 0.5;
+          const my2    = (sy + ey) / 2 + (p.noise(seed2 + d + 15) - 0.5) * dLen * 0.5;
           p.noFill();
           p.beginShape();
           p.vertex(sx, sy);
@@ -577,18 +618,16 @@ function startSketch(tree) {
           p.endShape();
         }
 
-        // ── nucleus — illustration clipped inside, opacity-aware ──────────
         const nucleusSize = nodeSize * 0.52;
-        const nr = nucleusSize / 2;
+        const nr2 = nucleusSize / 2;
         ctx.save();
         ctx.globalAlpha = opacity;
         ctx.beginPath();
-        ctx.arc(0, 0, nr, 0, Math.PI * 2);
+        ctx.arc(0, 0, nr2, 0, Math.PI * 2);
         ctx.clip();
         p.image(img, 0, 0, nucleusSize, nucleusSize);
         ctx.restore();
 
-        // nucleus envelope — double ring, subtle
         p.noFill();
         p.stroke(...col, 200 * opacity);
         p.strokeWeight(1);
@@ -598,7 +637,6 @@ function startSketch(tree) {
         p.ellipse(0, 0, nucleusSize + 4, nucleusSize + 4);
 
       } else {
-        // placeholder — organic blob + nucleus dot
         p.noStroke();
         p.fill(...col, 14);
         drawBlob(p, 0, 0, nodeSize * 1.5, nodeSize * 1.3, 7, depth * 3.1, 0.3);
@@ -611,35 +649,29 @@ function startSketch(tree) {
       leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side });
     }
 
-    // ── fan angles ────────────────────────────────────────────────────────
     function fanAngles(n, centre, spread) {
       if (n === 1) return [centre];
       const half = (spread * (n - 1)) / 2;
       return Array.from({ length: n }, (_, i) => centre - half + i * spread);
     }
 
-    // ── drawBlob: wobbly organic ellipse using noise-perturbed vertices ───
     function drawBlob(p, cx, cy, rw, rh, pts, seed, wobble) {
       p.beginShape();
       for (let i = 0; i <= pts; i++) {
-        const angle  = (i / pts) * 360;
-        const nVal   = p.noise(seed + i * 0.8) * 2 - 1;
-        const rx     = rw * 0.5 * (1 + nVal * wobble);
-        const ry     = rh * 0.5 * (1 + p.noise(seed + i * 0.8 + 100) * 2 - 1) * wobble + rh * 0.5;
-        const vx     = cx + p.cos(angle) * rx;
-        const vy     = cy + p.sin(angle) * (rh * 0.5 * (1 + nVal * wobble * 0.6));
-        i === 0 ? p.curveVertex(vx, vy) : p.curveVertex(vx, vy);
+        const angle = (i / pts) * 360;
+        const nVal  = p.noise(seed + i * 0.8) * 2 - 1;
+        const rx    = rw * 0.5 * (1 + nVal * wobble);
+        const vx    = cx + p.cos(angle) * rx;
+        const vy    = cy + p.sin(angle) * (rh * 0.5 * (1 + nVal * wobble * 0.6));
+        p.curveVertex(vx, vy);
       }
-      // close the shape
-      const angle0 = 0;
-      const nVal0  = p.noise(seed) * 2 - 1;
-      const vx0    = cx + p.cos(angle0) * rw * 0.5 * (1 + nVal0 * wobble);
-      const vy0    = cy + p.sin(angle0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6);
+      const nVal0 = p.noise(seed) * 2 - 1;
+      const vx0   = cx + p.cos(0) * rw * 0.5 * (1 + nVal0 * wobble);
+      const vy0   = cy + p.sin(0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6);
       p.curveVertex(vx0, vy0);
       p.endShape(p.CLOSE);
     }
 
-    // ── brain outline ─────────────────────────────────────────────────────
     function drawBrainOutline(p, W, H) {
       p.noFill();
       p.stroke(60, 60, 60);
@@ -649,22 +681,20 @@ function startSketch(tree) {
       const topY = H * 0.05;
       const botY = H - 10;
 
-      // left lobe — jagged with extra vertices
       p.beginShape();
       p.vertex(cx - 12, botY);
       p.bezierVertex(cx - lw*0.5, botY + 8, cx - lw*0.85, botY - 30, cx - lw*0.95, H*0.72);
       p.bezierVertex(cx - lw*1.12, H*0.58, cx - lw*0.98, H*0.42, cx - lw*1.05, H*0.32);
-      p.bezierVertex(cx - lw*1.1,  H*0.22, cx - lw*0.95, topY + H*0.12, cx - lw*0.82, topY + H*0.08);
+      p.bezierVertex(cx - lw*1.1, H*0.22, cx - lw*0.95, topY + H*0.12, cx - lw*0.82, topY + H*0.08);
       p.bezierVertex(cx - lw*0.65, topY - 4, cx - lw*0.42, topY + 2, cx - lw*0.28, topY + H*0.04);
       p.bezierVertex(cx - lw*0.15, topY + H*0.06, cx - lw*0.05, topY + H*0.1, cx - 12, topY + H*0.13);
       p.endShape();
 
-      // right lobe — jagged with extra vertices
       p.beginShape();
       p.vertex(cx + 12, botY);
       p.bezierVertex(cx + lw*0.5, botY + 8, cx + lw*0.85, botY - 30, cx + lw*0.95, H*0.72);
       p.bezierVertex(cx + lw*1.12, H*0.58, cx + lw*0.98, H*0.42, cx + lw*1.05, H*0.32);
-      p.bezierVertex(cx + lw*1.1,  H*0.22, cx + lw*0.95, topY + H*0.12, cx + lw*0.82, topY + H*0.08);
+      p.bezierVertex(cx + lw*1.1, H*0.22, cx + lw*0.95, topY + H*0.12, cx + lw*0.82, topY + H*0.08);
       p.bezierVertex(cx + lw*0.65, topY - 4, cx + lw*0.42, topY + 2, cx + lw*0.28, topY + H*0.04);
       p.bezierVertex(cx + lw*0.15, topY + H*0.06, cx + lw*0.05, topY + H*0.1, cx + 12, topY + H*0.13);
       p.endShape();
@@ -687,11 +717,10 @@ function setupInteraction() {
     const scaleY = canvas.height / rect.height;
     const mx     = (e.clientX - rect.left) * scaleX;
     const my     = (e.clientY - rect.top)  * scaleY;
-
     for (const node of leafNodes) {
       const dx = mx - node.x, dy = my - node.y;
       if (Math.sqrt(dx*dx + dy*dy) <= node.r + 10 && node.src) {
-        openLightbox(node.src, node.side);
+        openLightbox(node.src);
         return;
       }
     }
@@ -714,7 +743,7 @@ function setupInteraction() {
 }
 
 // ── LIGHTBOX ───────────────────────────────────────────────────────────────
-function openLightbox(src, side) {
+function openLightbox(src) {
   document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
 }
