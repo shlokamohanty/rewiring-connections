@@ -246,8 +246,8 @@ const CONFIG = {
   splitAngle:    26,    // angle for bad/good split
   subAngle:      20,    // angle between multiple bad or good images
   neutralColor:  [120, 120, 120],
-  badColor:      [185, 45, 45],
-  goodColor:     [28, 92, 175],
+  badColor:      [186, 50, 79],
+  goodColor:     [75, 163, 195],
 };
 
 function startSketch(tree) {
@@ -500,7 +500,7 @@ function startSketch(tree) {
         }
 
         // ── nucleus — illustration clipped inside, clear and prominent ────
-        const nucleusSize = nodeSize * 0.78;
+        const nucleusSize = nodeSize * 0.58;
         const nr = nucleusSize / 2;
         ctx.save();
         ctx.beginPath();
