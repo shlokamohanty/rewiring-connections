@@ -458,33 +458,56 @@ function startSketch(tree) {
       p.imageMode(p.CENTER);
 
       if (img) {
-        // clip image into a circle using a mask approach:
-        // draw the image, then punch out a circle via destination-in
         const ctx = p.drawingContext;
+
+        // ── cell body (cytoplasm) — large faded halo ──────────────────────
+        // outer glow, very transparent
+        p.noStroke();
+        p.fill(...col, 18);
+        p.ellipse(0, 0, nodeSize * 2.8, nodeSize * 2.4);
+        // inner cytoplasm, slightly more visible
+        p.fill(...col, 28);
+        p.ellipse(0, 0, nodeSize * 1.9, nodeSize * 1.7);
+        // cytoplasm membrane ring
+        p.noFill();
+        p.stroke(...col, 45);
+        p.strokeWeight(0.6);
+        p.ellipse(0, 0, nodeSize * 1.9, nodeSize * 1.7);
+
+        // ── nucleus — image clipped into smaller circle ───────────────────
+        const nucleusSize = nodeSize * 0.72; // nucleus smaller than cell body
+        const nr = nucleusSize / 2;
         ctx.save();
         ctx.beginPath();
-        ctx.arc(0, 0, r, 0, Math.PI * 2);
+        ctx.arc(0, 0, nr, 0, Math.PI * 2);
         ctx.clip();
-        p.image(img, 0, 0, nodeSize, nodeSize);
-        // tint overlay inside the circle
-        p.fill(...col, 75);
-        p.ellipse(0, 0, nodeSize, nodeSize);
+        p.image(img, 0, 0, nucleusSize, nucleusSize);
+        // tint overlay
+        p.fill(...col, 70);
+        p.ellipse(0, 0, nucleusSize, nucleusSize);
         ctx.restore();
 
-        // thin coloured ring around the node
+        // nucleus membrane — double ring like a nuclear envelope
         p.noFill();
-        p.stroke(...col, 160);
-        p.strokeWeight(0.8);
-        p.ellipse(0, 0, nodeSize + 3, nodeSize + 3);
+        p.stroke(...col, 180);
+        p.strokeWeight(0.9);
+        p.ellipse(0, 0, nucleusSize + 2, nucleusSize + 2);
+        p.stroke(...col, 80);
+        p.strokeWeight(0.4);
+        p.ellipse(0, 0, nucleusSize + 5, nucleusSize + 5);
+
       } else {
-        // placeholder — glowing dot
-        p.fill(...col, 60);
-        p.ellipse(0, 0, nodeSize * 0.9, nodeSize * 0.9);
+        // placeholder — cell body + nucleus dot
+        p.noStroke();
+        p.fill(...col, 18);
+        p.ellipse(0, 0, nodeSize * 2.6, nodeSize * 2.2);
+        p.fill(...col, 30);
+        p.ellipse(0, 0, nodeSize * 1.8, nodeSize * 1.6);
         p.fill(...col, 140);
         p.ellipse(0, 0, nodeSize * 0.5, nodeSize * 0.5);
       }
 
-      leafNodes.push({ x: wx, y: wy, r, src, side });
+      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.9, src, side });
     }
 
     // ── fan angles ────────────────────────────────────────────────────────
