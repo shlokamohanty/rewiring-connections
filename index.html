@@ -167,63 +167,66 @@ header {
 <script>
 // ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
 //
-// Everything lives in an `illustrations/` folder next to this HTML file.
-// You need a `manifest.json` that describes the full tree structure.
+// 1. FOLDER STRUCTURE
+//    Place all images in subfolders inside illustrations/
+//    illustrations/
+//      manifest.json
+//      1_losing-my-job/
+//        1_losing-my-job_bad.jpg
+//        1_losing-my-job_good.jpg
 //
-// FOLDER STRUCTURE EXAMPLE:
-//   illustrations/
-//     manifest.json
-//     1_school/
-//       1_music-class_bad.jpg
-//       1_music-class_good.jpg
-//       2_failing-exam_bad.jpg
-//       2_failing-exam_good.jpg
-//       3_best-friend/
-//         1_the-fight_bad.jpg
-//         1_the-fight_good.jpg
-//     2_losing-my-job/
-//       1_the-day_bad.jpg
-//       1_the-day_good.jpg
-//       2_aftermath/
-//         1_depression_bad.jpg
-//         1_new-start_good.jpg
+// 2. MANIFEST FORMAT
+//    manifest.json describes the full tree. Each node has:
+//      label    → text shown along the branch
+//      path     → folder path relative to illustrations/
+//      children → array of nested sub-events (optional)
+//      bad      → array of high-activity images (yellow)
+//      good     → array of low-activity images (blue)
 //
-// MANIFEST FORMAT:
-// The manifest describes the tree as nested JSON.
-// Each node has: label, children (sub-branches), bad (image files), good (image files)
+//    bad/good entries can be:
+//      a) plain string  →  "1_bad.jpg"
+//      b) object        →  { "file": "1_bad.jpg", "sensation": "zigzag" }
 //
+// 3. SENSATION LABELS (controls neuron opacity)
+//    Add "sensation" to any bad/good entry:
+//
+//      "sensation": "zigzag"  → uncomfortable / knots / shivers
+//                               → FULL opacity (most visible neuron)
+//
+//      "sensation": "wave"    → calming / pleasant
+//                               → LOW opacity (faded neuron)
+//
+//      no sensation field     → neutral / no strong feeling
+//                               → MID opacity (default)
+//
+// 4. FULL EXAMPLE
 // {
 //   "children": [
 //     {
-//       "label": "school",
-//       "children": [
-//         { "label": "music class", "bad": ["1_music-class_bad.jpg"], "good": ["1_music-class_good.jpg"], "path": "1_school" },
-//         { "label": "failing exam", "bad": ["2_failing-exam_bad.jpg"], "good": [], "path": "1_school" },
-//         {
-//           "label": "best friend",
-//           "path": "1_school/3_best-friend",
-//           "children": [
-//             { "label": "the fight", "bad": ["1_the-fight_bad.jpg"], "good": ["1_the-fight_good.jpg"], "path": "1_school/3_best-friend" }
-//           ]
-//         }
+//       "label": "losing my job",
+//       "path": "1_losing-my-job",
+//       "bad": [
+//         { "file": "1_losing-my-job_bad.jpg",  "sensation": "zigzag" },
+//         { "file": "2_losing-my-job_bad2.jpg", "sensation": "wave"   }
 //       ],
-//       "path": "1_school"
+//       "good": [
+//         { "file": "1_losing-my-job_good.jpg" }
+//       ]
 //     },
 //     {
-//       "label": "losing my job",
-//       "bad": ["1_the-day_bad.jpg"],
-//       "good": ["1_the-day_good.jpg"],
-//       "path": "2_losing-my-job"
+//       "label": "school",
+//       "path": "2_school",
+//       "children": [
+//         {
+//           "label": "music class",
+//           "path": "2_school/1_music-class",
+//           "bad":  [ { "file": "1_bad.jpg", "sensation": "zigzag" } ],
+//           "good": [ { "file": "1_good.jpg", "sensation": "wave"  } ]
+//         }
+//       ]
 //     }
 //   ]
 // }
-//
-// RULES:
-// - A node with `children` draws a neutral branch that fans into sub-branches
-// - A node with `bad`/`good` arrays draws leaf branches directly
-// - A node can have BOTH children and bad/good images
-// - `path` is the folder path relative to `illustrations/`
-// - image filenames in bad/good are just the filename (no folder prefix)
 
 const ROOT_FOLDER = 'illustrations';
 
