@@ -19,6 +19,19 @@ header {
   z-index: 10;
   padding: 20px 36px 14px;
   background: rgba(10,10,10,0.95);
+  display: flex;
+  align-items: baseline;
+  gap: 32px;
+}
+.legend {
+  display: flex;
+  gap: 20px;
+}
+.legend-item {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
 }
 .title {
   font-family: 'Courier New', Courier, monospace;
@@ -100,7 +113,13 @@ header {
 </head>
 <body>
 
-<header><p class="title">Rewiring Connections</p></header>
+<header>
+  <p class="title">Rewiring Connections</p>
+  <div class="legend">
+    <span class="legend-item" style="color:#FFD600;">&#9679; high activity</span>
+    <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
+  </div>
+</header>
 <div id="canvas-wrap"></div>
 
 <div class="lightbox" id="lightbox">
@@ -246,7 +265,7 @@ const CONFIG = {
   splitAngle:    26,    // angle for bad/good split
   subAngle:      20,    // angle between multiple bad or good images
   neutralColor:  [120, 120, 120],
-  badColor:      [186, 50, 79],
+  badColor:      [255, 214, 0],
   goodColor:     [75, 163, 195],
 };
 
@@ -500,7 +519,7 @@ function startSketch(tree) {
         }
 
         // ── nucleus — illustration clipped inside, clear and prominent ────
-        const nucleusSize = nodeSize * 0.58;
+        const nucleusSize = nodeSize * 0.78;
         const nr = nucleusSize / 2;
         ctx.save();
         ctx.beginPath();
