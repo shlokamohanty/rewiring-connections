@@ -459,55 +459,77 @@ function startSketch(tree) {
 
       if (img) {
         const ctx = p.drawingContext;
+        const seed2 = src.length * 0.3 + depth;
 
-        // ── cell body (cytoplasm) — large faded halo ──────────────────────
-        // outer glow, very transparent
+        // ── cell body — irregular organic blob (not a perfect circle) ─────
+        // draw using many bezier points around a wobbly ellipse
         p.noStroke();
-        p.fill(...col, 18);
-        p.ellipse(0, 0, nodeSize * 2.8, nodeSize * 2.4);
-        // inner cytoplasm, slightly more visible
-        p.fill(...col, 28);
-        p.ellipse(0, 0, nodeSize * 1.9, nodeSize * 1.7);
-        // cytoplasm membrane ring
-        p.noFill();
-        p.stroke(...col, 45);
-        p.strokeWeight(0.6);
-        p.ellipse(0, 0, nodeSize * 1.9, nodeSize * 1.7);
+        // outermost cytoplasm glow — very faint
+        p.fill(...col, 12);
+        drawBlob(p, 0, 0, nodeSize * 1.6, nodeSize * 1.4, 8, seed2, 0.32);
 
-        // ── nucleus — image clipped into smaller circle ───────────────────
-        const nucleusSize = nodeSize * 0.72; // nucleus smaller than cell body
+        // cytoplasm body — soft and irregular
+        p.fill(...col, 22);
+        drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
+
+        // cell membrane — faint stroke on blob edge
+        p.noFill();
+        p.stroke(...col, 50);
+        p.strokeWeight(0.5);
+        drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
+
+        // ── short dendrite stubs radiating from cell body ─────────────────
+        p.stroke(...col, 35);
+        p.strokeWeight(0.5);
+        const numDendrites = 5;
+        for (let d = 0; d < numDendrites; d++) {
+          const dAngle  = (d / numDendrites) * 360 + p.noise(seed2 + d) * 40;
+          const dLen    = nodeSize * (0.35 + p.noise(seed2 + d + 5) * 0.3);
+          const dRad    = nodeSize * 0.55;
+          const sx      = p.cos(dAngle) * dRad;
+          const sy      = p.sin(dAngle) * dRad;
+          const ex      = p.cos(dAngle) * (dRad + dLen);
+          const ey      = p.sin(dAngle) * (dRad + dLen);
+          const mx      = (sx + ex) / 2 + (p.noise(seed2 + d + 10) - 0.5) * dLen * 0.5;
+          const my2     = (sy + ey) / 2 + (p.noise(seed2 + d + 15) - 0.5) * dLen * 0.5;
+          p.noFill();
+          p.beginShape();
+          p.vertex(sx, sy);
+          p.quadraticVertex(mx, my2, ex, ey);
+          p.endShape();
+        }
+
+        // ── nucleus — illustration clipped inside, clear and prominent ────
+        const nucleusSize = nodeSize * 0.78;
         const nr = nucleusSize / 2;
         ctx.save();
         ctx.beginPath();
         ctx.arc(0, 0, nr, 0, Math.PI * 2);
         ctx.clip();
         p.image(img, 0, 0, nucleusSize, nucleusSize);
-        // tint overlay
-        p.fill(...col, 70);
-        p.ellipse(0, 0, nucleusSize, nucleusSize);
         ctx.restore();
 
-        // nucleus membrane — double ring like a nuclear envelope
+        // nucleus envelope — double ring, subtle
         p.noFill();
-        p.stroke(...col, 180);
-        p.strokeWeight(0.9);
-        p.ellipse(0, 0, nucleusSize + 2, nucleusSize + 2);
-        p.stroke(...col, 80);
+        p.stroke(...col, 200);
+        p.strokeWeight(1);
+        p.ellipse(0, 0, nucleusSize, nucleusSize);
+        p.stroke(...col, 60);
         p.strokeWeight(0.4);
-        p.ellipse(0, 0, nucleusSize + 5, nucleusSize + 5);
+        p.ellipse(0, 0, nucleusSize + 4, nucleusSize + 4);
 
       } else {
-        // placeholder — cell body + nucleus dot
+        // placeholder — organic blob + nucleus dot
         p.noStroke();
-        p.fill(...col, 18);
-        p.ellipse(0, 0, nodeSize * 2.6, nodeSize * 2.2);
-        p.fill(...col, 30);
-        p.ellipse(0, 0, nodeSize * 1.8, nodeSize * 1.6);
-        p.fill(...col, 140);
-        p.ellipse(0, 0, nodeSize * 0.5, nodeSize * 0.5);
+        p.fill(...col, 14);
+        drawBlob(p, 0, 0, nodeSize * 1.5, nodeSize * 1.3, 7, depth * 3.1, 0.3);
+        p.fill(...col, 25);
+        drawBlob(p, 0, 0, nodeSize * 1.1, nodeSize * 0.95, 6, depth * 3.1 + 1, 0.25);
+        p.fill(...col, 130);
+        p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
-      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.9, src, side });
+      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side });
     }
 
     // ── fan angles ────────────────────────────────────────────────────────
@@ -515,6 +537,27 @@ function startSketch(tree) {
       if (n === 1) return [centre];
       const half = (spread * (n - 1)) / 2;
       return Array.from({ length: n }, (_, i) => centre - half + i * spread);
+    }
+
+    // ── drawBlob: wobbly organic ellipse using noise-perturbed vertices ───
+    function drawBlob(p, cx, cy, rw, rh, pts, seed, wobble) {
+      p.beginShape();
+      for (let i = 0; i <= pts; i++) {
+        const angle  = (i / pts) * 360;
+        const nVal   = p.noise(seed + i * 0.8) * 2 - 1;
+        const rx     = rw * 0.5 * (1 + nVal * wobble);
+        const ry     = rh * 0.5 * (1 + p.noise(seed + i * 0.8 + 100) * 2 - 1) * wobble + rh * 0.5;
+        const vx     = cx + p.cos(angle) * rx;
+        const vy     = cy + p.sin(angle) * (rh * 0.5 * (1 + nVal * wobble * 0.6));
+        i === 0 ? p.curveVertex(vx, vy) : p.curveVertex(vx, vy);
+      }
+      // close the shape
+      const angle0 = 0;
+      const nVal0  = p.noise(seed) * 2 - 1;
+      const vx0    = cx + p.cos(angle0) * rw * 0.5 * (1 + nVal0 * wobble);
+      const vy0    = cy + p.sin(angle0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6);
+      p.curveVertex(vx0, vy0);
+      p.endShape(p.CLOSE);
     }
 
     // ── brain outline ─────────────────────────────────────────────────────
