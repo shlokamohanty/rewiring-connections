@@ -17,52 +17,56 @@ header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 10;
-  padding: 20px 36px 14px;
+  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px);
   background: rgba(10,10,10,0.95);
   display: flex;
   align-items: baseline;
-  gap: 32px;
-}
-.legend {
-  display: flex;
-  gap: 20px;
-}
-.legend-item {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  opacity: 0.85;
+  gap: clamp(16px, 2.5vw, 32px);
 }
 .title {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 17px;
+  font-size: clamp(13px, 1.4vw, 17px);
   font-weight: 400;
   letter-spacing: 0.06em;
   color: #fff;
 }
+.legend {
+  display: flex;
+  gap: clamp(12px, 1.5vw, 20px);
+}
+.legend-item {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: clamp(9px, 0.9vw, 11px);
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
 #canvas-wrap {
   position: fixed;
-  inset: 0;
   top: 54px;
-  left: 300px;
+  left: clamp(200px, 22vw, 320px);
+  right: 0;
+  bottom: 0;
+  z-index: 1;
 }
 #sidebar {
   position: fixed;
   top: 54px;
   left: 0;
-  width: 300px;
+  width: clamp(200px, 22vw, 320px);
   bottom: 0;
   overflow-y: auto;
-  padding: 28px 24px 40px;
+  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px;
   border-right: 0.5px solid #1e1e1e;
+  z-index: 2;
+  background: #0a0a0a;
 }
 #sidebar p {
   font-family: 'Courier New', Courier, monospace;
-  font-size: 10.5px;
+  font-size: clamp(9px, 1vw, 11px);
   line-height: 1.9;
   color: #888;
   letter-spacing: 0.02em;
-  margin-bottom: 16px;
+  margin-bottom: clamp(10px, 1.4vh, 16px);
 }
 #sidebar p.bullet {
   padding-left: 12px;
@@ -347,6 +351,13 @@ function startSketch(tree) {
       p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
       p.textFont('Courier New');
+    };
+
+    p.windowResized = () => {
+      const wrap = document.getElementById('canvas-wrap');
+      W = wrap.offsetWidth;
+      H = wrap.offsetHeight;
+      p.resizeCanvas(W, H);
     };
 
     p.draw = () => {
