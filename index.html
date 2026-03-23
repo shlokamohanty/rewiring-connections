@@ -41,7 +41,7 @@ header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 10;
-  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px);
+  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px) 16px;
   background: rgba(10,10,10,0.95);
   display: flex;
   align-items: baseline;
@@ -82,7 +82,7 @@ header {
   width: clamp(200px, 22vw, 320px);
   bottom: 0;
   overflow-y: auto;
-  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px;
+  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px 16px;
   border-right: 0.5px solid #1e1e1e;
   z-index: 2;
   background: #0a0a0a;
@@ -115,13 +115,13 @@ header {
   font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 1vw, 11px);
   line-height: 1.9;
-  color: #888;
+  color: #b0b0b0;
   letter-spacing: 0.02em;
   margin-bottom: clamp(10px, 1.4vh, 16px);
 }
 #sidebar p.bullet {
   padding-left: 12px;
-  color: #666;
+  color: #b0b0b0;
   border-left: 1px solid #2a2a2a;
 }
 .lightbox {
@@ -195,15 +195,15 @@ header {
 <header>
   <p class="title">Rewiring Connections</p>
   <div class="legend">
-    <span class="legend-item" style="color:#FFD600;">&#9679; high activity</span>
+    <span class="legend-item" style="color:#fcd494;">&#9679; high activity</span>
     <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
   </div>
 </header>
 <div id="sidebar">
   <p>I sometimes reflect on my childhood experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my childhood.</p>
   <p>Every day, the intent is to sketch a new memory from my childhood. The sketch could be mixed media or just as is.</p>
-  <p class="bullet">* If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
-  <p class="bullet">* I'll mark if I feel a physical sensation as I sketch: a wave symbol for calming/pleasant feelings, a zigzag for knots/shivers/uncomfortable feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+  <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
+  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for calming/pleasant feelings, a zigzag for knots/shivers/uncomfortable feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
@@ -386,7 +386,7 @@ const CONFIG = {
   splitAngle:    26,    // angle for bad/good split
   subAngle:      20,    // angle between multiple bad or good images
   neutralColor:  [120, 120, 120],
-  badColor:      [255, 214, 0],
+  badColor:      [252, 212, 148],
   goodColor:     [75, 163, 195],
 };
 
