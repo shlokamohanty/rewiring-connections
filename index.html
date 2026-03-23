@@ -577,10 +577,11 @@ function startSketch(tree) {
           p.endShape();
         }
 
-        // ── nucleus — illustration clipped inside, clear and prominent ────
-        const nucleusSize = nodeSize * 0.78;
+        // ── nucleus — illustration clipped inside, opacity-aware ──────────
+        const nucleusSize = nodeSize * 0.52;
         const nr = nucleusSize / 2;
         ctx.save();
+        ctx.globalAlpha = opacity;
         ctx.beginPath();
         ctx.arc(0, 0, nr, 0, Math.PI * 2);
         ctx.clip();
