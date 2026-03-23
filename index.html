@@ -190,14 +190,15 @@ header {
 // 3. SENSATION LABELS (controls neuron opacity)
 //    Add "sensation" to any bad/good entry:
 //
-//      "sensation": "zigzag"  → uncomfortable / knots / shivers
+//      no sensation field     → no strong feeling
+//                               → LOWEST opacity (most faded neuron)
+//
+//      "sensation": "wave"    → calming / medium emotion
+//                               → MID opacity
+//
+//      "sensation": "zigzag"  → strong feeling — really happy, really
+//                               uncomfortable, intense, visceral
 //                               → FULL opacity (most visible neuron)
-//
-//      "sensation": "wave"    → calming / pleasant
-//                               → LOW opacity (faded neuron)
-//
-//      no sensation field     → neutral / no strong feeling
-//                               → MID opacity (default)
 //
 // 4. FULL EXAMPLE
 // {
@@ -234,24 +235,16 @@ let leafNodes = [];
 let myP5 = null;
 
 // ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
-// In manifest.json, each leaf node can have a "sensation" field:
-//   "sensation": "wave"    → calming/pleasant  → lower opacity (0.55)
-//   "sensation": "zigzag"  → uncomfortable     → higher opacity (1.0)
-//   "sensation": none      → default           → mid opacity (0.75)
+// In manifest.json, each bad/good entry can have a "sensation" field:
 //
-// Example manifest node:
-// { "label": "losing my job", "path": "1_losing-my-job",
-//   "bad": [{ "file": "1_bad.jpg", "sensation": "zigzag" }],
-//   "good": [{ "file": "1_good.jpg", "sensation": "wave" }] }
-//
-// NOTE: bad/good arrays can be either plain strings ["file.jpg"]
-// OR objects [{ "file": "file.jpg", "sensation": "wave" }]
-// Both formats are supported.
+//   no sensation field  → no strong feeling → LOWEST opacity (0.30)
+//   "sensation": "wave" → calming / medium emotion → MID opacity (0.65)
+//   "sensation": "zigzag" → strong / uncomfortable / intense → FULL opacity (1.0)
 
 function sensationOpacity(sensation) {
-  if (sensation === 'wave')   return 0.52;
-  if (sensation === 'zigzag') return 1.0;
-  return 0.75; // default
+  if (sensation === 'zigzag') return 0.85;
+  if (sensation === 'wave')   return 0.65;
+  return 0.50; // no sensation = barely visible
 }
 
 // Normalise a bad/good entry to { file, sensation }
