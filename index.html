@@ -44,6 +44,30 @@ header {
   position: fixed;
   inset: 0;
   top: 54px;
+  left: 300px;
+}
+#sidebar {
+  position: fixed;
+  top: 54px;
+  left: 0;
+  width: 300px;
+  bottom: 0;
+  overflow-y: auto;
+  padding: 28px 24px 40px;
+  border-right: 0.5px solid #1e1e1e;
+}
+#sidebar p {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 10.5px;
+  line-height: 1.9;
+  color: #888;
+  letter-spacing: 0.02em;
+  margin-bottom: 16px;
+}
+#sidebar p.bullet {
+  padding-left: 12px;
+  color: #666;
+  border-left: 1px solid #2a2a2a;
 }
 .lightbox {
   display: none;
@@ -120,6 +144,12 @@ header {
     <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
   </div>
 </header>
+<div id="sidebar">
+  <p>I sometimes reflect on my childhood experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my childhood.</p>
+  <p>Every day, the intent is to sketch a new memory from my childhood. The sketch could be mixed media or just as is.</p>
+  <p class="bullet">* If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
+  <p class="bullet">* I'll mark if I feel a physical sensation as I sketch: a wave symbol for calming/pleasant feelings, a zigzag for knots/shivers/uncomfortable feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+</div>
 <div id="canvas-wrap"></div>
 
 <div class="lightbox" id="lightbox">
@@ -196,7 +226,32 @@ const ROOT_FOLDER = 'illustrations';
 let leafNodes = [];
 let myP5 = null;
 
-// ── LOAD MANIFEST ──────────────────────────────────────────────────────────
+// ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
+// In manifest.json, each leaf node can have a "sensation" field:
+//   "sensation": "wave"    → calming/pleasant  → lower opacity (0.55)
+//   "sensation": "zigzag"  → uncomfortable     → higher opacity (1.0)
+//   "sensation": none      → default           → mid opacity (0.75)
+//
+// Example manifest node:
+// { "label": "losing my job", "path": "1_losing-my-job",
+//   "bad": [{ "file": "1_bad.jpg", "sensation": "zigzag" }],
+//   "good": [{ "file": "1_good.jpg", "sensation": "wave" }] }
+//
+// NOTE: bad/good arrays can be either plain strings ["file.jpg"]
+// OR objects [{ "file": "file.jpg", "sensation": "wave" }]
+// Both formats are supported.
+
+function sensationOpacity(sensation) {
+  if (sensation === 'wave')   return 0.52;
+  if (sensation === 'zigzag') return 1.0;
+  return 0.75; // default
+}
+
+// Normalise a bad/good entry to { file, sensation }
+function normaliseEntry(entry) {
+  if (typeof entry === 'string') return { file: entry, sensation: null };
+  return { file: entry.file || entry, sensation: entry.sensation || null };
+}
 async function boot() {
   let tree = null;
   try {
@@ -222,8 +277,8 @@ function showError(msg) {
 
 // ── PRE-LOAD ALL IMAGES FROM TREE ──────────────────────────────────────────
 function collectSrcs(node, srcs = []) {
-  if (node.bad)  node.bad.forEach(f  => srcs.push(`${ROOT_FOLDER}/${node.path}/${f}`));
-  if (node.good) node.good.forEach(f => srcs.push(`${ROOT_FOLDER}/${node.path}/${f}`));
+  if (node.bad)  node.bad.forEach(e  => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
+  if (node.good) node.good.forEach(e => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
   if (node.children) node.children.forEach(c => collectSrcs(c, srcs));
   return srcs;
 }
@@ -422,22 +477,24 @@ function startSketch(tree) {
 
         if (hasBad) {
           const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
-          node.bad.forEach((f, i) => {
-            const src = `${ROOT_FOLDER}/${node.path}/${f}`;
+          node.bad.forEach((e, i) => {
+            const { file, sensation } = normaliseEntry(e);
+            const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push();
             p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H);
+            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, sensation);
             p.pop();
           });
         }
 
         if (hasGood) {
           const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
-          node.good.forEach((f, i) => {
-            const src = `${ROOT_FOLDER}/${node.path}/${f}`;
+          node.good.forEach((e, i) => {
+            const { file, sensation } = normaliseEntry(e);
+            const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push();
             p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H);
+            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, sensation);
             p.pop();
           });
         }
@@ -445,11 +502,12 @@ function startSketch(tree) {
     }
 
     // ── leaf: curvy axon strand ending in circular illustration node ──────
-    function drawLeaf(p, src, img, len, side, depth, W, H) {
-      const isBad  = side === 'bad';
-      const col    = isBad ? CONFIG.badColor : CONFIG.goodColor;
-      const alpha  = Math.max(190 - depth * 15, 90);
-      const sw     = Math.max(1.6 - depth * 0.1, 0.6);
+    function drawLeaf(p, src, img, len, side, depth, W, H, sensation) {
+      const isBad   = side === 'bad';
+      const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
+      const opacity = sensationOpacity(sensation);  // 0.52 / 0.75 / 1.0
+      const alpha   = Math.max(190 - depth * 15, 90) * opacity;
+      const sw      = Math.max(1.6 - depth * 0.1, 0.6);
 
       // curvy axon
       p.stroke(...col, alpha);
@@ -480,25 +538,19 @@ function startSketch(tree) {
         const ctx = p.drawingContext;
         const seed2 = src.length * 0.3 + depth;
 
-        // ── cell body — irregular organic blob (not a perfect circle) ─────
-        // draw using many bezier points around a wobbly ellipse
+        // ── cell body — irregular organic blob ────────────────────────────
         p.noStroke();
-        // outermost cytoplasm glow — very faint
-        p.fill(...col, 12);
+        p.fill(...col, 12 * opacity);
         drawBlob(p, 0, 0, nodeSize * 1.6, nodeSize * 1.4, 8, seed2, 0.32);
-
-        // cytoplasm body — soft and irregular
-        p.fill(...col, 22);
+        p.fill(...col, 22 * opacity);
         drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
-
-        // cell membrane — faint stroke on blob edge
         p.noFill();
-        p.stroke(...col, 50);
+        p.stroke(...col, 50 * opacity);
         p.strokeWeight(0.5);
         drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
 
-        // ── short dendrite stubs radiating from cell body ─────────────────
-        p.stroke(...col, 35);
+        // ── short dendrite stubs ──────────────────────────────────────────
+        p.stroke(...col, 35 * opacity);
         p.strokeWeight(0.5);
         const numDendrites = 5;
         for (let d = 0; d < numDendrites; d++) {
@@ -530,10 +582,10 @@ function startSketch(tree) {
 
         // nucleus envelope — double ring, subtle
         p.noFill();
-        p.stroke(...col, 200);
+        p.stroke(...col, 200 * opacity);
         p.strokeWeight(1);
         p.ellipse(0, 0, nucleusSize, nucleusSize);
-        p.stroke(...col, 60);
+        p.stroke(...col, 60 * opacity);
         p.strokeWeight(0.4);
         p.ellipse(0, 0, nucleusSize + 4, nucleusSize + 4);
 
