@@ -316,8 +316,8 @@ function sensationOpacity(sensation) {
 }
 
 function normaliseEntry(entry) {
-  if (typeof entry === 'string') return { file: entry, sensation: null, link: null };
-  return { file: entry.file || entry, sensation: entry.sensation || null, link: entry.link || null };
+  if (typeof entry === 'string') return { file: entry, sensation: null, link: null, action: null };
+  return { file: entry.file || entry, sensation: entry.sensation || null, link: entry.link || null, action: entry.action || null };
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────
@@ -539,27 +539,27 @@ function startSketch(tree) {
         if (hasBad) {
           const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
           node.bad.forEach((e, i) => {
-            const { file, sensation, link } = normaliseEntry(e);
+            const { file, sensation, link, action } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation, link);
+            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation, link, action);
             p.pop();
           });
         }
         if (hasGood) {
           const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
           node.good.forEach((e, i) => {
-            const { file, sensation, link } = normaliseEntry(e);
+            const { file, sensation, link, action } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation, link);
+            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation, link, action);
             p.pop();
           });
         }
       }
     }
 
-    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation, link) {
+    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation, link, action) {
       const isBad   = side === 'bad';
       const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
       const opacity = sensationOpacity(sensation);
@@ -651,44 +651,56 @@ function startSketch(tree) {
         p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
-      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side, link: link || null });
+      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side, link: link || null, action: action || null });
     }
 
-    // ── cross-links: dotted lines between nodes sharing a link tag ────────
+    // ── cross-links: dotted = emotion, dashed = action ────────────────────
     function drawCrossLinks(p) {
-      // group nodes by link tag
-      const groups = {};
+      // group by emotion link
+      const emotions = {};
+      const actions  = {};
       for (const node of leafNodes) {
-        if (!node.link) continue;
-        if (!groups[node.link]) groups[node.link] = [];
-        groups[node.link].push(node);
+        if (node.link)   { if (!emotions[node.link])   emotions[node.link]   = []; emotions[node.link].push(node);   }
+        if (node.action) { if (!actions[node.action])  actions[node.action]  = []; actions[node.action].push(node);  }
       }
 
-      for (const tag in groups) {
-        const nodes = groups[tag];
-        // connect every pair
+      // emotion links — short dots, white faint
+      for (const tag in emotions) {
+        const nodes = emotions[tag];
         for (let i = 0; i < nodes.length; i++) {
           for (let j = i + 1; j < nodes.length; j++) {
-            const a = nodes[i], b = nodes[j];
-            const mx = (a.x + b.x) / 2;
-            const my = (a.y + b.y) / 2 - Math.abs(b.x - a.x) * 0.3;
-
-            p.noFill();
-            p.stroke(255, 255, 255, 35);
-            p.strokeWeight(0.8);
-            // dotted effect via short dashes
-            const steps = 30;
-            for (let s = 0; s < steps; s += 2) {
-              const t0 = s / steps;
-              const t1 = (s + 1) / steps;
-              const x0 = bezierPoint(a.x, mx, mx, b.x, t0);
-              const y0 = bezierPoint(a.y, my, my, b.y, t0);
-              const x1 = bezierPoint(a.x, mx, mx, b.x, t1);
-              const y1 = bezierPoint(a.y, my, my, b.y, t1);
-              p.line(x0, y0, x1, y1);
-            }
+            drawArc(p, nodes[i], nodes[j], 30, 2, 255, 255, 255, 35);
           }
         }
+      }
+
+      // action links — longer dashes, slightly warmer tint
+      for (const tag in actions) {
+        const nodes = actions[tag];
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            drawArc(p, nodes[i], nodes[j], 10, 4, 220, 200, 180, 40);
+          }
+        }
+      }
+    }
+
+    // draws a dashed/dotted arc between two nodes
+    // steps = total segments, skip = every nth is drawn (2=dots, 4=dashes)
+    function drawArc(p, a, b, steps, skip, r, g, bv, alpha) {
+      const mx = (a.x + b.x) / 2;
+      const my = (a.y + b.y) / 2 - Math.abs(b.x - a.x) * 0.3;
+      p.noFill();
+      p.stroke(r, g, bv, alpha);
+      p.strokeWeight(0.8);
+      for (let s = 0; s < steps; s += skip) {
+        const t0 = s / steps;
+        const t1 = (s + skip * 0.5) / steps;
+        const x0 = bezierPoint(a.x, mx, mx, b.x, t0);
+        const y0 = bezierPoint(a.y, my, my, b.y, t0);
+        const x1 = bezierPoint(a.x, mx, mx, b.x, t1);
+        const y1 = bezierPoint(a.y, my, my, b.y, t1);
+        p.line(x0, y0, x1, y1);
       }
     }
 
