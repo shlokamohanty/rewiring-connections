@@ -202,11 +202,11 @@ header {
 </header>
 
 <div id="sidebar">
-  <p>I sometimes reflect on my teenage experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my teenage years.</p>
-  <p>Every day, the intent is to sketch a new memory from my teenage years. The sketch could be mixed media or just as is.</p>
+  <p>I sometimes reflect on my teenage experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my teenage.</p>
+  <p>Every day, the intent is to sketch a new memory from my teenage. The sketch could be mixed media or just as is.</p>
   <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
   <p class="bullet">If, while looking for a memory, an involuntary one surfaces, I'll sketch the voluntary one first and the involuntary one the next day.</p>
-  <p class="bullet">Sometimes, I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
@@ -316,8 +316,8 @@ function sensationOpacity(sensation) {
 }
 
 function normaliseEntry(entry) {
-  if (typeof entry === 'string') return { file: entry, sensation: null };
-  return { file: entry.file || entry, sensation: entry.sensation || null };
+  if (typeof entry === 'string') return { file: entry, sensation: null, link: null };
+  return { file: entry.file || entry, sensation: entry.sensation || null, link: entry.link || null };
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────
@@ -465,6 +465,9 @@ function startSketch(tree) {
       });
 
       p.pop();
+
+      // ── draw cross-links between nodes sharing the same link tag ─────────
+      drawCrossLinks(p);
     };
 
     function drawNode(p, node, len, depth, totalDepth, allImgs, W, H, S) {
@@ -536,27 +539,27 @@ function startSketch(tree) {
         if (hasBad) {
           const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
           node.bad.forEach((e, i) => {
-            const { file, sensation } = normaliseEntry(e);
+            const { file, sensation, link } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation);
+            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation, link);
             p.pop();
           });
         }
         if (hasGood) {
           const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
           node.good.forEach((e, i) => {
-            const { file, sensation } = normaliseEntry(e);
+            const { file, sensation, link } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation);
+            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation, link);
             p.pop();
           });
         }
       }
     }
 
-    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation) {
+    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation, link) {
       const isBad   = side === 'bad';
       const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
       const opacity = sensationOpacity(sensation);
@@ -648,7 +651,50 @@ function startSketch(tree) {
         p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
-      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side });
+      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side, link: link || null });
+    }
+
+    // ── cross-links: dotted lines between nodes sharing a link tag ────────
+    function drawCrossLinks(p) {
+      // group nodes by link tag
+      const groups = {};
+      for (const node of leafNodes) {
+        if (!node.link) continue;
+        if (!groups[node.link]) groups[node.link] = [];
+        groups[node.link].push(node);
+      }
+
+      for (const tag in groups) {
+        const nodes = groups[tag];
+        // connect every pair
+        for (let i = 0; i < nodes.length; i++) {
+          for (let j = i + 1; j < nodes.length; j++) {
+            const a = nodes[i], b = nodes[j];
+            const mx = (a.x + b.x) / 2;
+            const my = (a.y + b.y) / 2 - Math.abs(b.x - a.x) * 0.3;
+
+            p.noFill();
+            p.stroke(255, 255, 255, 35);
+            p.strokeWeight(0.8);
+            // dotted effect via short dashes
+            const steps = 30;
+            for (let s = 0; s < steps; s += 2) {
+              const t0 = s / steps;
+              const t1 = (s + 1) / steps;
+              const x0 = bezierPoint(a.x, mx, mx, b.x, t0);
+              const y0 = bezierPoint(a.y, my, my, b.y, t0);
+              const x1 = bezierPoint(a.x, mx, mx, b.x, t1);
+              const y1 = bezierPoint(a.y, my, my, b.y, t1);
+              p.line(x0, y0, x1, y1);
+            }
+          }
+        }
+      }
+    }
+
+    function bezierPoint(a, b, c, d, t) {
+      const mt = 1 - t;
+      return mt*mt*mt*a + 3*mt*mt*t*b + 3*mt*t*t*c + t*t*t*d;
     }
 
     function fanAngles(n, centre, spread) {
