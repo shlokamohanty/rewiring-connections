@@ -202,10 +202,11 @@ header {
 </header>
 
 <div id="sidebar">
-  <p>I sometimes reflect on my childhood experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my childhood.</p>
-  <p>Every day, the intent is to sketch a new memory from my childhood. The sketch could be mixed media or just as is.</p>
+  <p>I sometimes reflect on my teenage experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my teenage.</p>
+  <p>Every day, the intent is to sketch a new memory from my teenage. The sketch could be mixed media or just as is.</p>
   <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
-  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low intensity feelings, a zigzag for strong/high intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+  <p class="bullet">If, while looking for a memory, an involuntary one surfaces, I'll sketch the voluntary one first and the involuntary one the next day.</p>
+  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
@@ -292,8 +293,6 @@ const sidebar    = document.getElementById('sidebar');
 const canvasWrap = document.getElementById('canvas-wrap');
 let sidebarOpen  = true;
 
-const SIDEBAR_W = () => parseFloat(getComputedStyle(sidebar).width);
-
 toggleBtn.addEventListener('click', () => {
   sidebarOpen = !sidebarOpen;
   sidebar.classList.toggle('collapsed', !sidebarOpen);
@@ -301,7 +300,6 @@ toggleBtn.addEventListener('click', () => {
   toggleBtn.classList.toggle('collapsed', !sidebarOpen);
   toggleBtn.textContent = sidebarOpen ? 'hide' : 'show';
 
-  // After transition completes, resize canvas to fill new space
   setTimeout(() => {
     if (myP5) myP5.windowResized();
   }, 370);
@@ -418,24 +416,27 @@ function startSketch(tree) {
       const wrap = document.getElementById('canvas-wrap');
       W = wrap.offsetWidth;
       H = wrap.offsetHeight;
-      p.resizeCanvas(W, H);
+      if (W > 0 && H > 0) p.resizeCanvas(W, H);
     };
 
     p.draw = () => {
       p.background(10, 10, 10);
       leafNodes = [];
 
-      drawBrainOutline(p, W, H);
+      const S    = Math.min(W, H);
+      const botY = H / 2 + S * 0.44;
 
-      const trunkLen = H * CONFIG.trunkRatio;
+      drawBrainOutline(p, W, H, S);
+
+      const trunkLen = S * CONFIG.trunkRatio;
       const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
 
       p.push();
-      // always centred on the canvas-wrap, which resizes on toggle
-      p.translate(W / 2, H - 10);
+      // trunk base sits at the bottom of the brain outline
+      p.translate(W / 2, botY);
 
       p.stroke(...CONFIG.neutralColor);
-      p.strokeWeight(5.5);
+      p.strokeWeight(Math.max(S * 0.007, 2));
       p.noFill();
       const tc1x = p.noise(0.1) * 30 - 15;
       p.beginShape();
@@ -452,21 +453,21 @@ function startSketch(tree) {
 
       p.noStroke();
       p.fill(...CONFIG.neutralColor, 180);
-      p.ellipse(0, 0, 10, 10);
+      p.ellipse(0, 0, S * 0.012, S * 0.012);
 
       children.forEach((child, i) => {
         const angle = start + i * step + sway;
         const brLen = trunkLen * CONFIG.branchDecay;
         p.push();
         p.rotate(angle);
-        drawNode(p, child, brLen, 1, totalDepth, allImgs, W, H);
+        drawNode(p, child, brLen, 1, totalDepth, allImgs, W, H, S);
         p.pop();
       });
 
       p.pop();
     };
 
-    function drawNode(p, node, len, depth, totalDepth, allImgs, W, H) {
+    function drawNode(p, node, len, depth, totalDepth, allImgs, W, H, S) {
       const hasChildren = node.children && node.children.length > 0;
       const hasBad      = node.bad  && node.bad.length  > 0;
       const hasGood     = node.good && node.good.length > 0;
@@ -481,7 +482,7 @@ function startSketch(tree) {
       const g    = ng + (tg - ng) * t;
       const b    = nb + (tb - nb) * t;
       const alpha = Math.max(210 - depth * 18, 80);
-      const sw    = Math.max(4 - depth * 0.45, 0.7);
+      const sw    = Math.max(S * 0.005 - depth * 0.45, 0.7);
 
       p.stroke(r, g, b, alpha);
       p.strokeWeight(sw);
@@ -504,7 +505,7 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(9 - depth * 0.4, 7));
+        p.textSize(Math.max(S * 0.012 - depth * 0.4, 7));
         p.textAlign(p.CENTER, p.BOTTOM);
         p.translate(0, -len * 0.5);
         p.rotate(-90);
@@ -525,7 +526,7 @@ function startSketch(tree) {
         node.children.forEach((child, i) => {
           p.push();
           p.rotate(start + i * step);
-          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, W, H);
+          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, W, H, S);
           p.pop();
         });
       }
@@ -538,7 +539,7 @@ function startSketch(tree) {
             const { file, sensation } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, sensation);
+            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation);
             p.pop();
           });
         }
@@ -548,14 +549,14 @@ function startSketch(tree) {
             const { file, sensation } = normaliseEntry(e);
             const src = `${ROOT_FOLDER}/${node.path}/${file}`;
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, sensation);
+            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation);
             p.pop();
           });
         }
       }
     }
 
-    function drawLeaf(p, src, img, len, side, depth, W, H, sensation) {
+    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation) {
       const isBad   = side === 'bad';
       const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
       const opacity = sensationOpacity(sensation);
@@ -575,7 +576,8 @@ function startSketch(tree) {
 
       p.translate(0, -len);
 
-      const nodeSize = Math.max(Math.min(W, H) * 0.065 - depth * 4, 28);
+      // node size scales with S so it stays proportional on any screen
+      const nodeSize = Math.max(S * 0.065 - depth * 4, 20);
       const r        = nodeSize / 2;
 
       const xf = p.drawingContext.getTransform();
@@ -672,31 +674,31 @@ function startSketch(tree) {
       p.endShape(p.CLOSE);
     }
 
-    function drawBrainOutline(p, W, H) {
+    function drawBrainOutline(p, W, H, S) {
       p.noFill();
       p.stroke(60, 60, 60);
-      p.strokeWeight(3);
+      p.strokeWeight(Math.max(S * 0.004, 1.5));
       const cx   = W / 2;
-      const lw   = Math.min(W * 0.41, 315);
-      const topY = H * 0.05;
-      const botY = H - 10;
+      const lw   = S * 0.38;
+      const topY = H / 2 - S * 0.44;
+      const botY = H / 2 + S * 0.44;
 
       p.beginShape();
       p.vertex(cx - 12, botY);
-      p.bezierVertex(cx - lw*0.5, botY + 8, cx - lw*0.85, botY - 30, cx - lw*0.95, H*0.72);
-      p.bezierVertex(cx - lw*1.12, H*0.58, cx - lw*0.98, H*0.42, cx - lw*1.05, H*0.32);
-      p.bezierVertex(cx - lw*1.1, H*0.22, cx - lw*0.95, topY + H*0.12, cx - lw*0.82, topY + H*0.08);
-      p.bezierVertex(cx - lw*0.65, topY - 4, cx - lw*0.42, topY + 2, cx - lw*0.28, topY + H*0.04);
-      p.bezierVertex(cx - lw*0.15, topY + H*0.06, cx - lw*0.05, topY + H*0.1, cx - 12, topY + H*0.13);
+      p.bezierVertex(cx - lw*0.5, botY + S*0.01, cx - lw*0.85, botY - S*0.04, cx - lw*0.95, botY - S*0.3);
+      p.bezierVertex(cx - lw*1.12, botY - S*0.44, cx - lw*0.98, botY - S*0.6, cx - lw*1.05, botY - S*0.7);
+      p.bezierVertex(cx - lw*1.1,  botY - S*0.8,  cx - lw*0.95, topY + S*0.12, cx - lw*0.82, topY + S*0.08);
+      p.bezierVertex(cx - lw*0.65, topY - S*0.01, cx - lw*0.42, topY + S*0.005, cx - lw*0.28, topY + S*0.04);
+      p.bezierVertex(cx - lw*0.15, topY + S*0.06, cx - lw*0.05, topY + S*0.1, cx - 12, topY + S*0.13);
       p.endShape();
 
       p.beginShape();
       p.vertex(cx + 12, botY);
-      p.bezierVertex(cx + lw*0.5, botY + 8, cx + lw*0.85, botY - 30, cx + lw*0.95, H*0.72);
-      p.bezierVertex(cx + lw*1.12, H*0.58, cx + lw*0.98, H*0.42, cx + lw*1.05, H*0.32);
-      p.bezierVertex(cx + lw*1.1, H*0.22, cx + lw*0.95, topY + H*0.12, cx + lw*0.82, topY + H*0.08);
-      p.bezierVertex(cx + lw*0.65, topY - 4, cx + lw*0.42, topY + 2, cx + lw*0.28, topY + H*0.04);
-      p.bezierVertex(cx + lw*0.15, topY + H*0.06, cx + lw*0.05, topY + H*0.1, cx + 12, topY + H*0.13);
+      p.bezierVertex(cx + lw*0.5, botY + S*0.01, cx + lw*0.85, botY - S*0.04, cx + lw*0.95, botY - S*0.3);
+      p.bezierVertex(cx + lw*1.12, botY - S*0.44, cx + lw*0.98, botY - S*0.6, cx + lw*1.05, botY - S*0.7);
+      p.bezierVertex(cx + lw*1.1,  botY - S*0.8,  cx + lw*0.95, topY + S*0.12, cx + lw*0.82, topY + S*0.08);
+      p.bezierVertex(cx + lw*0.65, topY - S*0.01, cx + lw*0.42, topY + S*0.005, cx + lw*0.28, topY + S*0.04);
+      p.bezierVertex(cx + lw*0.15, topY + S*0.06, cx + lw*0.05, topY + S*0.1, cx + 12, topY + S*0.13);
       p.endShape();
     }
   };
