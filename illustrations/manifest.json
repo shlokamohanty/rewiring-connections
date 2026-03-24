@@ -1,10 +1,12 @@
 {
-  "children": [
-    {
-      "label": "losing my job",
-      "path": "1_losing-my-job",
-      "bad": ["1_losing-my-job_bad.jpg"],
-      "good": ["1_losing-my-job_good.jpg"]
-    }
-  ]
+  "label": "being-at-school",
+       "path": "1_being-at-school",
+       "children": [
+         {
+           "label": "lunch",
+           "path": "1_being-at-school/1_lunch",
+           "good":  [ { "file": "1_lunch-at-school_good.jpg", "sensation": "wave" } ]
+         }
+         ]
 }
+
