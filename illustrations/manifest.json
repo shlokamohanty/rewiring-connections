@@ -1,12 +1,15 @@
-{
+{ 
+  "children": [
+  {
   "label": "being-at-school",
        "path": "1_being-at-school",
        "children": [
          {
            "label": "lunch",
            "path": "1_being-at-school/1_lunch",
-           "good":  [ { "file": "1_lunch-at-school_good.jpg", "sensation": "wave" } ]
+           "good":  [ { "file": "1_lunch-at-school_good.jpg", "sensation": "wave"} ]
          }
          ]
 }
-
+]
+}
