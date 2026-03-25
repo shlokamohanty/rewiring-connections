@@ -78,7 +78,6 @@ header {
   left: 0;
   border-left: none;
 }
-
 #sidebar {
   position: fixed;
   top: 54px;
@@ -93,7 +92,6 @@ header {
   transition: transform 0.35s ease;
 }
 #sidebar.collapsed { transform: translateX(-100%); }
-
 #toggle-sidebar {
   position: fixed;
   top: 50%;
@@ -118,7 +116,6 @@ header {
   left: 12px;
   transform: translateY(-50%);
 }
-
 #sidebar p {
   font-family: 'Space Mono', monospace;
   font-size: clamp(9px, 1vw, 11px);
@@ -205,7 +202,7 @@ header {
   <p>I sometimes reflect on my teenage experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my teenage.</p>
   <p>Every day, the intent is to sketch a new memory from my teenage. The sketch could be mixed media or just as is.</p>
   <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
-  <p class="bullet">If, while looking for a memory, involuntary memories surface, I’ll sketch the voluntary one first and the involuntary ones in the next few days</p>
+  <p class="bullet">If, while looking for a memory, involuntary memories surface, I'll sketch the voluntary one first and the involuntary ones in the next few days.</p>
   <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
@@ -223,60 +220,46 @@ header {
 // ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
 //
 // 1. FOLDER STRUCTURE
-//    Place all images in subfolders inside illustrations/
 //    illustrations/
 //      manifest.json
-//      1_losing-my-job/
-//        1_losing-my-job_bad.jpg
-//        1_losing-my-job_good.jpg
+//      1_being-at-school/
+//        1_lunch/
+//          1_lunch_high.jpg     ← high activity (involuntary / yellow)
+//          1_lunch_low.jpg      ← low activity  (voluntary  / blue)
 //
 // 2. MANIFEST FORMAT
-//    manifest.json describes the full tree. Each node has:
+//    Each node has:
 //      label    → text shown along the branch
 //      path     → folder path relative to illustrations/
-//      children → array of nested sub-events (optional)
-//      bad      → array of high-activity images (yellow)
-//      good     → array of low-activity images (blue)
+//      children → nested sub-events (optional)
+//      high     → array of high-activity images (yellow, involuntary)
+//      low      → array of low-activity images  (blue,   voluntary)
 //
-//    bad/good entries can be:
-//      a) plain string  →  "1_bad.jpg"
-//      b) object        →  { "file": "1_bad.jpg", "sensation": "zigzag" }
+//    high/low entries can be:
+//      a) plain string  →  "1_lunch_high.jpg"
+//      b) object        →  { "file": "1_lunch_high.jpg", "sensation": "zigzag", "link": "guilt", "action": "eating" }
 //
-// 3. SENSATION LABELS (controls neuron opacity)
-//    Add "sensation" to any bad/good entry:
+// 3. SENSATION (controls neuron opacity)
+//      no sensation   → 0.50
+//      "wave"         → 0.65  (weak / low intensity)
+//      "zigzag"       → 0.85  (strong / high intensity)
 //
-//      no sensation field     → no strong feeling
-//                               → LOWEST opacity (0.50)
+// 4. CROSS-LINKS
+//      "link"   → emotion tag  (dotted line connects matching nodes)
+//      "action" → action tag   (dashed line connects matching nodes)
 //
-//      "sensation": "wave"    → weak / low intensity feeling
-//                               → MID opacity (0.65)
-//
-//      "sensation": "zigzag"  → strong / high intensity feeling
-//                               → HIGHEST opacity (0.85)
-//
-// 4. FULL EXAMPLE
+// 5. FULL EXAMPLE
 // {
 //   "children": [
 //     {
-//       "label": "losing my job",
-//       "path": "1_losing-my-job",
-//       "bad": [
-//         { "file": "1_losing-my-job_bad.jpg",  "sensation": "zigzag" },
-//         { "file": "2_losing-my-job_bad2.jpg", "sensation": "wave"   }
-//       ],
-//       "good": [
-//         { "file": "1_losing-my-job_good.jpg" }
-//       ]
-//     },
-//     {
-//       "label": "school",
-//       "path": "2_school",
+//       "label": "being at school",
+//       "path": "1_being-at-school",
 //       "children": [
 //         {
-//           "label": "music class",
-//           "path": "2_school/1_music-class",
-//           "bad":  [ { "file": "1_bad.jpg", "sensation": "zigzag" } ],
-//           "good": [ { "file": "1_good.jpg", "sensation": "wave"  } ]
+//           "label": "lunch",
+//           "path": "1_being-at-school/1_lunch",
+//           "high": [ { "file": "1_lunch_high.jpg", "sensation": "zigzag", "link": "guilt",     "action": "eating" } ],
+//           "low":  [ { "file": "1_lunch_low.jpg",  "sensation": "wave",   "link": "belonging", "action": "eating" } ]
 //         }
 //       ]
 //     }
@@ -299,16 +282,10 @@ toggleBtn.addEventListener('click', () => {
   canvasWrap.classList.toggle('collapsed', !sidebarOpen);
   toggleBtn.classList.toggle('collapsed', !sidebarOpen);
   toggleBtn.textContent = sidebarOpen ? 'hide' : 'show';
-
-  setTimeout(() => {
-    if (myP5) myP5.windowResized();
-  }, 370);
+  setTimeout(() => { if (myP5) myP5.windowResized(); }, 370);
 });
 
-// ── SENSATION → OPACITY MAP ────────────────────────────────────────────────
-// no sensation  → 0.50 (default, no strong feeling)
-// "wave"        → 0.65 (weak / low intensity)
-// "zigzag"      → 0.85 (strong / high intensity)
+// ── SENSATION OPACITY ──────────────────────────────────────────────────────
 function sensationOpacity(sensation) {
   if (sensation === 'zigzag') return 0.85;
   if (sensation === 'wave')   return 0.65;
@@ -329,8 +306,41 @@ async function boot() {
   } catch (_) {}
 
   if (!tree) {
-    showError('manifest.json not found in illustrations/ folder.');
-    tree = { children: [] };
+    // Demo tree — remove this block once you have a manifest.json
+    tree = {
+      children: [
+        {
+          label: 'being at school', path: '',
+          children: [
+            { label: 'lunch', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt',     action: 'eating' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'belonging', action: 'eating' } ] },
+            { label: 'sports day', path: '',
+              low:  [ { file: '', sensation: 'wave',   link: 'pride',     action: 'competing' } ],
+              high: [ { file: '',                      link: 'shame',     action: 'competing' } ] },
+          ]
+        },
+        {
+          label: 'hanging out with friends', path: '',
+          children: [
+            { label: 'in thane', path: '',
+              low:  [ { file: '', link: 'belonging', action: 'eating' } ] },
+            { label: 'first kiss', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'shame', action: 'intimacy' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'joy',   action: 'intimacy' } ] },
+          ]
+        },
+        {
+          label: 'home', path: '',
+          children: [
+            { label: 'dinner table', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt', action: 'eating' } ] },
+            { label: 'winning prize', path: '',
+              low:  [ { file: '', sensation: 'zigzag', link: 'pride', action: 'competing' } ] },
+          ]
+        }
+      ]
+    };
   }
 
   startSketch(tree);
@@ -344,36 +354,35 @@ function showError(msg) {
 
 // ── TREE HELPERS ───────────────────────────────────────────────────────────
 function collectSrcs(node, srcs = []) {
-  if (node.bad)  node.bad.forEach(e  => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
-  if (node.good) node.good.forEach(e => { const n = normaliseEntry(e); srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
+  if (node.high) node.high.forEach(e => { const n = normaliseEntry(e); if (n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
+  if (node.low)  node.low.forEach(e  => { const n = normaliseEntry(e); if (n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
   if (node.children) node.children.forEach(c => collectSrcs(c, srcs));
   return srcs;
 }
 
 function annotateTints(node) {
-  const hasBad  = node.bad  && node.bad.length  > 0;
-  const hasGood = node.good && node.good.length > 0;
+  const hasHigh = node.high && node.high.length > 0;
+  const hasLow  = node.low  && node.low.length  > 0;
 
   if (!node.children || node.children.length === 0) {
-    node.tint     = hasBad && !hasGood ? -1 : !hasBad && hasGood ? 1 : 0;
+    node.tint     = hasHigh && !hasLow ? -1 : !hasHigh && hasLow ? 1 : 0;
     node.maxDepth = 0;
     return;
   }
 
   node.children.forEach(c => annotateTints(c));
-
   const childTints = node.children.map(c => c.tint);
-  const allBad     = childTints.every(t => t === -1);
-  const allGood    = childTints.every(t => t ===  1);
+  const allHigh    = childTints.every(t => t === -1);
+  const allLow     = childTints.every(t => t ===  1);
 
-  if (hasBad)  childTints.push(-1);
-  if (hasGood) childTints.push( 1);
+  if (hasHigh) childTints.push(-1);
+  if (hasLow)  childTints.push( 1);
 
-  node.tint     = allBad ? -1 : allGood ? 1 : 0;
+  node.tint     = allHigh ? -1 : allLow ? 1 : 0;
   node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
 }
 
-// ── SKETCH CONFIG ──────────────────────────────────────────────────────────
+// ── CONFIG ─────────────────────────────────────────────────────────────────
 const CONFIG = {
   trunkRatio:   0.16,
   branchDecay:  0.65,
@@ -382,8 +391,8 @@ const CONFIG = {
   splitAngle:   26,
   subAngle:     20,
   neutralColor: [120, 120, 120],
-  badColor:     [252, 212, 148],
-  goodColor:    [75, 163, 195],
+  highColor:    [252, 212, 148],  // yellow — high activity / involuntary
+  lowColor:     [75,  163, 195],  // blue   — low activity  / voluntary
 };
 
 // ── SKETCH ─────────────────────────────────────────────────────────────────
@@ -432,7 +441,6 @@ function startSketch(tree) {
       const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
 
       p.push();
-      // trunk base sits at the bottom of the brain outline
       p.translate(W / 2, botY);
 
       p.stroke(...CONFIG.neutralColor);
@@ -466,7 +474,6 @@ function startSketch(tree) {
 
       p.pop();
 
-      // draw cross-links in screen space after all transforms are cleared
       p.push();
       p.resetMatrix();
       drawCrossLinks(p);
@@ -475,15 +482,15 @@ function startSketch(tree) {
 
     function drawNode(p, node, len, depth, totalDepth, allImgs, W, H, S) {
       const hasChildren = node.children && node.children.length > 0;
-      const hasBad      = node.bad  && node.bad.length  > 0;
-      const hasGood     = node.good && node.good.length > 0;
+      const hasHigh     = node.high && node.high.length > 0;
+      const hasLow      = node.low  && node.low.length  > 0;
 
       const t    = Math.min(depth / totalDepth, 1);
       const tint = node.tint || 0;
       const nr   = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
-      const tr   = tint < 0 ? CONFIG.badColor[0]  : tint > 0 ? CONFIG.goodColor[0]  : nr;
-      const tg   = tint < 0 ? CONFIG.badColor[1]  : tint > 0 ? CONFIG.goodColor[1]  : ng;
-      const tb   = tint < 0 ? CONFIG.badColor[2]  : tint > 0 ? CONFIG.goodColor[2]  : nb;
+      const tr   = tint < 0 ? CONFIG.highColor[0] : tint > 0 ? CONFIG.lowColor[0] : nr;
+      const tg   = tint < 0 ? CONFIG.highColor[1] : tint > 0 ? CONFIG.lowColor[1] : ng;
+      const tb   = tint < 0 ? CONFIG.highColor[2] : tint > 0 ? CONFIG.lowColor[2] : nb;
       const r    = nr + (tr - nr) * t;
       const g    = ng + (tg - ng) * t;
       const b    = nb + (tb - nb) * t;
@@ -511,11 +518,13 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.006 - depth * 0.14, 1.5));
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.translate(0.2, -len * 0.5);
-        p.rotate(-90);
-        p.text(node.label, 0, -4);
+        p.textSize(Math.max(S * 0.007 - depth * 0.3, 5.5));
+        p.translate(0, -len * 0.5);
+        const xfLabel = p.drawingContext.getTransform();
+        const ang     = Math.atan2(xfLabel.b, xfLabel.a) * (180 / Math.PI);
+        p.rotate(-ang);
+        p.textAlign(p.LEFT, p.CENTER);
+        p.text(node.label, 12, 0);
         p.pop();
       }
 
@@ -537,25 +546,25 @@ function startSketch(tree) {
         });
       }
 
-      if (hasBad || hasGood) {
+      if (hasHigh || hasLow) {
         const leafLen = len * CONFIG.branchDecay * 0.85;
-        if (hasBad) {
-          const angles = fanAngles(node.bad.length, -CONFIG.splitAngle, CONFIG.subAngle);
-          node.bad.forEach((e, i) => {
+        if (hasHigh) {
+          const angles = fanAngles(node.high.length, -CONFIG.splitAngle, CONFIG.subAngle);
+          node.high.forEach((e, i) => {
             const { file, sensation, link, action } = normaliseEntry(e);
-            const src = `${ROOT_FOLDER}/${node.path}/${file}`;
+            const src = file ? `${ROOT_FOLDER}/${node.path}/${file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'bad', depth, W, H, S, sensation, link, action);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'high', depth, W, H, S, sensation, link, action);
             p.pop();
           });
         }
-        if (hasGood) {
-          const angles = fanAngles(node.good.length, CONFIG.splitAngle, CONFIG.subAngle);
-          node.good.forEach((e, i) => {
+        if (hasLow) {
+          const angles = fanAngles(node.low.length, CONFIG.splitAngle, CONFIG.subAngle);
+          node.low.forEach((e, i) => {
             const { file, sensation, link, action } = normaliseEntry(e);
-            const src = `${ROOT_FOLDER}/${node.path}/${file}`;
+            const src = file ? `${ROOT_FOLDER}/${node.path}/${file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, allImgs[src], leafLen, 'good', depth, W, H, S, sensation, link, action);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'low', depth, W, H, S, sensation, link, action);
             p.pop();
           });
         }
@@ -563,8 +572,8 @@ function startSketch(tree) {
     }
 
     function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation, link, action) {
-      const isBad   = side === 'bad';
-      const col     = isBad ? CONFIG.badColor : CONFIG.goodColor;
+      const isHigh  = side === 'high';
+      const col     = isHigh ? CONFIG.highColor : CONFIG.lowColor;
       const opacity = sensationOpacity(sensation);
       const alpha   = Math.max(190 - depth * 15, 90) * opacity;
       const sw      = Math.max(1.6 - depth * 0.1, 0.6);
@@ -582,9 +591,7 @@ function startSketch(tree) {
 
       p.translate(0, -len);
 
-      // node size scales with S so it stays proportional on any screen
       const nodeSize = Math.max(S * 0.065 - depth * 4, 20);
-      const r        = nodeSize / 2;
 
       const xf = p.drawingContext.getTransform();
       const wx = xf.e;
@@ -646,18 +653,18 @@ function startSketch(tree) {
 
       } else {
         p.noStroke();
-        p.fill(...col, 14);
+        p.fill(...col, 14 * opacity);
         drawBlob(p, 0, 0, nodeSize * 1.5, nodeSize * 1.3, 7, depth * 3.1, 0.3);
-        p.fill(...col, 25);
+        p.fill(...col, 25 * opacity);
         drawBlob(p, 0, 0, nodeSize * 1.1, nodeSize * 0.95, 6, depth * 3.1 + 1, 0.25);
-        p.fill(...col, 130);
+        p.fill(...col, 130 * opacity);
         p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
       leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side, link: link || null, action: action || null });
     }
 
-    // ── cross-links: dotted = emotion, dashed = action ────────────────────
+    // ── cross-links ───────────────────────────────────────────────────────
     function drawCrossLinks(p) {
       const emotions = {};
       const actions  = {};
@@ -666,23 +673,20 @@ function startSketch(tree) {
         if (node.action) { if (!actions[node.action]) actions[node.action] = []; actions[node.action].push(node); }
       }
 
-      // emotion links — short dots
       for (const tag in emotions) {
         const nodes = emotions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 40, 2, 255, 255, 255, 50);
+            drawArc(p, nodes[i], nodes[j], 40, 2);
       }
 
-      // action links — longer dashes
       for (const tag in actions) {
         const nodes = actions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 14, 4, 255, 255, 255, 50);
+            drawArc(p, nodes[i], nodes[j], 14, 4);
       }
 
-      // ── legend — just line style + type label ──────────────────────────
       const hasEmotions = Object.keys(emotions).length > 0;
       const hasActions  = Object.keys(actions).length  > 0;
       if (!hasEmotions && !hasActions) return;
@@ -696,7 +700,7 @@ function startSketch(tree) {
       p.textAlign(p.RIGHT, p.CENTER);
 
       if (hasEmotions) {
-        p.stroke(255, 255, 255, 140);
+        p.stroke(255, 255, 255, 100);
         p.strokeWeight(0.5);
         for (let s = 0; s < 6; s += 2)
           p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
@@ -707,7 +711,7 @@ function startSketch(tree) {
       }
 
       if (hasActions) {
-        p.stroke(255, 255, 255, 140);
+        p.stroke(255, 255, 255, 100);
         p.strokeWeight(0.5);
         for (let s = 0; s < 3; s++)
           p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
@@ -717,17 +721,15 @@ function startSketch(tree) {
       }
     }
 
-    // draws a dashed/dotted arc between two nodes in absolute canvas coords
-    function drawArc(p, a, b, steps, skip, r, g, bv, alpha) {
+    function drawArc(p, a, b, steps, skip) {
       const dpr = p.pixelDensity();
       const ax  = a.x / dpr, ay = a.y / dpr;
       const bx  = b.x / dpr, by = b.y / dpr;
       const mx  = (ax + bx) / 2;
       const my  = (ay + by) / 2 - Math.abs(bx - ax) * 0.3;
-
       p.noFill();
-      p.stroke(255, 255, 255, 50);
-      p.strokeWeight(0.5);
+      p.stroke(255, 255, 255, 60);
+      p.strokeWeight(0.6);
       for (let s = 0; s < steps; s += skip) {
         const t0 = s / steps;
         const t1 = (s + skip * 0.5) / steps;
@@ -761,9 +763,7 @@ function startSketch(tree) {
         p.curveVertex(vx, vy);
       }
       const nVal0 = p.noise(seed) * 2 - 1;
-      const vx0   = cx + p.cos(0) * rw * 0.5 * (1 + nVal0 * wobble);
-      const vy0   = cy + p.sin(0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6);
-      p.curveVertex(vx0, vy0);
+      p.curveVertex(cx + p.cos(0) * rw * 0.5 * (1 + nVal0 * wobble), cy + p.sin(0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6));
       p.endShape(p.CLOSE);
     }
 
