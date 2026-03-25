@@ -466,8 +466,11 @@ function startSketch(tree) {
 
       p.pop();
 
-      // ── draw cross-links between nodes sharing the same link tag ─────────
+      // draw cross-links in screen space after all transforms are cleared
+      p.push();
+      p.resetMatrix();
       drawCrossLinks(p);
+      p.pop();
     };
 
     function drawNode(p, node, len, depth, totalDepth, allImgs, W, H, S) {
@@ -508,7 +511,7 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 160 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.009 - depth * 0.3, 6.5));
+        p.textSize(Math.max(S * 0.007 - depth * 0.3, 5.5));
         p.translate(0, -len * 0.5);
         const xfLabel = p.drawingContext.getTransform();
         const angle   = Math.atan2(xfLabel.b, xfLabel.a) * (180 / Math.PI);
@@ -586,9 +589,8 @@ function startSketch(tree) {
       const r        = nodeSize / 2;
 
       const xf = p.drawingContext.getTransform();
-      // Convert from CSS pixels to canvas pixels properly
-      const wx = xf.e / (window.devicePixelRatio || 1);
-      const wy = xf.f / (window.devicePixelRatio || 1);
+      const wx = xf.e;
+      const wy = xf.f;
 
       p.noStroke();
       p.imageMode(p.CENTER);
@@ -717,21 +719,24 @@ function startSketch(tree) {
       }
     }
 
-    // draws a dashed/dotted arc between two nodes
-    // steps = total segments, skip = every nth is drawn (2=dots, 4=dashes)
+    // draws a dashed/dotted arc between two nodes in absolute canvas coords
     function drawArc(p, a, b, steps, skip, r, g, bv, alpha) {
-      const mx = (a.x + b.x) / 2;
-      const my = (a.y + b.y) / 2 - Math.abs(b.x - a.x) * 0.3;
+      const dpr = p.pixelDensity();
+      const ax  = a.x / dpr, ay = a.y / dpr;
+      const bx  = b.x / dpr, by = b.y / dpr;
+      const mx  = (ax + bx) / 2;
+      const my  = (ay + by) / 2 - Math.abs(bx - ax) * 0.3;
+
       p.noFill();
       p.stroke(r, g, bv, alpha);
       p.strokeWeight(0.8);
       for (let s = 0; s < steps; s += skip) {
         const t0 = s / steps;
         const t1 = (s + skip * 0.5) / steps;
-        const x0 = bezierPoint(a.x, mx, mx, b.x, t0);
-        const y0 = bezierPoint(a.y, my, my, b.y, t0);
-        const x1 = bezierPoint(a.x, mx, mx, b.x, t1);
-        const y1 = bezierPoint(a.y, my, my, b.y, t1);
+        const x0 = bezierPoint(ax, mx, mx, bx, t0);
+        const y0 = bezierPoint(ay, my, my, by, t0);
+        const x1 = bezierPoint(ax, mx, mx, bx, t1);
+        const y1 = bezierPoint(ay, my, my, by, t1);
         p.line(x0, y0, x1, y1);
       }
     }
