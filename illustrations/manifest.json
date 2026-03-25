@@ -7,8 +7,8 @@
         {
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
-          "bad":  [ { "file": "1_lunch-at-school_bad.jpg", "link": "guilt", "action": "eating" } ],
-          "good": [ { "file": "1_lunch-at-school_good.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
+          "high":  [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating" } ],
+          "low": [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
         }
       ]
     },
@@ -19,7 +19,7 @@
         {
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
-          "good": [ { "file": "2_subway_good.jpg", "link": "belonging", "action": "eating" } ]
+          "low": [ { "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" } ]
         }
       ]
     }
