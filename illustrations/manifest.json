@@ -5,7 +5,7 @@
       "path": "1_being-at-school",
       "children": [
         {
-          "label": "lunch",
+          "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
           "bad":  [ { "file": "1_lunch-at-school_bad.jpg", "link": "guilt", "action": "eating" } ],
           "good": [ { "file": "1_lunch-at-school_good.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
