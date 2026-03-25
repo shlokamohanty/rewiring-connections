@@ -508,11 +508,11 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.012 - depth * 0.4, 7));
+        p.textSize(Math.max(S * 0.010 - depth * 0.4, 7));
         p.textAlign(p.CENTER, p.BOTTOM);
         p.translate(0, -len * 0.5);
         p.rotate(-90);
-        p.text(node.label, 0, -4);
+        p.text(node.label, 0, -7);
         p.pop();
       }
 
@@ -663,79 +663,56 @@ function startSketch(tree) {
         if (node.action) { if (!actions[node.action]) actions[node.action] = []; actions[node.action].push(node); }
       }
 
-      // emotion links — short dots, white faint
+      // emotion links — short dots
       for (const tag in emotions) {
         const nodes = emotions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 30, 2, 255, 255, 255, 35);
+            drawArc(p, nodes[i], nodes[j], 40, 2, 255, 255, 255, 80);
       }
 
-      // action links — longer dashes, warm tint
+      // action links — longer dashes
       for (const tag in actions) {
         const nodes = actions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 10, 4, 220, 200, 180, 40);
+            drawArc(p, nodes[i], nodes[j], 14, 4, 220, 200, 180, 90);
       }
 
-      // ── legend in bottom-right corner ──────────────────────────────────
-      const emotionTags = Object.keys(emotions);
-      const actionTags  = Object.keys(actions);
-      if (!emotionTags.length && !actionTags.length) return;
+      // ── legend — just line style + type label ──────────────────────────
+      const hasEmotions = Object.keys(emotions).length > 0;
+      const hasActions  = Object.keys(actions).length  > 0;
+      if (!hasEmotions && !hasActions) return;
 
       const px    = W - 16;
-      const lineH = 18;
-      const startY = H - 16 - (emotionTags.length + actionTags.length + (emotionTags.length && actionTags.length ? 1 : 0)) * lineH;
-      let y = startY;
+      const lineH = 20;
+      let y = H - 16 - ((hasEmotions ? 1 : 0) + (hasActions ? 1 : 0)) * lineH;
 
       p.textFont('Space Mono');
       p.textSize(8);
       p.textAlign(p.RIGHT, p.CENTER);
 
-      // emotion section
-      if (emotionTags.length) {
-        p.fill(160, 160, 160, 120);
+      if (hasEmotions) {
+        // dot sample
+        p.stroke(255, 255, 255, 80);
+        p.strokeWeight(0.8);
+        for (let s = 0; s < 6; s += 2)
+          p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
         p.noStroke();
+        p.fill(180, 180, 180, 160);
         p.text('emotion', px, y);
         y += lineH;
-
-        emotionTags.forEach(tag => {
-          // short dot sample
-          p.stroke(255, 255, 255, 50);
-          p.strokeWeight(0.8);
-          for (let s = 0; s < 5; s += 2) {
-            p.line(px - 60 + s * 4, y, px - 60 + s * 4 + 3, y);
-          }
-          // label
-          p.noStroke();
-          p.fill(200, 200, 200, 150);
-          p.text(tag, px, y);
-          y += lineH;
-        });
       }
 
-      // action section
-      if (actionTags.length) {
-        if (emotionTags.length) y += 4; // small gap between sections
+      if (hasActions) {
+        // dash sample
+        p.stroke(220, 200, 180, 90);
+        p.strokeWeight(0.8);
+        for (let s = 0; s < 3; s++)
+          p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
         p.noStroke();
-        p.fill(160, 160, 160, 120);
+        p.fill(180, 180, 180, 160);
         p.text('action', px, y);
-        y += lineH;
-
-        actionTags.forEach(tag => {
-          // longer dash sample
-          p.stroke(220, 200, 180, 55);
-          p.strokeWeight(0.8);
-          for (let s = 0; s < 3; s++) {
-            p.line(px - 60 + s * 9, y, px - 60 + s * 9 + 5, y);
-          }
-          // label
-          p.noStroke();
-          p.fill(200, 200, 200, 150);
-          p.text(tag, px, y);
-          y += lineH;
-        });
       }
     }
 
