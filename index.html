@@ -506,13 +506,15 @@ function startSketch(tree) {
       if (node.label) {
         p.push();
         p.noStroke();
-        p.fill(200, 200, 200, 180 - depth * 12);
+        p.fill(200, 200, 200, 160 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.010 - depth * 0.4, 7));
-        p.textAlign(p.CENTER, p.BOTTOM);
+        p.textSize(Math.max(S * 0.009 - depth * 0.3, 6.5));
         p.translate(0, -len * 0.5);
-        p.rotate(-90);
-        p.text(node.label, 0, -7);
+        const xfLabel = p.drawingContext.getTransform();
+        const angle   = Math.atan2(xfLabel.b, xfLabel.a) * (180 / Math.PI);
+        p.rotate(-angle);
+        p.textAlign(p.LEFT, p.CENTER);
+        p.text(node.label, 12, 0);
         p.pop();
       }
 
@@ -584,8 +586,9 @@ function startSketch(tree) {
       const r        = nodeSize / 2;
 
       const xf = p.drawingContext.getTransform();
-      const wx = xf.e;
-      const wy = xf.f;
+      // Convert from CSS pixels to canvas pixels properly
+      const wx = xf.e / (window.devicePixelRatio || 1);
+      const wy = xf.f / (window.devicePixelRatio || 1);
 
       p.noStroke();
       p.imageMode(p.CENTER);
@@ -668,7 +671,7 @@ function startSketch(tree) {
         const nodes = emotions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 40, 2, 255, 255, 255, 80);
+            drawArc(p, nodes[i], nodes[j], 40, 2, 255, 255, 255, 140);
       }
 
       // action links — longer dashes
@@ -676,7 +679,7 @@ function startSketch(tree) {
         const nodes = actions[tag];
         for (let i = 0; i < nodes.length; i++)
           for (let j = i + 1; j < nodes.length; j++)
-            drawArc(p, nodes[i], nodes[j], 14, 4, 220, 200, 180, 90);
+            drawArc(p, nodes[i], nodes[j], 14, 4, 252, 212, 148, 140);
       }
 
       // ── legend — just line style + type label ──────────────────────────
@@ -693,8 +696,7 @@ function startSketch(tree) {
       p.textAlign(p.RIGHT, p.CENTER);
 
       if (hasEmotions) {
-        // dot sample
-        p.stroke(255, 255, 255, 80);
+        p.stroke(255, 255, 255, 140);
         p.strokeWeight(0.8);
         for (let s = 0; s < 6; s += 2)
           p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
@@ -705,8 +707,7 @@ function startSketch(tree) {
       }
 
       if (hasActions) {
-        // dash sample
-        p.stroke(220, 200, 180, 90);
+        p.stroke(252, 212, 148, 140);
         p.strokeWeight(0.8);
         for (let s = 0; s < 3; s++)
           p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
