@@ -699,7 +699,7 @@ function startSketch(tree) {
 
       if (hasEmotions) {
         p.stroke(255, 255, 255, 140);
-        p.strokeWeight(0.8);
+        p.strokeWeight(0.5);
         for (let s = 0; s < 6; s += 2)
           p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
         p.noStroke();
@@ -709,8 +709,8 @@ function startSketch(tree) {
       }
 
       if (hasActions) {
-        p.stroke(252, 212, 148, 140);
-        p.strokeWeight(0.8);
+        p.stroke(255, 255, 255, 140);
+        p.strokeWeight(0.5);
         for (let s = 0; s < 3; s++)
           p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
         p.noStroke();
@@ -729,7 +729,7 @@ function startSketch(tree) {
 
       p.noFill();
       p.stroke(r, g, bv, alpha);
-      p.strokeWeight(0.8);
+      p.strokeWeight(0.5);
       for (let s = 0; s < steps; s += skip) {
         const t0 = s / steps;
         const t1 = (s + skip * 0.5) / steps;
