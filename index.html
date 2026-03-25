@@ -1,21 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rewiring Connections</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 <style>
-    text {
-        font-size: smaller;
-    }
-</style>
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: 400;
+  font-style: italic;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: 700;
+  font-style: italic;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: #0a0a0a;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+header {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 10;
+  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px) 16px;
+  background: rgba(10,10,10,0.95);
+  display: flex;
+  align-items: baseline;
+  gap: clamp(16px, 2.5vw, 32px);
+}
+.title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(13px, 1.4vw, 17px);
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: #fff;
+}
+.legend {
+  display: flex;
+  gap: clamp(12px, 1.5vw, 20px);
+}
+.legend-item {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(9px, 0.9vw, 11px);
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+#canvas-wrap {
+  position: fixed;
+  top: 54px;
+  left: clamp(200px, 22vw, 320px);
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  transition: left 0.35s ease;
+  border-left: 0.5px solid #1e1e1e;
+}
+#canvas-wrap.collapsed {
+  left: 0;
+  border-left: none;
+}
 
-<!-- Other HTML content -->
+#sidebar {
+  position: fixed;
+  top: 54px;
+  left: 0;
+  width: clamp(200px, 22vw, 320px);
+  bottom: 0;
+  overflow-y: auto;
+  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px 16px;
+  border-right: 0.5px solid #1e1e1e;
+  z-index: 2;
+  background: #0a0a0a;
+  transition: transform 0.35s ease;
+}
+#sidebar.collapsed { transform: translateX(-100%); }
+
+#toggle-sidebar {
+  position: fixed;
+  top: 50%;
+  left: clamp(200px, 22vw, 320px);
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  background: #0a0a0a;
+  border: 0.5px solid #2a2a2a;
+  color: #555;
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  cursor: pointer;
+  padding: 6px 5px;
+  line-height: 1;
+  border-radius: 2px;
+  transition: left 0.35s ease, color 0.15s, border-color 0.15s;
+  writing-mode: vertical-rl;
+  letter-spacing: 0.1em;
+}
+#toggle-sidebar:hover { color: #aaa; border-color: #555; }
+#toggle-sidebar.collapsed {
+  left: 12px;
+  transform: translateY(-50%);
+}
+
+#sidebar p {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(9px, 1vw, 11px);
+  line-height: 1.9;
+  color: #b0b0b0;
+  letter-spacing: 0.02em;
+  margin-bottom: clamp(10px, 1.4vh, 16px);
+}
+#sidebar p.bullet {
+  padding-left: 12px;
+  color: #b0b0b0;
+  border-left: 1px solid #2a2a2a;
+}
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(10,10,10,0.96);
+  align-items: center;
+  justify-content: center;
+  cursor: zoom-out;
+}
+.lightbox.open { display: flex; }
+.lightbox-inner {
+  position: relative;
+  max-width: min(88vw, 720px);
+  max-height: 88vh;
+  animation: lbIn 0.18s ease;
+}
+@keyframes lbIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to   { opacity: 1; transform: scale(1); }
+}
+.lightbox img {
+  display: block;
+  max-width: 100%;
+  max-height: 88vh;
+  object-fit: contain;
+}
+.lightbox-close {
+  position: absolute;
+  top: -36px; right: 0;
+  background: none;
+  border: none;
+  font-size: 28px;
+  font-weight: 200;
+  color: #666;
+  cursor: pointer;
+  line-height: 1;
+  transition: color 0.15s;
+  font-family: 'Space Mono', monospace;
+}
+.lightbox-close:hover { color: #ccc; }
+#error-banner {
+  display: none;
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #111;
+  border: 0.5px solid #333;
+  border-radius: 3px;
+  padding: 10px 22px;
+  font-size: 11px;
+  font-family: 'Space Mono', monospace;
+  color: #888;
+  z-index: 200;
+  white-space: nowrap;
+}
+</style>
+</head>
+<body>
+
+<header>
+  <p class="title">Rewiring Connections</p>
+  <div class="legend">
+    <span class="legend-item" style="color:#fcd494;">&#9679; high activity</span>
+    <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
+  </div>
+</header>
+
+<div id="sidebar">
+  <p>I sometimes reflect on my teenage experiences, and I consistently find myself fixating on events that were particularly traumatic for me. Many people who experience trauma often display increased neural activity in most regions of the brain, but with deliberate effort, it is possible to reorganize neural pathways and reduce overactivity in certain areas. So, I am dedicating the next 100 days to exploring whether I can rewire my brain's associations with my teenage.</p>
+  <p>Every day, the intent is to sketch a new memory from my teenage. The sketch could be mixed media or just as is.</p>
+  <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
+  <p class="bullet">If, while looking for a memory, an involuntary one surfaces, I'll sketch the voluntary one first and the involuntary one the next day.</p>
+  <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
+</div>
+<button id="toggle-sidebar">hide</button>
+<div id="canvas-wrap"></div>
+
+<div class="lightbox" id="lightbox">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" id="lbClose">×</button>
+    <img id="lbImg" src="" alt="">
+  </div>
+</div>
+<div id="error-banner"></div>
 
 <script>
-    // Assuming the original line looked like this:
-    // p.rotate(-angle);
-    // Drawing the text without rotation:
-    p.text(textContent, x, y);
+// ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
+//
+// 1. FOLDER STRUCTURE
+//    Place all images in subfolders inside illustrations/
+//    illustrations/
+//      manifest.json
+//      1_losing-my-job/
+//        1_losing-my-job_bad.jpg
+//        1_losing-my-job_good.jpg
+//
+// 2. MANIFEST FORMAT
+//    manifest.json describes the full tree. Each node has:
+//      label    → text shown along the branch
+//      path     → folder path relative to illustrations/
+//      children → array of nested sub-events (optional)
+//      bad      → array of high-activity images (yellow)
+//      good     → array of low-activity images (blue)
+//
+//    bad/good entries can be:
+//      a) plain string  →  "1_bad.jpg"
+//      b) object        →  { "file": "1_bad.jpg", "sensation": "zigzag" }
+//
+// 3. SENSATION LABELS (controls neuron opacity)
+//    Add "sensation" to any bad/good entry:
+//
+//      no sensation field     → no strong feeling
+//                               → LOWEST opacity (0.50)
+//
+//      "sensation": "wave"    → weak / low intensity feeling
+//                               → MID opacity (0.65)
+//
+//      "sensation": "zigzag"  → strong / high intensity feeling
+//                               → HIGHEST opacity (0.85)
+//
+// 4. FULL EXAMPLE
+// {
+//   "children": [
+//     {
+//       "label": "losing my job",
+//       "path": "1_losing-my-job",
+//       "bad": [
+//         { "file": "1_losing-my-job_bad.jpg",  "sensation": "zigzag" },
+//         { "file": "2_losing-my-job_bad2.jpg", "sensation": "wave"   }
+//       ],
+//       "good": [
+//         { "file": "1_losing-my-job_good.jpg" }
+//       ]
+//     },
+//     {
+//       "label": "school",
+//       "path": "2_school",
+//       "children": [
+//         {
+//           "label": "music class",
+//           "path": "2_school/1_music-class",
+//           "bad":  [ { "file": "1_bad.jpg", "sensation": "zigzag" } ],
+//           "good": [ { "file": "1_good.jpg", "sensation": "wave"  } ]
+//         }
+//       ]
+//     }
+//   ]
+// }
 
+<<<<<<< HEAD
 <<<<<<< HEAD
     // Other JavaScript code
 </script>
 =======
+=======
+>>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
 const ROOT_FOLDER = 'illustrations';
 let leafNodes = [];
 let myP5 = null;
@@ -432,7 +706,11 @@ function startSketch(tree) {
 
       if (hasEmotions) {
         p.stroke(255, 255, 255, 140);
+<<<<<<< HEAD
         p.strokeWeight(0.8);
+=======
+        p.strokeWeight(0.5);
+>>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
         for (let s = 0; s < 6; s += 2)
           p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
         p.noStroke();
@@ -442,8 +720,13 @@ function startSketch(tree) {
       }
 
       if (hasActions) {
+<<<<<<< HEAD
         p.stroke(252, 212, 148, 140);
         p.strokeWeight(0.8);
+=======
+        p.stroke(255, 255, 255, 140);
+        p.strokeWeight(0.5);
+>>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
         for (let s = 0; s < 3; s++)
           p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
         p.noStroke();
@@ -462,7 +745,11 @@ function startSketch(tree) {
 
       p.noFill();
       p.stroke(r, g, bv, alpha);
+<<<<<<< HEAD
       p.strokeWeight(0.8);
+=======
+      p.strokeWeight(0.5);
+>>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
       for (let s = 0; s < steps; s += skip) {
         const t0 = s / steps;
         const t1 = (s + skip * 0.5) / steps;
@@ -593,4 +880,7 @@ boot();
 </script>
 </body>
 </html>
+<<<<<<< HEAD
 >>>>>>> parent of 8637ebc (Reduce stroke weight for better visual clarity)
+=======
+>>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
