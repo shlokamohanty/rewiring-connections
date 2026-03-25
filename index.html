@@ -511,9 +511,9 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.007 - depth * 0.13, 2));
+        p.textSize(Math.max(S * 0.006 - depth * 0.14, 1.5));
         p.textAlign(p.CENTER, p.BOTTOM);
-        p.translate(0, -len * 0.5);
+        p.translate(0.2, -len * 0.5);
         p.rotate(-90);
         p.text(node.label, 0, -4);
         p.pop();
