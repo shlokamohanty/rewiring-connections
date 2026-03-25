@@ -220,15 +220,69 @@ header {
 <div id="error-banner"></div>
 
 <script>
-    // Assuming the original line looked like this:
-    // p.rotate(-angle);
-    // Drawing the text without rotation:
-    p.text(textContent, x, y);
+// ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
+//
+// 1. FOLDER STRUCTURE
+//    Place all images in subfolders inside illustrations/
+//    illustrations/
+//      manifest.json
+//      1_losing-my-job/
+//        1_losing-my-job_bad.jpg
+//        1_losing-my-job_good.jpg
+//
+// 2. MANIFEST FORMAT
+//    manifest.json describes the full tree. Each node has:
+//      label    → text shown along the branch
+//      path     → folder path relative to illustrations/
+//      children → array of nested sub-events (optional)
+//      bad      → array of high-activity images (yellow)
+//      good     → array of low-activity images (blue)
+//
+//    bad/good entries can be:
+//      a) plain string  →  "1_bad.jpg"
+//      b) object        →  { "file": "1_bad.jpg", "sensation": "zigzag" }
+//
+// 3. SENSATION LABELS (controls neuron opacity)
+//    Add "sensation" to any bad/good entry:
+//
+//      no sensation field     → no strong feeling
+//                               → LOWEST opacity (0.50)
+//
+//      "sensation": "wave"    → weak / low intensity feeling
+//                               → MID opacity (0.65)
+//
+//      "sensation": "zigzag"  → strong / high intensity feeling
+//                               → HIGHEST opacity (0.85)
+//
+// 4. FULL EXAMPLE
+// {
+//   "children": [
+//     {
+//       "label": "losing my job",
+//       "path": "1_losing-my-job",
+//       "bad": [
+//         { "file": "1_losing-my-job_bad.jpg",  "sensation": "zigzag" },
+//         { "file": "2_losing-my-job_bad2.jpg", "sensation": "wave"   }
+//       ],
+//       "good": [
+//         { "file": "1_losing-my-job_good.jpg" }
+//       ]
+//     },
+//     {
+//       "label": "school",
+//       "path": "2_school",
+//       "children": [
+//         {
+//           "label": "music class",
+//           "path": "2_school/1_music-class",
+//           "bad":  [ { "file": "1_bad.jpg", "sensation": "zigzag" } ],
+//           "good": [ { "file": "1_good.jpg", "sensation": "wave"  } ]
+//         }
+//       ]
+//     }
+//   ]
+// }
 
-<<<<<<< HEAD
-    // Other JavaScript code
-</script>
-=======
 const ROOT_FOLDER = 'illustrations';
 let leafNodes = [];
 let myP5 = null;
@@ -273,6 +327,10 @@ async function boot() {
     const res = await fetch(`${ROOT_FOLDER}/manifest.json`);
     if (res.ok) tree = await res.json();
   } catch (_) {}
+
+  if (!tree) {
+    showError('manifest.json not found in illustrations/ folder.');
+    tree = { children: [] };
   }
 
   startSketch(tree);
@@ -451,15 +509,13 @@ function startSketch(tree) {
       if (node.label) {
         p.push();
         p.noStroke();
-        p.fill(200, 200, 200, 160 - depth * 12);
+        p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.007 - depth * 0.3, 5.5));
+        p.textSize(Math.max(S * 0.010 - depth * 0.8, 5));
+        p.textAlign(p.CENTER, p.BOTTOM);
         p.translate(0, -len * 0.5);
-        const xfLabel = p.drawingContext.getTransform();
-        const angle   = Math.atan2(xfLabel.b, xfLabel.a) * (180 / Math.PI);
-        p.rotate(-angle);
-        p.textAlign(p.LEFT, p.CENTER);
-        p.text(node.label, 12, 0);
+        p.rotate(-90);
+        p.text(node.label, 0, -4);
         p.pop();
       }
 
@@ -641,11 +697,7 @@ function startSketch(tree) {
 
       if (hasEmotions) {
         p.stroke(255, 255, 255, 140);
-<<<<<<< HEAD
-        p.strokeWeight(0.8);
-=======
         p.strokeWeight(0.5);
->>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
         for (let s = 0; s < 6; s += 2)
           p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
         p.noStroke();
@@ -655,13 +707,8 @@ function startSketch(tree) {
       }
 
       if (hasActions) {
-<<<<<<< HEAD
-        p.stroke(252, 212, 148, 140);
-        p.strokeWeight(0.8);
-=======
         p.stroke(255, 255, 255, 140);
         p.strokeWeight(0.5);
->>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
         for (let s = 0; s < 3; s++)
           p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
         p.noStroke();
@@ -680,11 +727,7 @@ function startSketch(tree) {
 
       p.noFill();
       p.stroke(r, g, bv, alpha);
-<<<<<<< HEAD
-      p.strokeWeight(0.8);
-=======
       p.strokeWeight(0.5);
->>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
       for (let s = 0; s < steps; s += skip) {
         const t0 = s / steps;
         const t1 = (s + skip * 0.5) / steps;
@@ -815,4 +858,3 @@ boot();
 </script>
 </body>
 </html>
->>>>>>> parent of 8637ebc (Reduce stroke weight for better visual clarity)
