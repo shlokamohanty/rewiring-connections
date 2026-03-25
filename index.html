@@ -220,76 +220,15 @@ header {
 <div id="error-banner"></div>
 
 <script>
-// ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
-//
-// 1. FOLDER STRUCTURE
-//    Place all images in subfolders inside illustrations/
-//    illustrations/
-//      manifest.json
-//      1_losing-my-job/
-//        1_losing-my-job_bad.jpg
-//        1_losing-my-job_good.jpg
-//
-// 2. MANIFEST FORMAT
-//    manifest.json describes the full tree. Each node has:
-//      label    → text shown along the branch
-//      path     → folder path relative to illustrations/
-//      children → array of nested sub-events (optional)
-//      bad      → array of high-activity images (yellow)
-//      good     → array of low-activity images (blue)
-//
-//    bad/good entries can be:
-//      a) plain string  →  "1_bad.jpg"
-//      b) object        →  { "file": "1_bad.jpg", "sensation": "zigzag" }
-//
-// 3. SENSATION LABELS (controls neuron opacity)
-//    Add "sensation" to any bad/good entry:
-//
-//      no sensation field     → no strong feeling
-//                               → LOWEST opacity (0.50)
-//
-//      "sensation": "wave"    → weak / low intensity feeling
-//                               → MID opacity (0.65)
-//
-//      "sensation": "zigzag"  → strong / high intensity feeling
-//                               → HIGHEST opacity (0.85)
-//
-// 4. FULL EXAMPLE
-// {
-//   "children": [
-//     {
-//       "label": "losing my job",
-//       "path": "1_losing-my-job",
-//       "bad": [
-//         { "file": "1_losing-my-job_bad.jpg",  "sensation": "zigzag" },
-//         { "file": "2_losing-my-job_bad2.jpg", "sensation": "wave"   }
-//       ],
-//       "good": [
-//         { "file": "1_losing-my-job_good.jpg" }
-//       ]
-//     },
-//     {
-//       "label": "school",
-//       "path": "2_school",
-//       "children": [
-//         {
-//           "label": "music class",
-//           "path": "2_school/1_music-class",
-//           "bad":  [ { "file": "1_bad.jpg", "sensation": "zigzag" } ],
-//           "good": [ { "file": "1_good.jpg", "sensation": "wave"  } ]
-//         }
-//       ]
-//     }
-//   ]
-// }
+    // Assuming the original line looked like this:
+    // p.rotate(-angle);
+    // Drawing the text without rotation:
+    p.text(textContent, x, y);
 
-<<<<<<< HEAD
 <<<<<<< HEAD
     // Other JavaScript code
 </script>
 =======
-=======
->>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
 const ROOT_FOLDER = 'illustrations';
 let leafNodes = [];
 let myP5 = null;
@@ -334,10 +273,6 @@ async function boot() {
     const res = await fetch(`${ROOT_FOLDER}/manifest.json`);
     if (res.ok) tree = await res.json();
   } catch (_) {}
-
-  if (!tree) {
-    showError('manifest.json not found in illustrations/ folder.');
-    tree = { children: [] };
   }
 
   startSketch(tree);
@@ -880,7 +815,4 @@ boot();
 </script>
 </body>
 </html>
-<<<<<<< HEAD
 >>>>>>> parent of 8637ebc (Reduce stroke weight for better visual clarity)
-=======
->>>>>>> parent of 54734dc (Updated index.html to adjust branch labels' orientation and font size)
