@@ -20,6 +20,22 @@
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
           "low": [ { "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" } ]
+        }, 
+        {
+          "label": "in powai",
+          "path": "2_hanging-out-with-friends/2_in-powai",
+          "high": [ { "file": "2_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ]
+        }
+      ]
+    },
+    {
+      "label": "hanging out with partners",
+      "path": "3_hanging-out-with-partners",
+      "children": [
+        {
+          "label": "in thane",
+          "path": "3_hanging-out-with-partners/3_in-powai",
+          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating" } ]
         }
       ]
     }
