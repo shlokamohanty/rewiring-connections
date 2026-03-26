@@ -7,8 +7,8 @@
         {
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
-          "high":  [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating" } ],
-          "low": [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
+          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating" } ],
+          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
         }
       ]
     },
@@ -20,11 +20,11 @@
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
           "low": [ { "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" } ]
-        }, 
+        },
         {
           "label": "in powai",
           "path": "2_hanging-out-with-friends/2_in-powai",
-          "high": [ { "file": "2_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ]
+          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ]
         }
       ]
     },
@@ -33,7 +33,7 @@
       "path": "3_hanging-out-with-partners",
       "children": [
         {
-          "label": "in thane",
+          "label": "in powai",
           "path": "3_hanging-out-with-partners/3_in-powai",
           "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating" } ]
         }
