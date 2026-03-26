@@ -35,7 +35,7 @@
         {
           "label": "in thane",
           "path": "3_hanging-out-with-partners/3_in-powai",
-          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating" } ]
+          "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating" } ]
         }
       ]
     }
