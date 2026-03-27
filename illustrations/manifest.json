@@ -24,7 +24,8 @@
         {
           "label": "in powai",
           "path": "2_hanging-out-with-friends/2_in-powai",
-          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ]
+          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ],
+          "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking" } ]
         }
       ]
     },
