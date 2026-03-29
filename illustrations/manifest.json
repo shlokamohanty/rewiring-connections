@@ -7,8 +7,8 @@
         {
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
-          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating" } ],
-          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating" } ]
+          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third"} ],
+          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third"} ]
         }
       ]
     },
@@ -19,14 +19,14 @@
         {
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
-          "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" },
-            { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running" }]
+          "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating", "perspective": "third"},
+            { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running", "perspective": "third"}]
         },
         {
           "label": "in powai",
           "path": "2_hanging-out-with-friends/2_in-powai",
-          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing" } ],
-          "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking" } ]
+          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing", "perspective": "first"} ],
+          "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking", "perspective": "third"} ]
         }
       ]
     },
@@ -37,7 +37,7 @@
         {
           "label": "in powai",
           "path": "3_hanging-out-with-partners/3_in-powai",
-          "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating" } ]
+          "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating", "perspective": "third"} ]
         }
       ]
     }
