@@ -205,7 +205,6 @@ header {
   <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
   <p class="bullet">If, while looking for a memory, involuntary memories surface, I'll sketch the voluntary one first and the involuntary ones in the next few days.</p>
   <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
-  <p class="bullet">If someone prompts me to remember a memory, but I had previously forgotten, and after the prompt, I voluntarily search for it, I will categorize it as a ‘low activity’ memory.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
@@ -411,7 +410,13 @@ function startSketch(tree) {
     let W, H;
 
     p.preload = () => {
-      allSrcs.forEach(src => { allImgs[src] = p.loadImage(src); });
+      allSrcs.forEach(src => {
+        allImgs[src] = p.loadImage(
+          src,
+          () => {},
+          () => { allImgs[src] = null; }
+        );
+      });
     };
 
     p.setup = () => {
@@ -520,9 +525,9 @@ function startSketch(tree) {
         p.noStroke();
         p.fill(200, 200, 200, 180 - depth * 12);
         p.textFont('Space Mono');
-        p.textSize(Math.max(S * 0.006 - depth * 0.14, 1.5));
+        p.textSize(Math.max(S * 0.007 - depth * 0.3, 5.5));
         p.textAlign(p.CENTER, p.BOTTOM);
-        p.translate(0.2, -len * 0.5);
+        p.translate(0, -len * 0.5);
         p.rotate(-90);
         p.text(node.label, 0, -4);
         p.pop();
