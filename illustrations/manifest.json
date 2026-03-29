@@ -19,8 +19,8 @@
         {
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
-          "low": [ { "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" } ],
-          "low": [ { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running" } ]
+          "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating" },
+            { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running" }]
         },
         {
           "label": "in powai",
