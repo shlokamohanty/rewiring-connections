@@ -9,182 +9,100 @@
 @font-face {
   font-family: 'Space Mono';
   src: url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
+  font-weight: 400; font-style: normal;
 }
 @font-face {
   font-family: 'Space Mono';
   src: url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
+  font-weight: 700; font-style: normal;
 }
 @font-face {
   font-family: 'Space Mono';
   src: url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype');
-  font-weight: 400;
-  font-style: italic;
+  font-weight: 400; font-style: italic;
 }
 @font-face {
   font-family: 'Space Mono';
   src: url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype');
-  font-weight: 700;
-  font-style: italic;
+  font-weight: 700; font-style: italic;
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  background: #0a0a0a;
-  overflow: hidden;
-  height: 100vh;
-  width: 100vw;
-}
+body { background: #0a0a0a; overflow: hidden; height: 100vh; width: 100vw; }
 header {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  z-index: 10;
-  padding: clamp(12px, 1.8vh, 20px) clamp(20px, 3vw, 36px) clamp(10px, 1.2vh, 14px) 16px;
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  padding: clamp(12px,1.8vh,20px) clamp(20px,3vw,36px) clamp(10px,1.2vh,14px) 16px;
   background: rgba(10,10,10,0.95);
-  display: flex;
-  align-items: baseline;
-  gap: clamp(16px, 2.5vw, 32px);
+  display: flex; align-items: baseline; gap: clamp(16px,2.5vw,32px);
 }
 .title {
   font-family: 'Space Mono', monospace;
-  font-size: clamp(13px, 1.4vw, 17px);
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: #fff;
+  font-size: clamp(13px,1.4vw,17px); font-weight: 400;
+  letter-spacing: 0.06em; color: #fff;
 }
-.legend {
-  display: flex;
-  gap: clamp(12px, 1.5vw, 20px);
-}
+.legend { display: flex; gap: clamp(8px,1vw,14px); flex-wrap: wrap; align-items: center; }
 .legend-item {
   font-family: 'Space Mono', monospace;
-  font-size: clamp(9px, 0.9vw, 11px);
-  letter-spacing: 0.08em;
-  opacity: 0.85;
+  font-size: clamp(8px,0.8vw,10px); letter-spacing: 0.06em; opacity: 0.85;
+}
+.legend-divider {
+  width: 0.5px; height: 12px; background: #333; align-self: center;
 }
 #canvas-wrap {
-  position: fixed;
-  top: 54px;
-  left: clamp(200px, 22vw, 320px);
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  transition: left 0.35s ease;
+  position: fixed; top: 54px;
+  left: clamp(200px,22vw,320px); right: 0; bottom: 0;
+  z-index: 1; transition: left 0.35s ease;
   border-left: 0.5px solid #1e1e1e;
 }
-#canvas-wrap.collapsed {
-  left: 0;
-  border-left: none;
-}
+#canvas-wrap.collapsed { left: 0; border-left: none; }
 #sidebar {
-  position: fixed;
-  top: 54px;
-  left: 0;
-  width: clamp(200px, 22vw, 320px);
-  bottom: 0;
+  position: fixed; top: 54px; left: 0;
+  width: clamp(200px,22vw,320px); bottom: 0;
   overflow-y: auto;
-  padding: clamp(16px, 2vw, 28px) clamp(14px, 1.8vw, 24px) 40px 16px;
+  padding: clamp(16px,2vw,28px) clamp(14px,1.8vw,24px) 40px 16px;
   border-right: 0.5px solid #1e1e1e;
-  z-index: 2;
-  background: #0a0a0a;
-  transition: transform 0.35s ease;
+  z-index: 2; background: #0a0a0a; transition: transform 0.35s ease;
 }
 #sidebar.collapsed { transform: translateX(-100%); }
 #toggle-sidebar {
-  position: fixed;
-  top: 50%;
-  left: clamp(200px, 22vw, 320px);
-  transform: translate(-50%, -50%);
-  z-index: 20;
-  background: #0a0a0a;
-  border: 0.5px solid #2a2a2a;
-  color: #555;
-  font-family: 'Space Mono', monospace;
-  font-size: 11px;
-  cursor: pointer;
-  padding: 6px 5px;
-  line-height: 1;
-  border-radius: 2px;
+  position: fixed; top: 50%; left: clamp(200px,22vw,320px);
+  transform: translate(-50%,-50%); z-index: 20;
+  background: #0a0a0a; border: 0.5px solid #2a2a2a; color: #555;
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  cursor: pointer; padding: 6px 5px; line-height: 1; border-radius: 2px;
   transition: left 0.35s ease, color 0.15s, border-color 0.15s;
-  writing-mode: vertical-rl;
-  letter-spacing: 0.1em;
+  writing-mode: vertical-rl; letter-spacing: 0.1em;
 }
 #toggle-sidebar:hover { color: #aaa; border-color: #555; }
-#toggle-sidebar.collapsed {
-  left: 12px;
-  transform: translateY(-50%);
-}
+#toggle-sidebar.collapsed { left: 12px; transform: translateY(-50%); }
 #sidebar p {
-  font-family: 'Space Mono', monospace;
-  font-size: clamp(9px, 1vw, 11px);
-  line-height: 1.9;
-  color: #b0b0b0;
-  letter-spacing: 0.02em;
-  margin-bottom: clamp(10px, 1.4vh, 16px);
+  font-family: 'Space Mono', monospace; font-size: clamp(9px,1vw,11px);
+  line-height: 1.9; color: #b0b0b0; letter-spacing: 0.02em;
+  margin-bottom: clamp(10px,1.4vh,16px);
 }
-#sidebar p.bullet {
-  padding-left: 12px;
-  color: #b0b0b0;
-  border-left: 1px solid #2a2a2a;
-}
+#sidebar p.bullet { padding-left: 12px; color: #b0b0b0; border-left: 1px solid #2a2a2a; }
 .lightbox {
-  display: none;
-  position: fixed;
-  inset: 0;
-  z-index: 100;
-  background: rgba(10,10,10,0.96);
-  align-items: center;
-  justify-content: center;
-  cursor: zoom-out;
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(10,10,10,0.96); align-items: center; justify-content: center; cursor: zoom-out;
 }
 .lightbox.open { display: flex; }
 .lightbox-inner {
-  position: relative;
-  max-width: min(88vw, 720px);
-  max-height: 88vh;
+  position: relative; max-width: min(88vw,720px); max-height: 88vh;
   animation: lbIn 0.18s ease;
 }
-@keyframes lbIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to   { opacity: 1; transform: scale(1); }
-}
-.lightbox img {
-  display: block;
-  max-width: 100%;
-  max-height: 88vh;
-  object-fit: contain;
-}
+@keyframes lbIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+.lightbox img { display: block; max-width: 100%; max-height: 88vh; object-fit: contain; }
 .lightbox-close {
-  position: absolute;
-  top: -36px; right: 0;
-  background: none;
-  border: none;
-  font-size: 28px;
-  font-weight: 200;
-  color: #666;
-  cursor: pointer;
-  line-height: 1;
-  transition: color 0.15s;
+  position: absolute; top: -36px; right: 0;
+  background: none; border: none; font-size: 28px; font-weight: 200;
+  color: #666; cursor: pointer; line-height: 1; transition: color 0.15s;
   font-family: 'Space Mono', monospace;
 }
 .lightbox-close:hover { color: #ccc; }
 #error-banner {
-  display: none;
-  position: fixed;
-  bottom: 24px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #111;
-  border: 0.5px solid #333;
-  border-radius: 3px;
-  padding: 10px 22px;
-  font-size: 11px;
-  font-family: 'Space Mono', monospace;
-  color: #888;
-  z-index: 200;
-  white-space: nowrap;
+  display: none; position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%); background: #111; border: 0.5px solid #333;
+  border-radius: 3px; padding: 10px 22px; font-size: 11px;
+  font-family: 'Space Mono', monospace; color: #888; z-index: 200; white-space: nowrap;
 }
 </style>
 </head>
@@ -193,8 +111,11 @@ header {
 <header>
   <p class="title">Rewiring Connections</p>
   <div class="legend">
-    <span class="legend-item" style="color:#fcd494;">&#9679; high activity</span>
-    <span class="legend-item" style="color:#4ba3c3;">&#9679; low activity</span>
+    <span class="legend-item" style="color:#E34234;">&#9679; 1st person · high</span>
+    <span class="legend-item" style="color:#59788E;">&#9679; 1st person · low</span>
+    <div class="legend-divider"></div>
+    <span class="legend-item" style="color:#fcd494;">&#9679; 3rd person · high</span>
+    <span class="legend-item" style="color:#4ba3c3;">&#9679; 3rd person · low</span>
   </div>
 </header>
 
@@ -220,36 +141,22 @@ header {
 <script>
 // ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
 //
-// 1. FOLDER STRUCTURE
-//    illustrations/
-//      manifest.json
-//      1_being-at-school/
-//        1_lunch/
-//          1_lunch_high.jpg     ← high activity (involuntary / yellow)
-//          1_lunch_low.jpg      ← low activity  (voluntary  / blue)
+// 1. MANIFEST FORMAT — high/low entries support these fields:
+//      "file"        → filename
+//      "sensation"   → "wave" | "zigzag" (controls opacity)
+//      "link"        → emotion tag (dotted cross-link)
+//      "action"      → action tag  (dashed cross-link)
+//      "perspective" → "first" | "third" (controls colour)
+//                      first  = I am in the memory (1st person)
+//                      third  = I am watching myself (3rd person / default)
 //
-// 2. MANIFEST FORMAT
-//    Each node has:
-//      label    → text shown along the branch
-//      path     → folder path relative to illustrations/
-//      children → nested sub-events (optional)
-//      high     → array of high-activity images (yellow, involuntary)
-//      low      → array of low-activity images  (blue,   voluntary)
+// 2. COLOURS
+//      first  + high → #E34234  (red)
+//      first  + low  → #59788E  (slate blue)
+//      third  + high → #fcd494  (warm yellow)
+//      third  + low  → #4ba3c3  (teal blue)
 //
-//    high/low entries can be:
-//      a) plain string  →  "1_lunch_high.jpg"
-//      b) object        →  { "file": "1_lunch_high.jpg", "sensation": "zigzag", "link": "guilt", "action": "eating" }
-//
-// 3. SENSATION (controls neuron opacity)
-//      no sensation   → 0.50
-//      "wave"         → 0.65  (weak / low intensity)
-//      "zigzag"       → 0.85  (strong / high intensity)
-//
-// 4. CROSS-LINKS
-//      "link"   → emotion tag  (dotted line connects matching nodes)
-//      "action" → action tag   (dashed line connects matching nodes)
-//
-// 5. FULL EXAMPLE
+// 3. EXAMPLE
 // {
 //   "children": [
 //     {
@@ -259,8 +166,14 @@ header {
 //         {
 //           "label": "lunch",
 //           "path": "1_being-at-school/1_lunch",
-//           "high": [ { "file": "1_lunch_high.jpg", "sensation": "zigzag", "link": "guilt",     "action": "eating" } ],
-//           "low":  [ { "file": "1_lunch_low.jpg",  "sensation": "wave",   "link": "belonging", "action": "eating" } ]
+//           "high": [
+//             { "file": "1_lunch_high.jpg", "sensation": "zigzag",
+//               "link": "guilt", "action": "eating", "perspective": "first" }
+//           ],
+//           "low": [
+//             { "file": "1_lunch_low.jpg", "sensation": "wave",
+//               "link": "belonging", "action": "eating", "perspective": "third" }
+//           ]
 //         }
 //       ]
 //     }
@@ -270,6 +183,19 @@ header {
 const ROOT_FOLDER = 'illustrations';
 let leafNodes = [];
 let myP5 = null;
+
+// ── COLOURS ────────────────────────────────────────────────────────────────
+const COLORS = {
+  firstHigh:  [227, 66,  52],  // #E34234 — 1st person high
+  firstLow:   [61, 74, 145],  // #59788E — 1st person low
+  thirdHigh:  [252, 212, 148],  // #fcd494 — 3rd person high
+  thirdLow:   [75,  163, 195],  // #4ba3c3 — 3rd person low
+};
+
+function getColor(side, perspective) {
+  const p = perspective === 'first' ? 'first' : 'third';
+  return COLORS[p + (side === 'high' ? 'High' : 'Low')];
+}
 
 // ── SIDEBAR TOGGLE ─────────────────────────────────────────────────────────
 const toggleBtn  = document.getElementById('toggle-sidebar');
@@ -294,8 +220,15 @@ function sensationOpacity(sensation) {
 }
 
 function normaliseEntry(entry) {
-  if (typeof entry === 'string') return { file: entry, sensation: null, link: null, action: null };
-  return { file: entry.file || entry, sensation: entry.sensation || null, link: entry.link || null, action: entry.action || null };
+  if (typeof entry === 'string')
+    return { file: entry, sensation: null, link: null, action: null, perspective: 'third' };
+  return {
+    file:        entry.file        || entry,
+    sensation:   entry.sensation   || null,
+    link:        entry.link        || null,
+    action:      entry.action      || null,
+    perspective: entry.perspective || 'third',
+  };
 }
 
 // ── BOOT ───────────────────────────────────────────────────────────────────
@@ -307,37 +240,38 @@ async function boot() {
   } catch (_) {}
 
   if (!tree) {
-    // Demo tree — remove this block once you have a manifest.json
+    // Demo tree
     tree = {
       children: [
         {
           label: 'being at school', path: '',
           children: [
             { label: 'lunch', path: '',
-              high: [ { file: '', sensation: 'zigzag', link: 'guilt',     action: 'eating' } ],
-              low:  [ { file: '', sensation: 'wave',   link: 'belonging', action: 'eating' } ] },
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt',     action: 'eating',    perspective: 'first' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'belonging', action: 'eating',    perspective: 'third' } ] },
             { label: 'sports day', path: '',
-              low:  [ { file: '', sensation: 'wave',   link: 'pride',     action: 'competing' } ],
-              high: [ { file: '',                      link: 'shame',     action: 'competing' } ] },
+              low:  [ { file: '', sensation: 'wave',   link: 'pride',     action: 'competing', perspective: 'first' } ],
+              high: [ { file: '',                      link: 'shame',     action: 'competing', perspective: 'third' } ] },
           ]
         },
         {
           label: 'hanging out with friends', path: '',
           children: [
             { label: 'in thane', path: '',
-              low:  [ { file: '', link: 'belonging', action: 'eating' } ] },
+              low:  [ { file: '', link: 'belonging', action: 'eating', perspective: 'third' },
+                      { file: '', link: 'fear',      action: 'running', perspective: 'first' } ] },
             { label: 'first kiss', path: '',
-              high: [ { file: '', sensation: 'zigzag', link: 'shame', action: 'intimacy' } ],
-              low:  [ { file: '', sensation: 'wave',   link: 'joy',   action: 'intimacy' } ] },
+              high: [ { file: '', sensation: 'zigzag', link: 'shame', action: 'intimacy', perspective: 'first' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'joy',   action: 'intimacy', perspective: 'third' } ] },
           ]
         },
         {
           label: 'home', path: '',
           children: [
             { label: 'dinner table', path: '',
-              high: [ { file: '', sensation: 'zigzag', link: 'guilt', action: 'eating' } ] },
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt', action: 'eating', perspective: 'first' } ] },
             { label: 'winning prize', path: '',
-              low:  [ { file: '', sensation: 'zigzag', link: 'pride', action: 'competing' } ] },
+              low:  [ { file: '', sensation: 'zigzag', link: 'pride', action: 'competing', perspective: 'third' } ] },
           ]
         }
       ]
@@ -349,8 +283,7 @@ async function boot() {
 
 function showError(msg) {
   const el = document.getElementById('error-banner');
-  el.textContent = msg;
-  el.style.display = 'block';
+  el.textContent = msg; el.style.display = 'block';
 }
 
 // ── TREE HELPERS ───────────────────────────────────────────────────────────
@@ -364,21 +297,16 @@ function collectSrcs(node, srcs = []) {
 function annotateTints(node) {
   const hasHigh = node.high && node.high.length > 0;
   const hasLow  = node.low  && node.low.length  > 0;
-
   if (!node.children || node.children.length === 0) {
-    node.tint     = hasHigh && !hasLow ? -1 : !hasHigh && hasLow ? 1 : 0;
-    node.maxDepth = 0;
-    return;
+    node.tint = hasHigh && !hasLow ? -1 : !hasHigh && hasLow ? 1 : 0;
+    node.maxDepth = 0; return;
   }
-
   node.children.forEach(c => annotateTints(c));
   const childTints = node.children.map(c => c.tint);
-  const allHigh    = childTints.every(t => t === -1);
-  const allLow     = childTints.every(t => t ===  1);
-
+  const allHigh = childTints.every(t => t === -1);
+  const allLow  = childTints.every(t => t ===  1);
   if (hasHigh) childTints.push(-1);
   if (hasLow)  childTints.push( 1);
-
   node.tint     = allHigh ? -1 : allLow ? 1 : 0;
   node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
 }
@@ -390,10 +318,8 @@ const CONFIG = {
   spreadBase:   52,
   spreadDecay:  0.80,
   splitAngle:   34,
-  subAngle:     106,
+  subAngle:     42,
   neutralColor: [120, 120, 120],
-  highColor:    [252, 212, 148],  // yellow — high activity / involuntary
-  lowColor:     [75,  163, 195],  // blue   — low activity  / voluntary
 };
 
 // ── SKETCH ─────────────────────────────────────────────────────────────────
@@ -411,18 +337,13 @@ function startSketch(tree) {
 
     p.preload = () => {
       allSrcs.forEach(src => {
-        allImgs[src] = p.loadImage(
-          src,
-          () => {},
-          () => { allImgs[src] = null; }
-        );
+        allImgs[src] = p.loadImage(src, () => {}, () => { allImgs[src] = null; });
       });
     };
 
     p.setup = () => {
       const wrap = document.getElementById('canvas-wrap');
-      W = wrap.offsetWidth;
-      H = wrap.offsetHeight;
+      W = wrap.offsetWidth; H = wrap.offsetHeight;
       p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
       p.textFont('Space Mono');
@@ -430,8 +351,7 @@ function startSketch(tree) {
 
     p.windowResized = () => {
       const wrap = document.getElementById('canvas-wrap');
-      W = wrap.offsetWidth;
-      H = wrap.offsetHeight;
+      W = wrap.offsetWidth; H = wrap.offsetHeight;
       if (W > 0 && H > 0) p.resizeCanvas(W, H);
     };
 
@@ -472,10 +392,9 @@ function startSketch(tree) {
 
       children.forEach((child, i) => {
         const angle = start + i * step + sway;
-        const brLen = trunkLen * CONFIG.branchDecay;
         p.push();
         p.rotate(angle);
-        drawNode(p, child, brLen, 1, totalDepth, allImgs, W, H, S);
+        drawNode(p, child, trunkLen * CONFIG.branchDecay, 1, totalDepth, allImgs, S);
         p.pop();
       });
 
@@ -487,7 +406,8 @@ function startSketch(tree) {
       p.pop();
     };
 
-    function drawNode(p, node, len, depth, totalDepth, allImgs, W, H, S) {
+    // ── recursive branch ─────────────────────────────────────────────────
+    function drawNode(p, node, len, depth, totalDepth, allImgs, S) {
       const hasChildren = node.children && node.children.length > 0;
       const hasHigh     = node.high && node.high.length > 0;
       const hasLow      = node.low  && node.low.length  > 0;
@@ -495,9 +415,11 @@ function startSketch(tree) {
       const t    = Math.min(depth / totalDepth, 1);
       const tint = node.tint || 0;
       const nr   = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
-      const tr   = tint < 0 ? CONFIG.highColor[0] : tint > 0 ? CONFIG.lowColor[0] : nr;
-      const tg   = tint < 0 ? CONFIG.highColor[1] : tint > 0 ? CONFIG.lowColor[1] : ng;
-      const tb   = tint < 0 ? CONFIG.highColor[2] : tint > 0 ? CONFIG.lowColor[2] : nb;
+      // For branch colour use third-person colours as the neutral baseline
+      const baseHigh = COLORS.thirdHigh, baseLow = COLORS.thirdLow;
+      const tr   = tint < 0 ? baseHigh[0] : tint > 0 ? baseLow[0] : nr;
+      const tg   = tint < 0 ? baseHigh[1] : tint > 0 ? baseLow[1] : ng;
+      const tb   = tint < 0 ? baseHigh[2] : tint > 0 ? baseLow[2] : nb;
       const r    = nr + (tr - nr) * t;
       const g    = ng + (tg - ng) * t;
       const b    = nb + (tb - nb) * t;
@@ -546,7 +468,7 @@ function startSketch(tree) {
         node.children.forEach((child, i) => {
           p.push();
           p.rotate(start + i * step);
-          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, W, H, S);
+          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, S);
           p.pop();
         });
       }
@@ -556,30 +478,30 @@ function startSketch(tree) {
         if (hasHigh) {
           const angles = fanAngles(node.high.length, -CONFIG.splitAngle, CONFIG.subAngle);
           node.high.forEach((e, i) => {
-            const { file, sensation, link, action } = normaliseEntry(e);
-            const src = file ? `${ROOT_FOLDER}/${node.path}/${file}` : '';
+            const entry = normaliseEntry(e);
+            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'high', depth, W, H, S, sensation, link, action);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'high', depth, S, entry);
             p.pop();
           });
         }
         if (hasLow) {
           const angles = fanAngles(node.low.length, CONFIG.splitAngle, CONFIG.subAngle);
           node.low.forEach((e, i) => {
-            const { file, sensation, link, action } = normaliseEntry(e);
-            const src = file ? `${ROOT_FOLDER}/${node.path}/${file}` : '';
+            const entry = normaliseEntry(e);
+            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'low', depth, W, H, S, sensation, link, action);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'low', depth, S, entry);
             p.pop();
           });
         }
       }
     }
 
-    function drawLeaf(p, src, img, len, side, depth, W, H, S, sensation, link, action) {
-      const isHigh  = side === 'high';
-      const col     = isHigh ? CONFIG.highColor : CONFIG.lowColor;
-      const opacity = sensationOpacity(sensation);
+    // ── leaf node ─────────────────────────────────────────────────────────
+    function drawLeaf(p, src, img, len, side, depth, S, entry) {
+      const col     = getColor(side, entry.perspective);
+      const opacity = sensationOpacity(entry.sensation);
       const alpha   = Math.max(190 - depth * 15, 90) * opacity;
       const sw      = Math.max(1.6 - depth * 0.1, 0.6);
 
@@ -597,10 +519,8 @@ function startSketch(tree) {
       p.translate(0, -len);
 
       const nodeSize = Math.max(S * 0.065 - depth * 4, 20);
-
       const xf = p.drawingContext.getTransform();
-      const wx = xf.e;
-      const wy = xf.f;
+      const wx = xf.e, wy = xf.f;
 
       p.noStroke();
       p.imageMode(p.CENTER);
@@ -625,17 +545,12 @@ function startSketch(tree) {
           const dAngle = (d / 5) * 360 + p.noise(seed2 + d) * 40;
           const dLen   = nodeSize * (0.35 + p.noise(seed2 + d + 5) * 0.3);
           const dRad   = nodeSize * 0.55;
-          const sx     = p.cos(dAngle) * dRad;
-          const sy     = p.sin(dAngle) * dRad;
-          const ex     = p.cos(dAngle) * (dRad + dLen);
-          const ey     = p.sin(dAngle) * (dRad + dLen);
-          const mx     = (sx + ex) / 2 + (p.noise(seed2 + d + 10) - 0.5) * dLen * 0.5;
-          const my2    = (sy + ey) / 2 + (p.noise(seed2 + d + 15) - 0.5) * dLen * 0.5;
+          const sx = p.cos(dAngle) * dRad, sy = p.sin(dAngle) * dRad;
+          const ex = p.cos(dAngle) * (dRad + dLen), ey = p.sin(dAngle) * (dRad + dLen);
+          const mx = (sx+ex)/2 + (p.noise(seed2+d+10)-0.5)*dLen*0.5;
+          const my2 = (sy+ey)/2 + (p.noise(seed2+d+15)-0.5)*dLen*0.5;
           p.noFill();
-          p.beginShape();
-          p.vertex(sx, sy);
-          p.quadraticVertex(mx, my2, ex, ey);
-          p.endShape();
+          p.beginShape(); p.vertex(sx, sy); p.quadraticVertex(mx, my2, ex, ey); p.endShape();
         }
 
         const nucleusSize = nodeSize * 0.52;
@@ -649,11 +564,9 @@ function startSketch(tree) {
         ctx.restore();
 
         p.noFill();
-        p.stroke(...col, 200 * opacity);
-        p.strokeWeight(1);
+        p.stroke(...col, 200 * opacity); p.strokeWeight(1);
         p.ellipse(0, 0, nucleusSize, nucleusSize);
-        p.stroke(...col, 60 * opacity);
-        p.strokeWeight(0.4);
+        p.stroke(...col, 60 * opacity); p.strokeWeight(0.4);
         p.ellipse(0, 0, nucleusSize + 4, nucleusSize + 4);
 
       } else {
@@ -666,13 +579,17 @@ function startSketch(tree) {
         p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
-      leafNodes.push({ x: wx, y: wy, r: nodeSize * 0.85, src, side, link: link || null, action: action || null });
+      leafNodes.push({
+        x: wx, y: wy, r: nodeSize * 0.85, src, side,
+        link:        entry.link        || null,
+        action:      entry.action      || null,
+        perspective: entry.perspective || 'third',
+      });
     }
 
     // ── cross-links ───────────────────────────────────────────────────────
     function drawCrossLinks(p) {
-      const emotions = {};
-      const actions  = {};
+      const emotions = {}, actions = {};
       for (const node of leafNodes) {
         if (node.link)   { if (!emotions[node.link])  emotions[node.link]  = []; emotions[node.link].push(node);  }
         if (node.action) { if (!actions[node.action]) actions[node.action] = []; actions[node.action].push(node); }
@@ -684,7 +601,6 @@ function startSketch(tree) {
           for (let j = i + 1; j < nodes.length; j++)
             drawArc(p, nodes[i], nodes[j], 40, 2);
       }
-
       for (const tag in actions) {
         const nodes = actions[tag];
         for (let i = 0; i < nodes.length; i++)
@@ -696,107 +612,82 @@ function startSketch(tree) {
       const hasActions  = Object.keys(actions).length  > 0;
       if (!hasEmotions && !hasActions) return;
 
-      const px    = W - 16;
-      const lineH = 20;
+      const px = W - 16, lineH = 20;
       let y = H - 16 - ((hasEmotions ? 1 : 0) + (hasActions ? 1 : 0)) * lineH;
-
-      p.textFont('Space Mono');
-      p.textSize(8);
-      p.textAlign(p.RIGHT, p.CENTER);
+      p.textFont('Space Mono'); p.textSize(8); p.textAlign(p.RIGHT, p.CENTER);
 
       if (hasEmotions) {
-        p.stroke(255, 255, 255, 100);
-        p.strokeWeight(0.5);
+        p.stroke(255,255,255,100); p.strokeWeight(0.5);
         for (let s = 0; s < 6; s += 2)
-          p.line(px - 58 + s * 4, y, px - 58 + s * 4 + 3, y);
-        p.noStroke();
-        p.fill(180, 180, 180, 160);
-        p.text('emotion', px, y);
+          p.line(px - 58 + s*4, y, px - 58 + s*4 + 3, y);
+        p.noStroke(); p.fill(180,180,180,160); p.text('emotion', px, y);
         y += lineH;
       }
-
       if (hasActions) {
-        p.stroke(255, 255, 255, 100);
-        p.strokeWeight(0.5);
+        p.stroke(255,255,255,100); p.strokeWeight(0.5);
         for (let s = 0; s < 3; s++)
-          p.line(px - 58 + s * 10, y, px - 58 + s * 10 + 6, y);
-        p.noStroke();
-        p.fill(180, 180, 180, 160);
-        p.text('action', px, y);
+          p.line(px - 58 + s*10, y, px - 58 + s*10 + 6, y);
+        p.noStroke(); p.fill(180,180,180,160); p.text('action', px, y);
       }
     }
 
     function drawArc(p, a, b, steps, skip) {
       const dpr = p.pixelDensity();
-      const ax  = a.x / dpr, ay = a.y / dpr;
-      const bx  = b.x / dpr, by = b.y / dpr;
-      const mx  = (ax + bx) / 2;
-      const my  = (ay + by) / 2 - Math.abs(bx - ax) * 0.3;
-      p.noFill();
-      p.stroke(255, 255, 255, 60);
-      p.strokeWeight(0.6);
+      const ax = a.x/dpr, ay = a.y/dpr, bx = b.x/dpr, by = b.y/dpr;
+      const mx = (ax+bx)/2, my = (ay+by)/2 - Math.abs(bx-ax)*0.3;
+      p.noFill(); p.stroke(255,255,255,60); p.strokeWeight(0.6);
       for (let s = 0; s < steps; s += skip) {
-        const t0 = s / steps;
-        const t1 = (s + skip * 0.5) / steps;
-        const x0 = bezierPoint(ax, mx, mx, bx, t0);
-        const y0 = bezierPoint(ay, my, my, by, t0);
-        const x1 = bezierPoint(ax, mx, mx, bx, t1);
-        const y1 = bezierPoint(ay, my, my, by, t1);
-        p.line(x0, y0, x1, y1);
+        const t0 = s/steps, t1 = (s + skip*0.5)/steps;
+        p.line(bezierPoint(ax,mx,mx,bx,t0), bezierPoint(ay,my,my,by,t0),
+               bezierPoint(ax,mx,mx,bx,t1), bezierPoint(ay,my,my,by,t1));
       }
     }
 
-    function bezierPoint(a, b, c, d, t) {
-      const mt = 1 - t;
+    function bezierPoint(a,b,c,d,t) {
+      const mt = 1-t;
       return mt*mt*mt*a + 3*mt*mt*t*b + 3*mt*t*t*c + t*t*t*d;
     }
 
     function fanAngles(n, centre, spread) {
       if (n === 1) return [centre];
-      const half = (spread * (n - 1)) / 2;
-      return Array.from({ length: n }, (_, i) => centre - half + i * spread);
+      const half = (spread*(n-1))/2;
+      return Array.from({length:n}, (_,i) => centre - half + i*spread);
     }
 
     function drawBlob(p, cx, cy, rw, rh, pts, seed, wobble) {
       p.beginShape();
       for (let i = 0; i <= pts; i++) {
-        const angle = (i / pts) * 360;
-        const nVal  = p.noise(seed + i * 0.8) * 2 - 1;
-        const rx    = rw * 0.5 * (1 + nVal * wobble);
-        const vx    = cx + p.cos(angle) * rx;
-        const vy    = cy + p.sin(angle) * (rh * 0.5 * (1 + nVal * wobble * 0.6));
-        p.curveVertex(vx, vy);
+        const angle = (i/pts)*360;
+        const nVal  = p.noise(seed + i*0.8)*2 - 1;
+        const rx    = rw*0.5*(1 + nVal*wobble);
+        p.curveVertex(cx + p.cos(angle)*rx, cy + p.sin(angle)*(rh*0.5*(1 + nVal*wobble*0.6)));
       }
-      const nVal0 = p.noise(seed) * 2 - 1;
-      p.curveVertex(cx + p.cos(0) * rw * 0.5 * (1 + nVal0 * wobble), cy + p.sin(0) * rh * 0.5 * (1 + nVal0 * wobble * 0.6));
+      const nVal0 = p.noise(seed)*2-1;
+      p.curveVertex(cx + p.cos(0)*rw*0.5*(1+nVal0*wobble), cy + p.sin(0)*rh*0.5*(1+nVal0*wobble*0.6));
       p.endShape(p.CLOSE);
     }
 
     function drawBrainOutline(p, W, H, S) {
-      p.noFill();
-      p.stroke(60, 60, 60);
-      p.strokeWeight(Math.max(S * 0.004, 1.5));
-      const cx   = W / 2;
-      const lw   = S * 0.38;
-      const topY = H / 2 - S * 0.44;
-      const botY = H / 2 + S * 0.44;
+      p.noFill(); p.stroke(60,60,60); p.strokeWeight(Math.max(S*0.004,1.5));
+      const cx = W/2, lw = S*0.38;
+      const topY = H/2 - S*0.44, botY = H/2 + S*0.44;
 
       p.beginShape();
-      p.vertex(cx - 12, botY);
-      p.bezierVertex(cx - lw*0.5, botY + S*0.01, cx - lw*0.85, botY - S*0.04, cx - lw*0.95, botY - S*0.3);
-      p.bezierVertex(cx - lw*1.12, botY - S*0.44, cx - lw*0.98, botY - S*0.6, cx - lw*1.05, botY - S*0.7);
-      p.bezierVertex(cx - lw*1.1,  botY - S*0.8,  cx - lw*0.95, topY + S*0.12, cx - lw*0.82, topY + S*0.08);
-      p.bezierVertex(cx - lw*0.65, topY - S*0.01, cx - lw*0.42, topY + S*0.005, cx - lw*0.28, topY + S*0.04);
-      p.bezierVertex(cx - lw*0.15, topY + S*0.06, cx - lw*0.05, topY + S*0.1, cx - 12, topY + S*0.13);
+      p.vertex(cx-12, botY);
+      p.bezierVertex(cx-lw*0.5, botY+S*0.01, cx-lw*0.85, botY-S*0.04, cx-lw*0.95, botY-S*0.3);
+      p.bezierVertex(cx-lw*1.12, botY-S*0.44, cx-lw*0.98, botY-S*0.6, cx-lw*1.05, botY-S*0.7);
+      p.bezierVertex(cx-lw*1.1, botY-S*0.8, cx-lw*0.95, topY+S*0.12, cx-lw*0.82, topY+S*0.08);
+      p.bezierVertex(cx-lw*0.65, topY-S*0.01, cx-lw*0.42, topY+S*0.005, cx-lw*0.28, topY+S*0.04);
+      p.bezierVertex(cx-lw*0.15, topY+S*0.06, cx-lw*0.05, topY+S*0.1, cx-12, topY+S*0.13);
       p.endShape();
 
       p.beginShape();
-      p.vertex(cx + 12, botY);
-      p.bezierVertex(cx + lw*0.5, botY + S*0.01, cx + lw*0.85, botY - S*0.04, cx + lw*0.95, botY - S*0.3);
-      p.bezierVertex(cx + lw*1.12, botY - S*0.44, cx + lw*0.98, botY - S*0.6, cx + lw*1.05, botY - S*0.7);
-      p.bezierVertex(cx + lw*1.1,  botY - S*0.8,  cx + lw*0.95, topY + S*0.12, cx + lw*0.82, topY + S*0.08);
-      p.bezierVertex(cx + lw*0.65, topY - S*0.01, cx + lw*0.42, topY + S*0.005, cx + lw*0.28, topY + S*0.04);
-      p.bezierVertex(cx + lw*0.15, topY + S*0.06, cx + lw*0.05, topY + S*0.1, cx + 12, topY + S*0.13);
+      p.vertex(cx+12, botY);
+      p.bezierVertex(cx+lw*0.5, botY+S*0.01, cx+lw*0.85, botY-S*0.04, cx+lw*0.95, botY-S*0.3);
+      p.bezierVertex(cx+lw*1.12, botY-S*0.44, cx+lw*0.98, botY-S*0.6, cx+lw*1.05, botY-S*0.7);
+      p.bezierVertex(cx+lw*1.1, botY-S*0.8, cx+lw*0.95, topY+S*0.12, cx+lw*0.82, topY+S*0.08);
+      p.bezierVertex(cx+lw*0.65, topY-S*0.01, cx+lw*0.42, topY+S*0.005, cx+lw*0.28, topY+S*0.04);
+      p.bezierVertex(cx+lw*0.15, topY+S*0.06, cx+lw*0.05, topY+S*0.1, cx+12, topY+S*0.13);
       p.endShape();
     }
   };
@@ -812,32 +703,22 @@ function setupInteraction() {
   wrap.addEventListener('click', e => {
     const canvas = wrap.querySelector('canvas');
     if (!canvas) return;
-    const rect   = canvas.getBoundingClientRect();
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const mx     = (e.clientX - rect.left) * scaleX;
-    const my     = (e.clientY - rect.top)  * scaleY;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
     for (const node of leafNodes) {
-      const dx = mx - node.x, dy = my - node.y;
-      if (Math.sqrt(dx*dx + dy*dy) <= node.r + 10 && node.src) {
-        openLightbox(node.src);
-        return;
-      }
+      const dx = mx-node.x, dy = my-node.y;
+      if (Math.sqrt(dx*dx+dy*dy) <= node.r+10 && node.src) { openLightbox(node.src); return; }
     }
   });
 
   wrap.addEventListener('mousemove', e => {
     const canvas = wrap.querySelector('canvas');
     if (!canvas) return;
-    const rect   = canvas.getBoundingClientRect();
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const mx     = (e.clientX - rect.left) * scaleX;
-    const my     = (e.clientY - rect.top)  * scaleY;
-    const hit    = leafNodes.some(n => {
-      const dx = mx - n.x, dy = my - n.y;
-      return Math.sqrt(dx*dx+dy*dy) <= n.r + 10 && n.src;
-    });
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+    const hit = leafNodes.some(n => Math.sqrt((mx-n.x)**2+(my-n.y)**2) <= n.r+10 && n.src);
     canvas.style.cursor = hit ? 'zoom-in' : 'default';
   });
 }
@@ -847,7 +728,6 @@ function openLightbox(src) {
   document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
 }
-
 document.getElementById('lbClose').addEventListener('click', () => {
   document.getElementById('lightbox').classList.remove('open');
 });
