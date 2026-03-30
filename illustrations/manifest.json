@@ -37,7 +37,8 @@
         {
           "label": "in powai",
           "path": "3_hanging-out-with-partners/3_in-powai",
-          "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating", "perspective": "third"} ]
+          "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating", "perspective": "third"}, 
+            { "file": "4_partner-vir-das_high.jpg", "link": "love", "action": "getting caught", "perspective": "third"} ]
         }
       ]
     }
