@@ -20,7 +20,8 @@
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
           "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating", "perspective": "third"},
-            { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running", "perspective": "third"}]
+            { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running", "perspective": "third"}],
+          "high": [ { "file": "5_playing-badminton_high.jpg", "link": "belonging", "action": "playing", "perspective": "first"}]
         },
         {
           "label": "in powai",
