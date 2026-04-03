@@ -34,6 +34,11 @@
           "label": "in transit",
           "path": "2_hanging-out-with-friends/2_in-transit",
           "high": [ { "file": "2_getting-stuck_high.jpg", "sensation": "wave", "link": "belonging", "action": "waiting", "perspective": "third"}]
+        },
+        {
+          "label": "in unexpected places",
+          "path": "2_hanging-out-with-friends/2_unexpected-places",
+          "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}]
         }
       ]
     },
