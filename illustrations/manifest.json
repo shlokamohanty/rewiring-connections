@@ -26,11 +26,21 @@
         {
           "label": "in powai",
           "path": "2_hanging-out-with-friends/2_in-powai",
-          "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing", "perspective": "first"},
-            { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third"}, 
-            { "file": "5_after-breakfast.jpg", "link": "love", "action": "talking", "perspective": "third"}],
-          "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking", "perspective": "third"} ]
-        },
+          "children" : [{
+            "label": "at some food joint",
+            "path": "2_hanging-out-with-friends/2_in-powai/2_at-some-food-joint",
+            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing", "perspective": "first"}],
+            "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking", "perspective": "third"} ]
+            },{
+            "label": "at someone's house",
+            "path": "2_hanging-out-with-friends/2_in-powai/2_at-someones-house",
+            "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third"}]
+            },{
+              "label": "after breakfast",
+              "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
+              "high": [{ "file": "5_after-breakfast.jpg", "link": "love", "action": "talking", "perspective": "third"}]
+              }]
+          },
         {
           "label": "in transit",
           "path": "2_hanging-out-with-friends/2_in-transit",
