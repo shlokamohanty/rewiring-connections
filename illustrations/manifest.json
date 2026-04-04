@@ -40,6 +40,11 @@
           "label": "in unexpected places",
           "path": "2_hanging-out-with-friends/2_unexpected-places",
           "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}]
+        },
+        {
+          "label": "online",
+          "path": "2_hanging-out-with-friends/2_online",
+          "high": [ { "file": "2_playing-broforce.jpg", "link": "belonging", "action": "praying", "perspective": "first"}]
         }
       ]
     },
