@@ -34,7 +34,8 @@
             },{
             "label": "at someone's house",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-someones-house",
-            "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third"}]
+            "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third"},
+              {"file": "5_jatin-man-united.jpg", "link": "belonging", "action": "walking", "perspective": "third"}]
             },{
               "label": "after breakfast",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
