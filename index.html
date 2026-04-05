@@ -318,9 +318,9 @@ const CONFIG = {
   trunkRatio:   0.20,
   branchDecay:  0.58,
   spreadBase:   52,
-  spreadDecay:  0.72,
-  splitAngle:   36,
-  subAngle:     52,
+  spreadDecay:  0.82,
+  splitAngle:   56,
+  subAngle:     62,
   neutralColor: [120, 120, 120],
 };
 
@@ -384,7 +384,7 @@ function startSketch(tree) {
 
       const children = tree.children || [];
       const n        = children.length;
-      const spread   = Math.min(n * CONFIG.spreadBase, 160);
+      const spread   = Math.min(n * CONFIG.spreadBase, 140);
       const step     = n > 1 ? spread / (n - 1) : 0;
       const start    = -spread / 2;
 
