@@ -45,7 +45,8 @@
         {
           "label": "in transit",
           "path": "2_hanging-out-with-friends/2_in-transit",
-          "high": [ { "file": "2_getting-stuck_high.jpg", "sensation": "wave", "link": "belonging", "action": "waiting", "perspective": "third"}]
+          "high": [ { "file": "2_getting-stuck_high.jpg", "sensation": "wave", "link": "belonging", "action": "waiting", "perspective": "third"},
+            { "file": "3_brain-tumor.jpg", "sensation": "zigzag", "link": "fear", "action": "waiting", "perspective": "first"}]
         },
         {
           "label": "in unexpected places",
