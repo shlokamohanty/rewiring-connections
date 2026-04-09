@@ -9,6 +9,11 @@
           "path": "1_being-at-school/1_lunch",
           "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third"} ],
           "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third"} ]
+        },
+        {
+          "label": "by the cubbies",
+          "path": "1_being-at-school/2_by-the-cubbies",
+          "high": [ { "file": "1_unsolicited-advice_high.jpg", "link": "annoyance", "action": "eating", "perspective": "first"} ]
         }
       ]
     },
@@ -56,7 +61,7 @@
         {
           "label": "online",
           "path": "2_hanging-out-with-friends/2_online",
-          "high": [ { "file": "2_playing-broforce.jpg", "link": "belonging", "action": "praying", "perspective": "first"}]
+          "high": [ { "file": "2_playing-broforce.jpg", "link": "belonging", "action": "playing", "perspective": "first"}]
         }
       ]
     },
