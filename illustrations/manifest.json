@@ -18,6 +18,23 @@
       ]
     },
     {
+      "label": "being at home",
+      "path": "4_being-at-home",
+      "children": [
+        {
+          "label": "during lunch",
+          "path": "4_being-at-home/1_in-my-room",
+          "high": [ { "file": "1_sid-in-hosp-call_high.jpg", "link": "fear", "action": "calling", "perspective": "first"},
+            { "file": "2_suicide-attempt_high.jpg", "sensation": "zigzag", "link": "grief", "action": "self harm", "perspective": "first"} ]
+        },
+        {
+          "label": "by the cubbies",
+          "path": "1_being-at-school/2_by-the-cubbies",
+          "high": [ { "file": "1_unsolicited-advice_high.jpg", "link": "annoyance", "action": "eating", "perspective": "first"} ]
+        }
+      ]
+    },
+    {
       "label": "hanging out with friends",
       "path": "2_hanging-out-with-friends",
       "children": [
