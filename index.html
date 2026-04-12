@@ -383,7 +383,7 @@ function startSketch(tree) {
 
       const children = tree.children || [];
       const n        = children.length;
-      const spread   = Math.min(n * CONFIG.spreadBase, 180);
+      const spread   = Math.min(n * CONFIG.spreadBase, 160);
       const step     = n > 1 ? spread / (n - 1) : 0;
       const start    = -spread / 2;
 
