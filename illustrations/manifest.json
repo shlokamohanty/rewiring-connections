@@ -46,7 +46,7 @@
           "children" : [{
             "label": "at some food joint",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-some-food-joint",
-            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "posing", "perspective": "first"}],
+            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "taking a photo", "perspective": "first"}],
             "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking", "perspective": "third"} ]
             },{
             "label": "at someone's house",
@@ -68,7 +68,8 @@
         {
           "label": "in unexpected places",
           "path": "2_hanging-out-with-friends/2_unexpected-places",
-          "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}]
+          "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}, 
+          { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first"} ]
         },
         {
           "label": "online",
