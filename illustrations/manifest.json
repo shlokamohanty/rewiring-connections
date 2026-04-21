@@ -19,6 +19,11 @@
           "label": "in classrooms",
           "path": "1_being-at-school/3_in-classrooms",
           "high": [ { "file": "1_cheesecake.jpg", "link": "belonging", "action": "eating", "perspective": "third"} ]
+        },
+         {
+          "label": "and being part of student council",
+          "path": "1_being-at-school/4_student-council",
+          "high": [ { "file": "1_council-meeting.jpg", "link": "annoyance", "action": "sitting", "perspective": "third"} ]
         }
       ]
     },
@@ -32,6 +37,27 @@
           "high": [ { "file": "1_sid-in-hosp-call_high.jpg", "link": "fear", "action": "calling", "perspective": "first"},
             { "file": "2_suicide-attempt_high.jpg", "sensation": "zigzag", "link": "grief", "action": "self harm", "perspective": "first"},
           {"file": "3_sid-wires-high.jpg", "link": "annoyance", "action": "watching", "perspective": "first"} ]
+        },
+        {
+          "label": "in my parent's room",
+          "path": "4_being-at-home/2_in-my-parents-room",
+          "high": [ { "file": "1_sid-dancing-high.jpg", "link": "love", "action": "dancing", "perspective": "third"}]
+        }
+      ]
+    },
+    {
+      "label": "hanging out with family",
+      "path": "5_hanging-out-with-family",
+      "children": [
+        {
+          "label": "outdoors",
+          "path": "5_hanging-out-with-family/2_play-area",
+          "high": [ { "file": "1_mom-tumor-high.jpg", "link": "awe", "action": "trekking", "perspective": "third"}]
+        },
+        {
+          "label": "outdoors",
+          "path": "5_hanging-out-with-family/1_outdoors",
+          "high": [ { "file": "1_trek-high.jpg", "link": "fear", "action": "crying", "perspective": "third"}]
         }
       ]
     },
@@ -58,7 +84,8 @@
             "label": "at someone's house",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-someones-house",
             "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third"},
-              {"file": "5_jatin-man-united.jpg", "link": "belonging", "action": "walking", "perspective": "third"}]
+              {"file": "5_jatin-man-united.jpg", "link": "belonging", "action": "walking", "perspective": "third"},
+            {"file": "6_cooking_high.jpg", "link": "belonging", "action": "cooking", "perspective": "third"}]
             },{
               "label": "after breakfast",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
@@ -75,7 +102,9 @@
           "label": "in unexpected places",
           "path": "2_hanging-out-with-friends/2_unexpected-places",
           "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}, 
-          { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first"} ]
+          { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first"},
+          { "file": "4_hey-guys-high.jpg", "link": "belonging", "action": "watching a video", "perspective": "first"},
+          { "file": "5_versova-beach-birthday-high.jpg", "link": "belonging", "action": "painting", "perspective": "third"}]
         },
         {
           "label": "online",
@@ -92,7 +121,8 @@
           "label": "in powai",
           "path": "3_hanging-out-with-partners/3_in-powai",
           "high": [ { "file": "3_partner-subway_high.jpg", "sensation": "wave", "link": "love", "action": "eating", "perspective": "third"}, 
-            { "file": "4_partner-vir-das_high.jpg", "link": "love", "action": "getting caught", "perspective": "third"} ],
+            { "file": "4_partner-vir-das_high.jpg", "link": "love", "action": "getting caught", "perspective": "third"},
+             { "file": "6_first-kiss_high.jpg", "link": "love", "action": "kissing", "perspective": "third"}],
           "low":  [ { "file": "5_first-date_low.jpg", "link": "love", "action": "pulling nose", "perspective": "third"}]
         }
       ]
