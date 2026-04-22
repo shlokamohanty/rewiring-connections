@@ -50,7 +50,7 @@
       "path": "5_hanging-out-with-family",
       "children": [
         {
-          "label": "outdoors",
+          "label": "play area",
           "path": "5_hanging-out-with-family/2_play-area",
           "high": [ { "file": "1_mom-tumor-high.jpg", "link": "awe", "action": "trekking", "perspective": "third"}]
         },
@@ -58,6 +58,11 @@
           "label": "outdoors",
           "path": "5_hanging-out-with-family/1_outdoors",
           "high": [ { "file": "1_trek-high.jpg", "link": "fear", "action": "crying", "perspective": "third"}]
+        },
+        {
+          "label": "in transit",
+          "path": "5_hanging-out-with-family/3_in-transit",
+          "high": [ { "file": "1_sid-and-mom.jpg", "link": "awe", "action": "staring", "perspective": "first"}]
         }
       ]
     },
@@ -87,9 +92,10 @@
               {"file": "5_jatin-man-united.jpg", "link": "belonging", "action": "walking", "perspective": "third"},
             {"file": "6_cooking_high.jpg", "link": "belonging", "action": "cooking", "perspective": "third"}]
             },{
-              "label": "after breakfast",
+              "label": "at parks",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
-              "high": [{ "file": "5_after-breakfast.jpg", "link": "love", "action": "talking", "perspective": "third"}]
+              "high": [{ "file": "5_after-breakfast.jpg", "link": "love", "action": "talking", "perspective": "third"},
+                { "file": "6_talking.jpg", "link": "love", "action": "talking", "perspective": "third"}]
               }]
           },
         {
