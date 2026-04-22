@@ -6,89 +6,104 @@
 <title>Rewiring Connections</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
 <style>
-@font-face { font-family:'Space Mono'; src:url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype'); font-weight:400; font-style:normal; }
-@font-face { font-family:'Space Mono'; src:url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype'); font-weight:700; font-style:normal; }
-@font-face { font-family:'Space Mono'; src:url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype'); font-weight:400; font-style:italic; }
-@font-face { font-family:'Space Mono'; src:url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype'); font-weight:700; font-style:italic; }
-* { box-sizing:border-box; margin:0; padding:0; }
-body { background:#0a0a0a; overflow:hidden; height:100vh; width:100vw; }
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Regular.ttf') format('truetype');
+  font-weight: 400; font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Bold.ttf') format('truetype');
+  font-weight: 700; font-style: normal;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-Italic.ttf') format('truetype');
+  font-weight: 400; font-style: italic;
+}
+@font-face {
+  font-family: 'Space Mono';
+  src: url('fonts/Space_Mono/SpaceMono-BoldItalic.ttf') format('truetype');
+  font-weight: 700; font-style: italic;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #0a0a0a; overflow: hidden; height: 100vh; width: 100vw; }
 header {
-  position:fixed; top:0; left:0; right:0; z-index:10;
-  padding:clamp(12px,1.8vh,20px) clamp(20px,3vw,36px) clamp(10px,1.2vh,14px) 16px;
-  background:rgba(10,10,10,0.95);
-  display:flex; align-items:baseline; gap:clamp(16px,2.5vw,32px);
+  position: fixed; top: 0; left: 0; right: 0; z-index: 10;
+  padding: clamp(12px,1.8vh,20px) clamp(20px,3vw,36px) clamp(10px,1.2vh,14px) 16px;
+  background: rgba(10,10,10,0.95);
+  display: flex; align-items: baseline; gap: clamp(16px,2.5vw,32px);
 }
-.title { font-family:'Space Mono',monospace; font-size:clamp(13px,1.4vw,17px); font-weight:400; letter-spacing:0.06em; color:#fff; }
-.legend { display:flex; gap:clamp(8px,1vw,14px); flex-wrap:wrap; align-items:center; }
-.legend-item { font-family:'Space Mono',monospace; font-size:clamp(8px,0.8vw,10px); letter-spacing:0.06em; opacity:0.85; }
-.legend-divider { width:0.5px; height:12px; background:#333; align-self:center; }
+.title {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(13px,1.4vw,17px); font-weight: 400;
+  letter-spacing: 0.06em; color: #fff;
+}
+.legend { display: flex; gap: clamp(8px,1vw,14px); flex-wrap: wrap; align-items: center; }
+.legend-item {
+  font-family: 'Space Mono', monospace;
+  font-size: clamp(8px,0.8vw,10px); letter-spacing: 0.06em; opacity: 0.85;
+}
+.legend-divider {
+  width: 0.5px; height: 12px; background: #333; align-self: center;
+}
 #canvas-wrap {
-  position:fixed; top:54px; left:clamp(200px,22vw,320px); right:0; bottom:0;
-  z-index:1; transition:left 0.35s ease; border-left:0.5px solid #1e1e1e;
+  position: fixed; top: 54px;
+  left: clamp(200px,22vw,320px); right: 0; bottom: 0;
+  z-index: 1; transition: left 0.35s ease;
+  border-left: 0.5px solid #1e1e1e;
 }
-#canvas-wrap.collapsed { left:0; border-left:none; }
+#canvas-wrap.collapsed { left: 0; border-left: none; }
 #sidebar {
-  position:fixed; top:54px; left:0; width:clamp(200px,22vw,320px); bottom:0;
-  overflow-y:auto; padding:clamp(16px,2vw,28px) clamp(14px,1.8vw,24px) 40px 16px;
-  border-right:0.5px solid #1e1e1e; z-index:2; background:#0a0a0a; transition:transform 0.35s ease;
+  position: fixed; top: 54px; left: 0;
+  width: clamp(200px,22vw,320px); bottom: 0;
+  overflow-y: auto;
+  padding: clamp(16px,2vw,28px) clamp(14px,1.8vw,24px) 40px 16px;
+  border-right: 0.5px solid #1e1e1e;
+  z-index: 2; background: #0a0a0a; transition: transform 0.35s ease;
 }
-#sidebar.collapsed { transform:translateX(-100%); }
+#sidebar.collapsed { transform: translateX(-100%); }
 #toggle-sidebar {
-  position:fixed; top:50%; left:clamp(200px,22vw,320px);
-  transform:translate(-50%,-50%); z-index:20;
-  background:#0a0a0a; border:0.5px solid #2a2a2a; color:#555;
-  font-family:'Space Mono',monospace; font-size:11px;
-  cursor:pointer; padding:6px 5px; line-height:1; border-radius:2px;
-  transition:left 0.35s ease, color 0.15s, border-color 0.15s;
-  writing-mode:vertical-rl; letter-spacing:0.1em;
+  position: fixed; top: 50%; left: clamp(200px,22vw,320px);
+  transform: translate(-50%,-50%); z-index: 20;
+  background: #0a0a0a; border: 0.5px solid #2a2a2a; color: #555;
+  font-family: 'Space Mono', monospace; font-size: 11px;
+  cursor: pointer; padding: 6px 5px; line-height: 1; border-radius: 2px;
+  transition: left 0.35s ease, color 0.15s, border-color 0.15s;
+  writing-mode: vertical-rl; letter-spacing: 0.1em;
 }
-#toggle-sidebar:hover { color:#aaa; border-color:#555; }
-#toggle-sidebar.collapsed { left:12px; transform:translateY(-50%); }
-#sidebar p { font-family:'Space Mono',monospace; font-size:clamp(9px,1vw,11px); line-height:1.9; color:#b0b0b0; letter-spacing:0.02em; margin-bottom:clamp(10px,1.4vh,16px); }
-#sidebar p.bullet { padding-left:12px; color:#b0b0b0; border-left:1px solid #2a2a2a; }
-
-/* ── Memory detail panel ── */
-#detail-panel {
-  display:none;
-  position:fixed; bottom:0; left:clamp(200px,22vw,320px); right:0;
-  z-index:15; background:rgba(10,10,10,0.96);
-  border-top:0.5px solid #1e1e1e;
-  padding:14px 20px 14px 20px;
-  transition:left 0.35s ease;
+#toggle-sidebar:hover { color: #aaa; border-color: #555; }
+#toggle-sidebar.collapsed { left: 12px; transform: translateY(-50%); }
+#sidebar p {
+  font-family: 'Space Mono', monospace; font-size: clamp(9px,1vw,11px);
+  line-height: 1.9; color: #b0b0b0; letter-spacing: 0.02em;
+  margin-bottom: clamp(10px,1.4vh,16px);
 }
-#detail-panel.visible { display:flex; align-items:center; justify-content:space-between; gap:16px; }
-#detail-panel.sidebar-collapsed { left:0; }
-#detail-path {
-  font-family:'Space Mono',monospace; font-size:10px; color:#888;
-  letter-spacing:0.08em; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+#sidebar p.bullet { padding-left: 12px; color: #b0b0b0; border-left: 1px solid #2a2a2a; }
+.lightbox {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(10,10,10,0.96); align-items: center; justify-content: center; cursor: zoom-out;
 }
-#detail-path span.arrow { color:#333; margin:0 5px; }
-#detail-path span.active { color:#ccc; }
-#detail-tags { display:flex; gap:10px; flex-shrink:0; }
-.detail-tag {
-  font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em;
-  padding:3px 8px; border-radius:2px; border:0.5px solid;
+.lightbox.open { display: flex; }
+.lightbox-inner {
+  position: relative; max-width: min(88vw,720px); max-height: 88vh;
+  animation: lbIn 0.18s ease;
 }
-.detail-tag.emotion { color:#888; border-color:#2a2a2a; }
-.detail-tag.action  { color:#888; border-color:#2a2a2a; }
-.detail-tag.sensation-wave   { color:#4ba3c3; border-color:#4ba3c3; }
-.detail-tag.sensation-zigzag { color:#E34234; border-color:#E34234; }
-#detail-nav { display:flex; gap:8px; flex-shrink:0; }
-.nav-btn {
-  font-family:'Space Mono',monospace; font-size:11px; color:#555;
-  background:none; border:0.5px solid #2a2a2a; padding:4px 10px;
-  cursor:pointer; border-radius:2px; transition:color 0.15s, border-color 0.15s;
+@keyframes lbIn { from { opacity:0; transform:scale(0.95); } to { opacity:1; transform:scale(1); } }
+.lightbox img { display: block; max-width: 100%; max-height: 88vh; object-fit: contain; }
+.lightbox-close {
+  position: absolute; top: -36px; right: 0;
+  background: none; border: none; font-size: 28px; font-weight: 200;
+  color: #666; cursor: pointer; line-height: 1; transition: color 0.15s;
+  font-family: 'Space Mono', monospace;
 }
-.nav-btn:hover { color:#ccc; border-color:#555; }
-
-.lightbox { display:none; position:fixed; inset:0; z-index:100; background:rgba(10,10,10,0.96); align-items:center; justify-content:center; cursor:zoom-out; }
-.lightbox.open { display:flex; }
-.lightbox-inner { position:relative; max-width:min(88vw,720px); max-height:80vh; animation:lbIn 0.18s ease; }
-@keyframes lbIn { from{opacity:0;transform:scale(0.95)} to{opacity:1;transform:scale(1)} }
-.lightbox img { display:block; max-width:100%; max-height:80vh; object-fit:contain; }
-.lightbox-close { position:absolute; top:-36px; right:0; background:none; border:none; font-size:28px; font-weight:200; color:#666; cursor:pointer; line-height:1; transition:color 0.15s; font-family:'Space Mono',monospace; }
-.lightbox-close:hover { color:#ccc; }
-#error-banner { display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#111; border:0.5px solid #333; border-radius:3px; padding:10px 22px; font-size:11px; font-family:'Space Mono',monospace; color:#888; z-index:200; white-space:nowrap; }
+.lightbox-close:hover { color: #ccc; }
+#error-banner {
+  display: none; position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%); background: #111; border: 0.5px solid #333;
+  border-radius: 3px; padding: 10px 22px; font-size: 11px;
+  font-family: 'Space Mono', monospace; color: #888; z-index: 200; white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -111,20 +126,10 @@ header {
   <p class="bullet">If I intentionally look for a memory, I will categorize it as a "low activity" memory, indicating I am voluntarily retrieving it. If a memory surfaces unexpectedly without my intention, I'll label it a "high activity" memory, since I am retrieving it involuntarily.</p>
   <p class="bullet">If, while looking for a memory, involuntary memories surface, I'll sketch the voluntary one first and the involuntary ones in the next few days.</p>
   <p class="bullet">I'll mark if I feel a physical sensation as I sketch: a wave symbol for weak/low-intensity feelings, a zigzag for strong/high-intensity feelings, and perhaps even put a timestamp on how long the physical sensation lasted. Neurons with strong emotions would be more opaque than the others.</p>
-  <p class="bullet">I'll also mark whether the recalled memory was in first- or third-person perspective. People with PTSD can become hyper-focused on their surroundings rather than on themselves. As a result, they may view memories from a third-person perspective to create emotional distance and protect themselves.</p>
+  <p class="bullet">I’ll also mark whether the recalled memory was in first- or third-person perspective. People with PTSD can become hyper-focused on their surroundings rather than on themselves. As a result, they may view memories from a third-person perspective to create emotional distance and protect themselves.</p>
 </div>
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
-
-<!-- Memory detail panel -->
-<div id="detail-panel">
-  <div id="detail-path"></div>
-  <div id="detail-tags"></div>
-  <div id="detail-nav">
-    <button class="nav-btn" id="nav-prev">&#8592;</button>
-    <button class="nav-btn" id="nav-next">&#8594;</button>
-  </div>
-</div>
 
 <div class="lightbox" id="lightbox">
   <div class="lightbox-inner">
@@ -135,27 +140,59 @@ header {
 <div id="error-banner"></div>
 
 <script>
-// ── MANIFEST COMMENTS ──────────────────────────────────────────────────────
+// ── HOW TO STRUCTURE YOUR FILES ────────────────────────────────────────────
+//
+// 1. MANIFEST FORMAT — high/low entries support these fields:
+//      "file"        → filename
+//      "sensation"   → "wave" | "zigzag" (controls opacity)
+//      "link"        → emotion tag (dotted cross-link)
+//      "action"      → action tag  (dashed cross-link)
+//      "perspective" → "first" | "third" (controls colour)
+//                      first  = I am in the memory (1st person)
+//                      third  = I am watching myself (3rd person / default)
+//
+// 2. COLOURS
+//      first  + high → #E34234  (red)
+//      first  + low  → #59788E  (slate blue)
+//      third  + high → #fcd494  (warm yellow)
+//      third  + low  → #4ba3c3  (teal blue)
+//
+// 3. EXAMPLE
+// {
+//   "children": [
+//     {
+//       "label": "being at school",
+//       "path": "1_being-at-school",
+//       "children": [
+//         {
+//           "label": "lunch",
+//           "path": "1_being-at-school/1_lunch",
+//           "high": [
+//             { "file": "1_lunch_high.jpg", "sensation": "zigzag",
+//               "link": "guilt", "action": "eating", "perspective": "first" }
+//           ],
+//           "low": [
+//             { "file": "1_lunch_low.jpg", "sensation": "wave",
+//               "link": "belonging", "action": "eating", "perspective": "third" }
+//           ]
+//         }
+//       ]
+//     }
+//   ]
+// }
+
 const ROOT_FOLDER = 'illustrations';
-
-// leafNodes stores display info; dragPositions stores per-node overrides keyed by a stable id
-let leafNodes    = [];   // { x, y, r, src, side, link, action, sensation, perspective, labelPath, id, attachX, attachY }
-let dragPositions = {};  // id -> { x, y }  (world-space overrides)
-let myP5         = null;
-let selectedIdx  = -1;
-
-// ── NODE DRAG STATE ────────────────────────────────────────────────────────
-let draggingNodeIdx = -1;   // index into leafNodes currently being dragged
-let nodeDragOffsetX = 0;    // offset from node centre to mouse at drag start
-let nodeDragOffsetY = 0;
+let leafNodes = [];
+let myP5 = null;
 
 // ── COLOURS ────────────────────────────────────────────────────────────────
 const COLORS = {
-  firstHigh: [227, 66,  52],
-  firstLow:  [61,  74, 145],
-  thirdHigh: [252, 212, 148],
-  thirdLow:  [75,  163, 195],
+  firstHigh:  [227, 66,  52],  // #E34234 — 1st person high
+  firstLow:   [61, 74, 145],  // #59788E — 1st person low
+  thirdHigh:  [252, 212, 148],  // #fcd494 — 3rd person high
+  thirdLow:   [75,  163, 195],  // #4ba3c3 — 3rd person low
 };
+
 function getColor(side, perspective) {
   const p = perspective === 'first' ? 'first' : 'third';
   return COLORS[p + (side === 'high' ? 'High' : 'Low')];
@@ -165,7 +202,6 @@ function getColor(side, perspective) {
 const toggleBtn  = document.getElementById('toggle-sidebar');
 const sidebar    = document.getElementById('sidebar');
 const canvasWrap = document.getElementById('canvas-wrap');
-const detailPanel = document.getElementById('detail-panel');
 let sidebarOpen  = true;
 
 toggleBtn.addEventListener('click', () => {
@@ -173,20 +209,20 @@ toggleBtn.addEventListener('click', () => {
   sidebar.classList.toggle('collapsed', !sidebarOpen);
   canvasWrap.classList.toggle('collapsed', !sidebarOpen);
   toggleBtn.classList.toggle('collapsed', !sidebarOpen);
-  detailPanel.classList.toggle('sidebar-collapsed', !sidebarOpen);
   toggleBtn.textContent = sidebarOpen ? 'hide' : 'show';
   setTimeout(() => { if (myP5) myP5.windowResized(); }, 370);
 });
 
-// ── SENSATION / ENTRY HELPERS ──────────────────────────────────────────────
+// ── SENSATION OPACITY ──────────────────────────────────────────────────────
 function sensationOpacity(sensation) {
   if (sensation === 'zigzag') return 0.85;
   if (sensation === 'wave')   return 0.65;
   return 0.50;
 }
+
 function normaliseEntry(entry) {
   if (typeof entry === 'string')
-    return { file:entry, sensation:null, link:null, action:null, perspective:'third' };
+    return { file: entry, sensation: null, link: null, action: null, perspective: 'third' };
   return {
     file:        entry.file        || entry,
     sensation:   entry.sensation   || null,
@@ -195,89 +231,6 @@ function normaliseEntry(entry) {
     perspective: entry.perspective || 'third',
   };
 }
-
-// ── DETAIL PANEL ───────────────────────────────────────────────────────────
-function showDetail(idx) {
-  if (idx < 0 || idx >= leafNodes.length) return;
-  selectedIdx = idx;
-  const node = leafNodes[idx];
-  const panel = document.getElementById('detail-panel');
-  const pathEl = document.getElementById('detail-path');
-  const tagsEl = document.getElementById('detail-tags');
-
-  const parts = (node.labelPath || []).map((lbl, i, arr) => {
-    const span = document.createElement('span');
-    if (i === arr.length - 1) { span.className = 'active'; span.textContent = lbl; }
-    else { span.textContent = lbl; }
-    return span.outerHTML;
-  });
-  const arrowHtml = '<span class="arrow">›</span>';
-  const sideLabel = node.side === 'high' ? 'high activity' : 'low activity';
-  const perspLabel = (node.perspective === 'first' ? '1st person' : '3rd person');
-  parts.push(`<span class="active">${perspLabel} · ${sideLabel}</span>`);
-  pathEl.innerHTML = parts.join(arrowHtml);
-
-  tagsEl.innerHTML = '';
-  if (node.link) {
-    const t = document.createElement('span');
-    t.className = 'detail-tag emotion';
-    t.textContent = node.link;
-    tagsEl.appendChild(t);
-  }
-  if (node.action) {
-    const t = document.createElement('span');
-    t.className = 'detail-tag action';
-    t.textContent = node.action;
-    tagsEl.appendChild(t);
-  }
-  if (node.sensation) {
-    const t = document.createElement('span');
-    t.className = `detail-tag sensation-${node.sensation}`;
-    t.textContent = node.sensation === 'wave' ? '∿ wave' : '⌇ zigzag';
-    tagsEl.appendChild(t);
-  }
-
-  panel.classList.add('visible');
-}
-
-function hideDetail() {
-  document.getElementById('detail-panel').classList.remove('visible');
-  selectedIdx = -1;
-}
-
-document.getElementById('nav-prev').addEventListener('click', () => {
-  if (leafNodes.length === 0) return;
-  const idx = selectedIdx <= 0 ? leafNodes.length - 1 : selectedIdx - 1;
-  showDetail(idx);
-  if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
-});
-document.getElementById('nav-next').addEventListener('click', () => {
-  if (leafNodes.length === 0) return;
-  const idx = (selectedIdx + 1) % leafNodes.length;
-  showDetail(idx);
-  if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
-});
-
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    document.getElementById('lightbox').classList.remove('open');
-    hideDetail();
-    return;
-  }
-  if (e.key === 'ArrowRight' || e.key === 'ArrowLeft') {
-    if (leafNodes.length === 0) return;
-    let idx;
-    if (selectedIdx < 0) {
-      idx = e.key === 'ArrowRight' ? 0 : leafNodes.length - 1;
-    } else {
-      idx = e.key === 'ArrowRight'
-        ? (selectedIdx + 1) % leafNodes.length
-        : (selectedIdx <= 0 ? leafNodes.length - 1 : selectedIdx - 1);
-    }
-    showDetail(idx);
-    if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
-  }
-});
 
 // ── BOOT ───────────────────────────────────────────────────────────────────
 async function boot() {
@@ -288,37 +241,38 @@ async function boot() {
   } catch (_) {}
 
   if (!tree) {
+    // Demo tree
     tree = {
       children: [
         {
-          label:'being at school', path:'',
+          label: 'being at school', path: '',
           children: [
-            { label:'lunch', path:'',
-              high:[{file:'',sensation:'zigzag',link:'guilt',    action:'eating',   perspective:'first'}],
-              low: [{file:'',sensation:'wave',  link:'belonging',action:'eating',   perspective:'third'}] },
-            { label:'sports day', path:'',
-              low: [{file:'',sensation:'wave',  link:'pride',    action:'competing',perspective:'first'}],
-              high:[{file:'',                   link:'shame',    action:'competing',perspective:'third'}] },
+            { label: 'lunch', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt',     action: 'eating',    perspective: 'first' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'belonging', action: 'eating',    perspective: 'third' } ] },
+            { label: 'sports day', path: '',
+              low:  [ { file: '', sensation: 'wave',   link: 'pride',     action: 'competing', perspective: 'first' } ],
+              high: [ { file: '',                      link: 'shame',     action: 'competing', perspective: 'third' } ] },
           ]
         },
         {
-          label:'hanging out with friends', path:'',
+          label: 'hanging out with friends', path: '',
           children: [
-            { label:'in thane', path:'',
-              low: [{file:'',link:'belonging',action:'eating', perspective:'third'},
-                    {file:'',link:'fear',     action:'running',perspective:'first'}] },
-            { label:'first kiss', path:'',
-              high:[{file:'',sensation:'zigzag',link:'shame',action:'intimacy',perspective:'first'}],
-              low: [{file:'',sensation:'wave',  link:'joy',  action:'intimacy',perspective:'third'}] },
+            { label: 'in thane', path: '',
+              low:  [ { file: '', link: 'belonging', action: 'eating', perspective: 'third' },
+                      { file: '', link: 'fear',      action: 'running', perspective: 'first' } ] },
+            { label: 'first kiss', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'shame', action: 'intimacy', perspective: 'first' } ],
+              low:  [ { file: '', sensation: 'wave',   link: 'joy',   action: 'intimacy', perspective: 'third' } ] },
           ]
         },
         {
-          label:'home', path:'',
+          label: 'home', path: '',
           children: [
-            { label:'dinner table', path:'',
-              high:[{file:'',sensation:'zigzag',link:'guilt',action:'eating',   perspective:'first'}] },
-            { label:'winning prize', path:'',
-              low: [{file:'',sensation:'zigzag',link:'pride',action:'competing',perspective:'third'}] },
+            { label: 'dinner table', path: '',
+              high: [ { file: '', sensation: 'zigzag', link: 'guilt', action: 'eating', perspective: 'first' } ] },
+            { label: 'winning prize', path: '',
+              low:  [ { file: '', sensation: 'zigzag', link: 'pride', action: 'competing', perspective: 'third' } ] },
           ]
         }
       ]
@@ -328,11 +282,16 @@ async function boot() {
   startSketch(tree);
 }
 
+function showError(msg) {
+  const el = document.getElementById('error-banner');
+  el.textContent = msg; el.style.display = 'block';
+}
+
 // ── TREE HELPERS ───────────────────────────────────────────────────────────
-function collectSrcs(node, srcs=[]) {
-  if (node.high) node.high.forEach(e=>{const n=normaliseEntry(e);if(n.file)srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`);});
-  if (node.low)  node.low.forEach(e =>{const n=normaliseEntry(e);if(n.file)srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`);});
-  if (node.children) node.children.forEach(c=>collectSrcs(c,srcs));
+function collectSrcs(node, srcs = []) {
+  if (node.high) node.high.forEach(e => { const n = normaliseEntry(e); if (n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
+  if (node.low)  node.low.forEach(e  => { const n = normaliseEntry(e); if (n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
+  if (node.children) node.children.forEach(c => collectSrcs(c, srcs));
   return srcs;
 }
 
@@ -340,13 +299,17 @@ function annotateTints(node) {
   const hasHigh = node.high && node.high.length > 0;
   const hasLow  = node.low  && node.low.length  > 0;
   if (!node.children || node.children.length === 0) {
-    node.tint=hasHigh&&!hasLow?-1:!hasHigh&&hasLow?1:0; node.maxDepth=0; return;
+    node.tint = hasHigh && !hasLow ? -1 : !hasHigh && hasLow ? 1 : 0;
+    node.maxDepth = 0; return;
   }
-  node.children.forEach(c=>annotateTints(c));
-  const ct=node.children.map(c=>c.tint);
-  if(hasHigh)ct.push(-1); if(hasLow)ct.push(1);
-  node.tint=ct.every(t=>t===-1)?-1:ct.every(t=>t===1)?1:0;
-  node.maxDepth=Math.max(...node.children.map(c=>c.maxDepth))+1;
+  node.children.forEach(c => annotateTints(c));
+  const childTints = node.children.map(c => c.tint);
+  const allHigh = childTints.every(t => t === -1);
+  const allLow  = childTints.every(t => t ===  1);
+  if (hasHigh) childTints.push(-1);
+  if (hasLow)  childTints.push( 1);
+  node.tint     = allHigh ? -1 : allLow ? 1 : 0;
+  node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
 }
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
@@ -360,167 +323,176 @@ const CONFIG = {
   neutralColor: [120, 120, 120],
 };
 
-// ── STABLE NODE ID ─────────────────────────────────────────────────────────
-// Build a deterministic string id from the leaf's path + side + entry index
-let _leafCounter = 0;
-function makeLeafId() { return 'leaf_' + (_leafCounter++); }
-
 // ── SKETCH ─────────────────────────────────────────────────────────────────
 function startSketch(tree) {
-  if (myP5) { myP5.remove(); myP5=null; }
-  leafNodes=[];
+  if (myP5) { myP5.remove(); myP5 = null; }
+  leafNodes = [];
+
   annotateTints(tree);
   const totalDepth = tree.maxDepth || 4;
   const allSrcs    = collectSrcs(tree);
 
   const sketch = p => {
-    const allImgs={};
+    const allImgs = {};
     let W, H;
 
     p.preload = () => {
-      allSrcs.forEach(src=>{
-        allImgs[src]=p.loadImage(src,()=>{},()=>{allImgs[src]=null;});
+      allSrcs.forEach(src => {
+        allImgs[src] = p.loadImage(src, () => {}, () => { allImgs[src] = null; });
       });
     };
 
     p.setup = () => {
-      const wrap=document.getElementById('canvas-wrap');
-      W=wrap.offsetWidth; H=wrap.offsetHeight;
-      p.createCanvas(W,H).parent('canvas-wrap');
+      const wrap = document.getElementById('canvas-wrap');
+      W = wrap.offsetWidth; H = wrap.offsetHeight;
+      p.createCanvas(W, H).parent('canvas-wrap');
       p.angleMode(p.DEGREES);
       p.textFont('Space Mono');
-      setupInteraction(p);
     };
 
     p.windowResized = () => {
-      const wrap=document.getElementById('canvas-wrap');
-      W=wrap.offsetWidth; H=wrap.offsetHeight;
-      if(W>0&&H>0) p.resizeCanvas(W,H);
+      const wrap = document.getElementById('canvas-wrap');
+      W = wrap.offsetWidth; H = wrap.offsetHeight;
+      if (W > 0 && H > 0) p.resizeCanvas(W, H);
     };
 
-    // ── mouse events handled via setupInteraction ─────────────────────────
-
     p.draw = () => {
-      p.background(10,10,10);
-      // rebuild leaf list each frame so positions reflect drag overrides
-      leafNodes=[];
-      _leafCounter=0;
+      p.background(10, 10, 10);
+      leafNodes = [];
 
-      const S    = Math.min(W,H);
-      const botY = H/2 + S*0.45;
+      const S    = Math.min(W, H);
+      const botY = H / 2 + S * 0.44;
 
-      drawBrainOutline(p,W,H,S);
+      drawBrainOutline(p, W, H, S);
 
-      const trunkLen = S*CONFIG.trunkRatio;
-      const sway     = Math.sin(p.frameCount*0.008)*1.2;
+      const trunkLen = S * CONFIG.trunkRatio;
+      const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
 
       p.push();
-      p.translate(W/2, botY);
+      p.translate(W / 2, botY);
 
       p.stroke(...CONFIG.neutralColor);
-      p.strokeWeight(Math.max(S*0.007,2));
+      p.strokeWeight(Math.max(S * 0.007, 2));
       p.noFill();
-      const tc1x=p.noise(0.1)*30-15;
+      const tc1x = p.noise(0.1) * 30 - 15;
       p.beginShape();
-      p.vertex(0,0);
-      p.bezierVertex(tc1x,-trunkLen*0.35,-tc1x,-trunkLen*0.65,0,-trunkLen);
+      p.vertex(0, 0);
+      p.bezierVertex(tc1x, -trunkLen * 0.35, -tc1x, -trunkLen * 0.65, 0, -trunkLen);
       p.endShape();
-      p.translate(0,-trunkLen);
+      p.translate(0, -trunkLen);
 
-      const children=tree.children||[];
-      const n=children.length;
-      const spread=Math.min(n*CONFIG.spreadBase,110);
-      const step=n>1?spread/(n-1):0;
-      const start=-spread/2;
+      const children = tree.children || [];
+      const n        = children.length;
+      const spread   = Math.min(n * CONFIG.spreadBase, 110);
+      const step     = n > 1 ? spread / (n - 1) : 0;
+      const start    = -spread / 2;
 
       p.noStroke();
-      p.fill(...CONFIG.neutralColor,180);
-      p.ellipse(0,0,S*0.012,S*0.012);
+      p.fill(...CONFIG.neutralColor, 180);
+      p.ellipse(0, 0, S * 0.012, S * 0.012);
 
-      children.forEach((child,i)=>{
-        const angle=start+i*step+sway;
-        p.push(); p.rotate(angle);
-        drawNode(p,child,trunkLen*CONFIG.branchDecay,1,totalDepth,allImgs,S,[]);
+      children.forEach((child, i) => {
+        const angle = start + i * step + sway;
+        p.push();
+        p.rotate(angle);
+        drawNode(p, child, trunkLen * CONFIG.branchDecay, 1, totalDepth, allImgs, S);
         p.pop();
       });
 
       p.pop();
 
-      p.push(); p.resetMatrix(); drawCrossLinks(p); p.pop();
+      p.push();
+      p.resetMatrix();
+      drawCrossLinks(p);
+      p.pop();
     };
 
     // ── recursive branch ─────────────────────────────────────────────────
-    function drawNode(p,node,len,depth,totalDepth,allImgs,S,parentPath) {
-      const hasChildren=node.children&&node.children.length>0;
-      const hasHigh=node.high&&node.high.length>0;
-      const hasLow =node.low &&node.low.length >0;
+    function drawNode(p, node, len, depth, totalDepth, allImgs, S) {
+      const hasChildren = node.children && node.children.length > 0;
+      const hasHigh     = node.high && node.high.length > 0;
+      const hasLow      = node.low  && node.low.length  > 0;
 
-      const t=Math.min(depth/totalDepth,1);
-      const tint=node.tint||0;
-      const nr=CONFIG.neutralColor[0],ng=CONFIG.neutralColor[1],nb=CONFIG.neutralColor[2];
-      const baseHigh=COLORS.thirdHigh,baseLow=COLORS.thirdLow;
-      const tr=tint<0?baseHigh[0]:tint>0?baseLow[0]:nr;
-      const tg=tint<0?baseHigh[1]:tint>0?baseLow[1]:ng;
-      const tb=tint<0?baseHigh[2]:tint>0?baseLow[2]:nb;
-      const r=nr+(tr-nr)*t, g=ng+(tg-ng)*t, b=nb+(tb-nb)*t;
-      const alpha=Math.max(210-depth*18,80);
-      const sw=Math.max(S*0.005-depth*0.45,0.7);
+      const t    = Math.min(depth / totalDepth, 1);
+      const tint = node.tint || 0;
+      const nr   = CONFIG.neutralColor[0], ng = CONFIG.neutralColor[1], nb = CONFIG.neutralColor[2];
+      // For branch colour use third-person colours as the neutral baseline
+      const baseHigh = COLORS.thirdHigh, baseLow = COLORS.thirdLow;
+      const tr   = tint < 0 ? baseHigh[0] : tint > 0 ? baseLow[0] : nr;
+      const tg   = tint < 0 ? baseHigh[1] : tint > 0 ? baseLow[1] : ng;
+      const tb   = tint < 0 ? baseHigh[2] : tint > 0 ? baseLow[2] : nb;
+      const r    = nr + (tr - nr) * t;
+      const g    = ng + (tg - ng) * t;
+      const b    = nb + (tb - nb) * t;
+      const alpha = Math.max(210 - depth * 18, 80);
+      const sw    = Math.max(S * 0.005 - depth * 0.45, 0.7);
 
-      p.stroke(r,g,b,alpha); p.strokeWeight(sw); p.noFill();
-      const seed=depth*13.7+(node.label?node.label.charCodeAt(0):0);
-      const cx1=p.noise(seed)*len*0.18-len*0.09;
-      const cx2=p.noise(seed+1.3)*len*0.18-len*0.09;
-      p.beginShape(); p.vertex(0,0); p.bezierVertex(cx1,-len*0.33,cx2,-len*0.66,0,-len); p.endShape();
+      p.stroke(r, g, b, alpha);
+      p.strokeWeight(sw);
+      p.noFill();
+      const seed = depth * 13.7 + (node.label ? node.label.charCodeAt(0) : 0);
+      const cx1  = p.noise(seed)       * len * 0.5 - len * 0.25;
+      const cx2  = p.noise(seed + 1.3) * len * 0.5 - len * 0.25;
+      p.beginShape();
+      p.vertex(0, 0);
+      p.bezierVertex(cx1, -len * 0.33, cx2, -len * 0.66, 0, -len);
+      p.endShape();
 
-      p.noStroke(); p.fill(r,g,b,alpha*0.7);
-      const somaR=Math.max(sw*2.2,2.5);
-      p.ellipse(0,0,somaR*2,somaR*2);
+      p.noStroke();
+      p.fill(r, g, b, alpha * 0.7);
+      const somaR = Math.max(sw * 2.2, 2.5);
+      p.ellipse(0, 0, somaR * 2, somaR * 2);
 
-      if(node.label){
-        p.push(); p.noStroke(); p.fill(200,200,200,180-depth*12);
-        p.textFont('Space Mono'); p.textSize(Math.max(S*0.007-depth*0.3,5.5));
-        p.textAlign(p.CENTER,p.BOTTOM);
-        p.translate(0,-len*0.5); p.rotate(-90); p.text(node.label,0,-4);
+      if (node.label) {
+        p.push();
+        p.noStroke();
+        p.fill(200, 200, 200, 180 - depth * 12);
+        p.textFont('Space Mono');
+        p.textSize(Math.max(S * 0.007 - depth * 0.3, 5.5));
+        p.textAlign(p.CENTER, p.BOTTOM);
+        p.translate(0, -len * 0.5);
+        p.rotate(-90);
+        p.text(node.label, 0, -4);
         p.pop();
       }
 
-      p.translate(0,-len);
+      p.translate(0, -len);
 
-      const childLen=len*CONFIG.branchDecay;
-      const spread=CONFIG.spreadBase*Math.pow(CONFIG.spreadDecay,depth);
-      const currentPath=[...parentPath, node.label].filter(Boolean);
+      const childLen = len * CONFIG.branchDecay;
+      const spread   = CONFIG.spreadBase * Math.pow(CONFIG.spreadDecay, depth);
 
-      if(hasChildren){
-        const n=node.children.length;
-        const total=Math.min(n*spread,160);
-        const step=n>1?total/(n-1):0;
-        const st=-total/2;
-        node.children.forEach((child,i)=>{
-          p.push(); p.rotate(st+i*step);
-          drawNode(p,child,childLen,depth+1,totalDepth,allImgs,S,currentPath);
+      if (hasChildren) {
+        const n     = node.children.length;
+        const total = Math.min(n * spread, 160);
+        const step  = n > 1 ? total / (n - 1) : 0;
+        const start = -total / 2;
+        node.children.forEach((child, i) => {
+          p.push();
+          p.rotate(start + i * step);
+          drawNode(p, child, childLen, depth + 1, totalDepth, allImgs, S);
           p.pop();
         });
       }
 
-      if(hasHigh||hasLow){
-        const leafLen=len*CONFIG.branchDecay*0.85;
-        if(hasHigh){
-          const angles=fanAngles(node.high.length,-CONFIG.splitAngle,CONFIG.subAngle);
-          node.high.forEach((e,i)=>{
-            const entry=normaliseEntry(e);
-            const src=entry.file?`${ROOT_FOLDER}/${node.path}/${entry.file}`:'';
+      if (hasHigh || hasLow) {
+        const leafLen = len * CONFIG.branchDecay * 0.85;
+        if (hasHigh) {
+          const angles = fanAngles(node.high.length, -CONFIG.splitAngle, CONFIG.subAngle);
+          node.high.forEach((e, i) => {
+            const entry = normaliseEntry(e);
+            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p,src,src?allImgs[src]:null,leafLen,'high',depth,S,entry,currentPath);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'high', depth, S, entry);
             p.pop();
           });
         }
-        if(hasLow){
-          const angles=fanAngles(node.low.length,CONFIG.splitAngle,CONFIG.subAngle);
-          node.low.forEach((e,i)=>{
-            const entry=normaliseEntry(e);
-            const src=entry.file?`${ROOT_FOLDER}/${node.path}/${entry.file}`:'';
+        if (hasLow) {
+          const angles = fanAngles(node.low.length, CONFIG.splitAngle, CONFIG.subAngle);
+          node.low.forEach((e, i) => {
+            const entry = normaliseEntry(e);
+            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
             p.push(); p.rotate(angles[i]);
-            drawLeaf(p,src,src?allImgs[src]:null,leafLen,'low',depth,S,entry,currentPath);
+            drawLeaf(p, src, src ? allImgs[src] : null, leafLen, 'low', depth, S, entry);
             p.pop();
           });
         }
@@ -528,273 +500,244 @@ function startSketch(tree) {
     }
 
     // ── leaf node ─────────────────────────────────────────────────────────
-    function drawLeaf(p,src,img,len,side,depth,S,entry,parentPath) {
-      const col=getColor(side,entry.perspective);
-      const opacity=sensationOpacity(entry.sensation);
-      const alpha=Math.max(190-depth*15,90)*opacity;
-      const sw=Math.max(1.6-depth*0.1,0.6);
+    function drawLeaf(p, src, img, len, side, depth, S, entry) {
+      const col     = getColor(side, entry.perspective);
+      const opacity = sensationOpacity(entry.sensation);
+      const alpha   = Math.max(190 - depth * 15, 90) * opacity;
+      const sw      = Math.max(1.6 - depth * 0.1, 0.6);
 
-      // Get the world-space attach point (where the branch starts)
-      const xfAttach = p.drawingContext.getTransform();
-      const attachX  = xfAttach.e;
-      const attachY  = xfAttach.f;
+      p.stroke(...col, alpha);
+      p.strokeWeight(sw);
+      p.noFill();
+      const seed = depth * 7.3 + (src.length % 17);
+      const cx1  = p.noise(seed)       * len * 0.6 - len * 0.3;
+      const cx2  = p.noise(seed + 2.1) * len * 0.6 - len * 0.3;
+      p.beginShape();
+      p.vertex(0, 0);
+      p.bezierVertex(cx1, -len * 0.33, cx2, -len * 0.66, 0, -len);
+      p.endShape();
 
-      // Build a stable id for this leaf
-      const leafId = makeLeafId();
+      p.translate(0, -len);
 
-      // Determine if this node has a drag override
-      const dpr    = p.pixelDensity();
-      const hasDrag = dragPositions[leafId] !== undefined;
+      const nodeSize = Math.max(S * 0.065 - depth * 4, 20);
+      const xf = p.drawingContext.getTransform();
+      const wx = xf.e, wy = xf.f;
 
-      // The natural end-of-branch world position (without drag)
-      // We need to walk the transform to find it; compute it from attach + rotated offset
-      // Instead: draw the branch normally first to get the endpoint, then handle drag below.
+      p.noStroke();
+      p.imageMode(p.CENTER);
 
-      const seed=depth*7.3+(src.length%17);
-      const cx1=p.noise(seed)*len*0.2-len*0.1;
-      const cx2=p.noise(seed+2.1)*len*0.2-len*0.1;
+      if (img) {
+        const ctx   = p.drawingContext;
+        const seed2 = src.length * 0.3 + depth;
 
-      if (!hasDrag) {
-        // Normal drawing: branch then node at tip
-        p.stroke(...col,alpha); p.strokeWeight(sw); p.noFill();
-        p.beginShape(); p.vertex(0,0); p.bezierVertex(cx1,-len*0.33,cx2,-len*0.66,0,-len); p.endShape();
-        p.translate(0,-len);
-      } else {
-        // Drag override: draw a stretching branch from attach point to dragged position
-        const tx = dragPositions[leafId].x;
-        const ty = dragPositions[leafId].y;
-
-        // Convert drag target from screen space to local space
-        const inv = xfAttach;
-        // Compute local dx/dy by reversing the current transform
-        const localX =  ((tx - inv.e) * inv.a + (ty - inv.f) * inv.b) / (inv.a*inv.a + inv.b*inv.b);
-        const localY =  ((ty - inv.f) * inv.a - (tx - inv.e) * inv.b) / (inv.a*inv.a + inv.b*inv.b);
-
-        p.stroke(...col,alpha); p.strokeWeight(sw); p.noFill();
-        // Bezier stretches: ctrl points proportional to the vector
-        const dx = localX, dy = localY;
-        p.beginShape();
-        p.vertex(0,0);
-        p.bezierVertex(dx*0.2+cx1*0.5, dy*0.2-len*0.1,
-                       dx*0.7+cx2*0.3, dy*0.7-len*0.05,
-                       dx, dy);
-        p.endShape();
-        // Move to dragged position in screen space for node drawing
-        p.resetMatrix();
-        p.translate(tx/dpr, ty/dpr);
-      }
-
-      const nodeSize=Math.max(S*0.065-depth*4,20);
-      const xf=p.drawingContext.getTransform();
-      const wx=xf.e, wy=xf.f;
-
-      p.noStroke(); p.imageMode(p.CENTER);
-
-      if(img){
-        const ctx=p.drawingContext;
-        const seed2=src.length*0.3+depth;
         p.noStroke();
-        p.fill(...col,12*opacity); drawBlob(p,0,0,nodeSize*1.6,nodeSize*1.4,8,seed2,0.32);
-        p.fill(...col,22*opacity); drawBlob(p,0,0,nodeSize*1.25,nodeSize*1.1,7,seed2+1,0.28);
-        p.noFill(); p.stroke(...col,50*opacity); p.strokeWeight(0.5);
-        drawBlob(p,0,0,nodeSize*1.25,nodeSize*1.1,7,seed2+1,0.28);
-        p.stroke(...col,35*opacity); p.strokeWeight(0.5);
-        for(let d=0;d<5;d++){
-          const dAngle=(d/5)*360+p.noise(seed2+d)*40;
-          const dLen=nodeSize*(0.35+p.noise(seed2+d+5)*0.3);
-          const dRad=nodeSize*0.55;
-          const sx=p.cos(dAngle)*dRad,sy=p.sin(dAngle)*dRad;
-          const ex=p.cos(dAngle)*(dRad+dLen),ey=p.sin(dAngle)*(dRad+dLen);
-          const mx=(sx+ex)/2+(p.noise(seed2+d+10)-0.5)*dLen*0.5;
-          const my2=(sy+ey)/2+(p.noise(seed2+d+15)-0.5)*dLen*0.5;
-          p.noFill(); p.beginShape(); p.vertex(sx,sy); p.quadraticVertex(mx,my2,ex,ey); p.endShape();
+        p.fill(...col, 12 * opacity);
+        drawBlob(p, 0, 0, nodeSize * 1.6, nodeSize * 1.4, 8, seed2, 0.32);
+        p.fill(...col, 22 * opacity);
+        drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
+        p.noFill();
+        p.stroke(...col, 50 * opacity);
+        p.strokeWeight(0.5);
+        drawBlob(p, 0, 0, nodeSize * 1.25, nodeSize * 1.1, 7, seed2 + 1, 0.28);
+
+        p.stroke(...col, 35 * opacity);
+        p.strokeWeight(0.5);
+        for (let d = 0; d < 5; d++) {
+          const dAngle = (d / 5) * 360 + p.noise(seed2 + d) * 40;
+          const dLen   = nodeSize * (0.35 + p.noise(seed2 + d + 5) * 0.3);
+          const dRad   = nodeSize * 0.55;
+          const sx = p.cos(dAngle) * dRad, sy = p.sin(dAngle) * dRad;
+          const ex = p.cos(dAngle) * (dRad + dLen), ey = p.sin(dAngle) * (dRad + dLen);
+          const mx = (sx+ex)/2 + (p.noise(seed2+d+10)-0.5)*dLen*0.5;
+          const my2 = (sy+ey)/2 + (p.noise(seed2+d+15)-0.5)*dLen*0.5;
+          p.noFill();
+          p.beginShape(); p.vertex(sx, sy); p.quadraticVertex(mx, my2, ex, ey); p.endShape();
         }
-        const nucleusSize=nodeSize*0.52, nr2=nucleusSize/2;
-        ctx.save(); ctx.globalAlpha=opacity;
-        ctx.beginPath(); ctx.arc(0,0,nr2,0,Math.PI*2); ctx.clip();
-        p.image(img,0,0,nucleusSize,nucleusSize);
+
+        const nucleusSize = nodeSize * 0.52;
+        const nr2 = nucleusSize / 2;
+        ctx.save();
+        ctx.globalAlpha = opacity;
+        ctx.beginPath();
+        ctx.arc(0, 0, nr2, 0, Math.PI * 2);
+        ctx.clip();
+        p.image(img, 0, 0, nucleusSize, nucleusSize);
         ctx.restore();
-        p.noFill(); p.stroke(...col,200*opacity); p.strokeWeight(1); p.ellipse(0,0,nucleusSize,nucleusSize);
-        p.stroke(...col,60*opacity); p.strokeWeight(0.4); p.ellipse(0,0,nucleusSize+4,nucleusSize+4);
+
+        p.noFill();
+        p.stroke(...col, 200 * opacity); p.strokeWeight(1);
+        p.ellipse(0, 0, nucleusSize, nucleusSize);
+        p.stroke(...col, 60 * opacity); p.strokeWeight(0.4);
+        p.ellipse(0, 0, nucleusSize + 4, nucleusSize + 4);
+
       } else {
         p.noStroke();
-        p.fill(...col,14*opacity); drawBlob(p,0,0,nodeSize*1.5,nodeSize*1.3,7,depth*3.1,0.3);
-        p.fill(...col,25*opacity); drawBlob(p,0,0,nodeSize*1.1,nodeSize*0.95,6,depth*3.1+1,0.25);
-        p.fill(...col,130*opacity); p.ellipse(0,0,nodeSize*0.38,nodeSize*0.38);
+        p.fill(...col, 14 * opacity);
+        drawBlob(p, 0, 0, nodeSize * 1.5, nodeSize * 1.3, 7, depth * 3.1, 0.3);
+        p.fill(...col, 25 * opacity);
+        drawBlob(p, 0, 0, nodeSize * 1.1, nodeSize * 0.95, 6, depth * 3.1 + 1, 0.25);
+        p.fill(...col, 130 * opacity);
+        p.ellipse(0, 0, nodeSize * 0.38, nodeSize * 0.38);
       }
 
       leafNodes.push({
-        x:wx, y:wy, r:nodeSize*0.85, src, side,
-        link:        entry.link        ||null,
-        action:      entry.action      ||null,
-        sensation:   entry.sensation   ||null,
-        perspective: entry.perspective ||'third',
-        labelPath:   parentPath,
-        id:          leafId,
-        attachX,
-        attachY,
+        x: wx, y: wy, r: nodeSize * 0.85, src, side,
+        link:        entry.link        || null,
+        action:      entry.action      || null,
+        perspective: entry.perspective || 'third',
       });
     }
 
     // ── cross-links ───────────────────────────────────────────────────────
-    function drawCrossLinks(p){
-      const emotions={},actions={};
-      for(const node of leafNodes){
-        if(node.link)  {if(!emotions[node.link]) emotions[node.link] =[];emotions[node.link].push(node);}
-        if(node.action){if(!actions[node.action])actions[node.action]=[];actions[node.action].push(node);}
+    function drawCrossLinks(p) {
+      const emotions = {}, actions = {};
+      for (const node of leafNodes) {
+        if (node.link)   { if (!emotions[node.link])  emotions[node.link]  = []; emotions[node.link].push(node);  }
+        if (node.action) { if (!actions[node.action]) actions[node.action] = []; actions[node.action].push(node); }
       }
-      for(const tag in emotions){const ns=emotions[tag];for(let i=0;i<ns.length;i++)for(let j=i+1;j<ns.length;j++)drawArc(p,ns[i],ns[j],40,2);}
-      for(const tag in actions) {const ns=actions[tag]; for(let i=0;i<ns.length;i++)for(let j=i+1;j<ns.length;j++)drawArc(p,ns[i],ns[j],14,4);}
 
-      const hE=Object.keys(emotions).length>0, hA=Object.keys(actions).length>0;
-      if(!hE&&!hA) return;
-      const px=W-16, lineH=20;
-      let y=H-16-((hE?1:0)+(hA?1:0))*lineH;
-      p.textFont('Space Mono'); p.textSize(8); p.textAlign(p.RIGHT,p.CENTER);
-      if(hE){ p.stroke(255,255,255,100); p.strokeWeight(0.5); for(let s=0;s<6;s+=2)p.line(px-58+s*4,y,px-58+s*4+3,y); p.noStroke();p.fill(180,180,180,160);p.text('emotion',px,y); y+=lineH; }
-      if(hA){ p.stroke(255,255,255,100); p.strokeWeight(0.5); for(let s=0;s<3;s++)p.line(px-58+s*10,y,px-58+s*10+6,y); p.noStroke();p.fill(180,180,180,160);p.text('action',px,y); }
+      for (const tag in emotions) {
+        const nodes = emotions[tag];
+        for (let i = 0; i < nodes.length; i++)
+          for (let j = i + 1; j < nodes.length; j++)
+            drawArc(p, nodes[i], nodes[j], 40, 2);
+      }
+      for (const tag in actions) {
+        const nodes = actions[tag];
+        for (let i = 0; i < nodes.length; i++)
+          for (let j = i + 1; j < nodes.length; j++)
+            drawArc(p, nodes[i], nodes[j], 14, 4);
+      }
+
+      const hasEmotions = Object.keys(emotions).length > 0;
+      const hasActions  = Object.keys(actions).length  > 0;
+      if (!hasEmotions && !hasActions) return;
+
+      const px = W - 16, lineH = 20;
+      let y = H - 16 - ((hasEmotions ? 1 : 0) + (hasActions ? 1 : 0)) * lineH;
+      p.textFont('Space Mono'); p.textSize(8); p.textAlign(p.RIGHT, p.CENTER);
+
+      if (hasEmotions) {
+        p.stroke(255,255,255,100); p.strokeWeight(0.5);
+        for (let s = 0; s < 6; s += 2)
+          p.line(px - 58 + s*4, y, px - 58 + s*4 + 3, y);
+        p.noStroke(); p.fill(180,180,180,160); p.text('emotion', px, y);
+        y += lineH;
+      }
+      if (hasActions) {
+        p.stroke(255,255,255,100); p.strokeWeight(0.5);
+        for (let s = 0; s < 3; s++)
+          p.line(px - 58 + s*10, y, px - 58 + s*10 + 6, y);
+        p.noStroke(); p.fill(180,180,180,160); p.text('action', px, y);
+      }
     }
 
-    function drawArc(p,a,b,steps,skip){
-      const dpr=p.pixelDensity();
-      const ax=a.x/dpr,ay=a.y/dpr,bx=b.x/dpr,by=b.y/dpr;
-      const mx=(ax+bx)/2,my=(ay+by)/2-Math.abs(bx-ax)*0.3;
+    function drawArc(p, a, b, steps, skip) {
+      const dpr = p.pixelDensity();
+      const ax = a.x/dpr, ay = a.y/dpr, bx = b.x/dpr, by = b.y/dpr;
+      const mx = (ax+bx)/2, my = (ay+by)/2 - Math.abs(bx-ax)*0.3;
       p.noFill(); p.stroke(255,255,255,60); p.strokeWeight(0.6);
-      for(let s=0;s<steps;s+=skip){
-        const t0=s/steps,t1=(s+skip*0.5)/steps;
-        p.line(bezierPoint(ax,mx,mx,bx,t0),bezierPoint(ay,my,my,by,t0),
-               bezierPoint(ax,mx,mx,bx,t1),bezierPoint(ay,my,my,by,t1));
+      for (let s = 0; s < steps; s += skip) {
+        const t0 = s/steps, t1 = (s + skip*0.5)/steps;
+        p.line(bezierPoint(ax,mx,mx,bx,t0), bezierPoint(ay,my,my,by,t0),
+               bezierPoint(ax,mx,mx,bx,t1), bezierPoint(ay,my,my,by,t1));
       }
     }
-    function bezierPoint(a,b,c,d,t){const mt=1-t;return mt*mt*mt*a+3*mt*mt*t*b+3*mt*t*t*c+t*t*t*d;}
-    function fanAngles(n,centre,spread){if(n===1)return[centre];const half=(spread*(n-1))/2;return Array.from({length:n},(_,i)=>centre-half+i*spread);}
 
-    function drawBlob(p,cx,cy,rw,rh,pts,seed,wobble){
+    function bezierPoint(a,b,c,d,t) {
+      const mt = 1-t;
+      return mt*mt*mt*a + 3*mt*mt*t*b + 3*mt*t*t*c + t*t*t*d;
+    }
+
+    function fanAngles(n, centre, spread) {
+      if (n === 1) return [centre];
+      const half = (spread*(n-1))/2;
+      return Array.from({length:n}, (_,i) => centre - half + i*spread);
+    }
+
+    function drawBlob(p, cx, cy, rw, rh, pts, seed, wobble) {
       p.beginShape();
-      for(let i=0;i<=pts;i++){
-        const angle=(i/pts)*360, nVal=p.noise(seed+i*0.8)*2-1;
-        const rx=rw*0.5*(1+nVal*wobble);
-        p.curveVertex(cx+p.cos(angle)*rx, cy+p.sin(angle)*(rh*0.5*(1+nVal*wobble*0.6)));
+      for (let i = 0; i <= pts; i++) {
+        const angle = (i/pts)*360;
+        const nVal  = p.noise(seed + i*0.8)*2 - 1;
+        const rx    = rw*0.5*(1 + nVal*wobble);
+        p.curveVertex(cx + p.cos(angle)*rx, cy + p.sin(angle)*(rh*0.5*(1 + nVal*wobble*0.6)));
       }
-      const nVal0=p.noise(seed)*2-1;
-      p.curveVertex(cx+p.cos(0)*rw*0.5*(1+nVal0*wobble), cy+p.sin(0)*rh*0.5*(1+nVal0*wobble*0.6));
+      const nVal0 = p.noise(seed)*2-1;
+      p.curveVertex(cx + p.cos(0)*rw*0.5*(1+nVal0*wobble), cy + p.sin(0)*rh*0.5*(1+nVal0*wobble*0.6));
       p.endShape(p.CLOSE);
     }
 
-    function drawBrainOutline(p,W,H,S){
+    function drawBrainOutline(p, W, H, S) {
       p.noFill(); p.stroke(60,60,60); p.strokeWeight(Math.max(S*0.004,1.5));
-      const cx=W/2, lw=S*0.54;
-      const topY=H/2-S*0.48, botY=H/2+S*0.45;
+      const cx = W/2, lw = S*0.54;
+      const topY = H/2 - S*0.48, botY = H/2 + S*0.45;
+
       p.beginShape();
-      p.vertex(cx-12,botY);
-      p.bezierVertex(cx-lw*0.5,botY+S*0.01,cx-lw*0.85,botY-S*0.04,cx-lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx-lw*1.12,botY-S*0.44,cx-lw*0.98,botY-S*0.6,cx-lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx-lw*1.1,botY-S*0.8,cx-lw*0.95,topY+S*0.12,cx-lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx-lw*0.65,topY-S*0.01,cx-lw*0.42,topY+S*0.005,cx-lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx-lw*0.15,topY+S*0.06,cx-lw*0.05,topY+S*0.1,cx-12,topY+S*0.13);
+      p.vertex(cx-12, botY);
+      p.bezierVertex(cx-lw*0.5, botY+S*0.01, cx-lw*0.85, botY-S*0.04, cx-lw*0.95, botY-S*0.3);
+      p.bezierVertex(cx-lw*1.12, botY-S*0.44, cx-lw*0.98, botY-S*0.6, cx-lw*1.05, botY-S*0.7);
+      p.bezierVertex(cx-lw*1.1, botY-S*0.8, cx-lw*0.95, topY+S*0.12, cx-lw*0.82, topY+S*0.08);
+      p.bezierVertex(cx-lw*0.65, topY-S*0.01, cx-lw*0.42, topY+S*0.005, cx-lw*0.28, topY+S*0.04);
+      p.bezierVertex(cx-lw*0.15, topY+S*0.06, cx-lw*0.05, topY+S*0.1, cx-12, topY+S*0.13);
       p.endShape();
+
       p.beginShape();
-      p.vertex(cx+12,botY);
-      p.bezierVertex(cx+lw*0.5,botY+S*0.01,cx+lw*0.85,botY-S*0.04,cx+lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx+lw*1.12,botY-S*0.44,cx+lw*0.98,botY-S*0.6,cx+lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx+lw*1.1,botY-S*0.8,cx+lw*0.95,topY+S*0.12,cx+lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx+lw*0.65,topY-S*0.01,cx+lw*0.42,topY+S*0.005,cx+lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx+lw*0.15,topY+S*0.06,cx+lw*0.05,topY+S*0.1,cx+12,topY+S*0.13);
+      p.vertex(cx+12, botY);
+      p.bezierVertex(cx+lw*0.5, botY+S*0.01, cx+lw*0.85, botY-S*0.04, cx+lw*0.95, botY-S*0.3);
+      p.bezierVertex(cx+lw*1.12, botY-S*0.44, cx+lw*0.98, botY-S*0.6, cx+lw*1.05, botY-S*0.7);
+      p.bezierVertex(cx+lw*1.1, botY-S*0.8, cx+lw*0.95, topY+S*0.12, cx+lw*0.82, topY+S*0.08);
+      p.bezierVertex(cx+lw*0.65, topY-S*0.01, cx+lw*0.42, topY+S*0.005, cx+lw*0.28, topY+S*0.04);
+      p.bezierVertex(cx+lw*0.15, topY+S*0.06, cx+lw*0.05, topY+S*0.1, cx+12, topY+S*0.13);
       p.endShape();
     }
   };
 
-  myP5=new p5(sketch);
+  myP5 = new p5(sketch);
+  setupInteraction();
 }
 
 // ── INTERACTION ────────────────────────────────────────────────────────────
-function setupInteraction(p){
-  const wrap=document.getElementById('canvas-wrap');
+function setupInteraction() {
+  const wrap = document.getElementById('canvas-wrap');
 
-  // Helper: find the leaf node under screen coords (mx, my in canvas pixels)
-  function hitLeaf(mx, my) {
-    const dpr = p.pixelDensity();
-    for (let i = leafNodes.length - 1; i >= 0; i--) {
-      const node = leafNodes[i];
-      const dx = mx - node.x/dpr, dy = my - node.y/dpr;
-      if (Math.sqrt(dx*dx+dy*dy) <= node.r/dpr + 10) return i;
-    }
-    return -1;
-  }
-
-  function canvasCoords(e) {
+  wrap.addEventListener('click', e => {
     const canvas = wrap.querySelector('canvas');
-    const rect   = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
-    return {
-      mx: (e.clientX - rect.left) * scaleX,
-      my: (e.clientY - rect.top)  * scaleY,
-    };
-  }
-
-  wrap.addEventListener('mousedown', e => {
-    const { mx, my } = canvasCoords(e);
-    const idx = hitLeaf(mx, my);
-    if (idx !== -1) {
-      draggingNodeIdx = idx;
-      const dpr = p.pixelDensity();
-      nodeDragOffsetX = mx - leafNodes[idx].x / dpr;
-      nodeDragOffsetY = my - leafNodes[idx].y / dpr;
-      wrap.querySelector('canvas').style.cursor = 'grabbing';
-      e.stopPropagation();
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+    for (const node of leafNodes) {
+      const dx = mx-node.x, dy = my-node.y;
+      if (Math.sqrt(dx*dx+dy*dy) <= node.r+10 && node.src) { openLightbox(node.src); return; }
     }
   });
 
   wrap.addEventListener('mousemove', e => {
-    const { mx, my } = canvasCoords(e);
-    if (draggingNodeIdx !== -1) {
-      const node = leafNodes[draggingNodeIdx];
-      const dpr  = p.pixelDensity();
-      // Store override in screen*dpr space (matches how x/y are stored)
-      dragPositions[node.id] = {
-        x: (mx - nodeDragOffsetX) * dpr,
-        y: (my - nodeDragOffsetY) * dpr,
-      };
-      return;
-    }
-    const hit = hitLeaf(mx, my);
-    wrap.querySelector('canvas').style.cursor = hit !== -1 ? (leafNodes[hit].src ? 'zoom-in' : 'grab') : 'default';
-  });
-
-  wrap.addEventListener('mouseup', e => {
-    if (draggingNodeIdx !== -1) {
-      draggingNodeIdx = -1;
-      wrap.querySelector('canvas').style.cursor = 'default';
-    }
-  });
-
-  wrap.addEventListener('mouseleave', () => { draggingNodeIdx = -1; });
-
-  wrap.addEventListener('click', e => {
-    // Only open detail/lightbox on click without drag
-    const { mx, my } = canvasCoords(e);
-    const idx = hitLeaf(mx, my);
-    if (idx !== -1) {
-      showDetail(idx);
-      if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
-      return;
-    }
-    hideDetail();
+    const canvas = wrap.querySelector('canvas');
+    if (!canvas) return;
+    const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width/rect.width, scaleY = canvas.height/rect.height;
+    const mx = (e.clientX-rect.left)*scaleX, my = (e.clientY-rect.top)*scaleY;
+    const hit = leafNodes.some(n => Math.sqrt((mx-n.x)**2+(my-n.y)**2) <= n.r+10 && n.src);
+    canvas.style.cursor = hit ? 'zoom-in' : 'default';
   });
 }
 
 // ── LIGHTBOX ───────────────────────────────────────────────────────────────
-function openLightbox(src){
-  document.getElementById('lbImg').src=src;
+function openLightbox(src) {
+  document.getElementById('lbImg').src = src;
   document.getElementById('lightbox').classList.add('open');
 }
-document.getElementById('lbClose').addEventListener('click',()=>{
+document.getElementById('lbClose').addEventListener('click', () => {
   document.getElementById('lightbox').classList.remove('open');
 });
-document.getElementById('lightbox').addEventListener('click',e=>{
-  if(e.target===document.getElementById('lightbox'))
+document.getElementById('lightbox').addEventListener('click', e => {
+  if (e.target === document.getElementById('lightbox'))
     document.getElementById('lightbox').classList.remove('open');
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') document.getElementById('lightbox').classList.remove('open');
 });
 
 boot();
