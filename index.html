@@ -314,11 +314,11 @@ function annotateTints(node) {
 
 // ── CONFIG ─────────────────────────────────────────────────────────────────
 const CONFIG = {
-  trunkRatio:   0.20,
+  trunkRatio:   0.205,
   branchDecay:  0.90,
-  spreadBase:   70,
-  spreadDecay:  0.85,
-  splitAngle:   40,
+  spreadBase:   100,
+  spreadDecay:  0.95,
+  splitAngle:   35,
   subAngle:     60,
   neutralColor: [120, 120, 120],
 };
@@ -383,7 +383,7 @@ function startSketch(tree) {
 
       const children = tree.children || [];
       const n        = children.length;
-      const spread   = Math.min(n * CONFIG.spreadBase, 110);
+      const spread   = Math.min(n * CONFIG.spreadBase, 120);
       const step     = n > 1 ? spread / (n - 1) : 0;
       const start    = -spread / 2;
 
@@ -519,7 +519,7 @@ function startSketch(tree) {
 
       p.translate(0, -len);
 
-      const nodeSize = Math.max(S * 0.065 - depth * 4, 20);
+      const nodeSize = Math.max(S * 0.035 - depth * 3, 20);
       const xf = p.drawingContext.getTransform();
       const wx = xf.e, wy = xf.f;
 
