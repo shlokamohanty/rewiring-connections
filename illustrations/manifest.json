@@ -41,7 +41,8 @@
         {
           "label": "in my parent's room",
           "path": "4_being-at-home/2_in-my-parents-room",
-          "high": [ { "file": "1_sid-dancing-high.jpg", "link": "love", "action": "dancing", "perspective": "third"}]
+          "high": [ { "file": "1_sid-dancing-high.jpg", "link": "love", "action": "dancing", "perspective": "third"},
+        {"file": "papa_sick_high.jpeg", "link": "fear", "action": "watching", "perspective": "first"}]
         }
       ]
     },
@@ -57,13 +58,19 @@
         {
           "label": "outdoors",
           "path": "5_hanging-out-with-family/1_outdoors",
-          "high": [ { "file": "1_trek-high.jpg", "link": "fear", "action": "crying", "perspective": "third"}]
+          "high": [ { "file": "1_trek-high.jpg", "link": "fear", "action": "crying", "perspective": "third"},
+            { "file": "sid_drowning_high.jpeg", "link": "fear", "action": "watching", "perspective": "first"}]
         },
         {
           "label": "in transit",
           "path": "5_hanging-out-with-family/3_in-transit",
-          "high": [ { "file": "1_sid-and-mom.jpg", "link": "awe", "action": "staring", "perspective": "first"}]
-        }
+          "high": [ { "file": "sid_mom_looking_high.jpg", "link": "awe", "action": "watching", "perspective": "first"}]
+        },
+          {
+            "label": "somewhere",
+            "path": "5_hanging-out-with-family/4_somewhere",
+            "high": [ { "file": "sid_dancing_high.jpg", "link": "awe", "action": "watching", "perspective": "first"}]
+          }
       ]
     },
     {
