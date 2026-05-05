@@ -7,8 +7,8 @@
         {
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
-          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third"} ],
-          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third"} ]
+          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third", "hidden": true} ],
+          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third", "hidden": true} ]
         },
         {
           "label": "by the cubbies",
@@ -115,9 +115,9 @@
           "label": "in unexpected places",
           "path": "2_hanging-out-with-friends/2_unexpected-places",
           "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third"}, 
-          { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first"},
+          { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first", "hidden": true},
           { "file": "4_hey-guys-high.jpg", "link": "belonging", "action": "watching a video", "perspective": "first"},
-          { "file": "5_versova-beach-birthday-high.jpg", "link": "belonging", "action": "painting", "perspective": "third"}]
+          { "file": "5_versova-beach-birthday-high.jpg", "link": "belonging", "action": "painting", "perspective": "third", "hidden": true}]
         },
         {
           "label": "online",
