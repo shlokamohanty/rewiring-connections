@@ -51,6 +51,17 @@ header {
 #sidebar p { font-family:'Space Mono',monospace; font-size:clamp(9px,1vw,11px); line-height:1.9; color:#b0b0b0; letter-spacing:0.02em; margin-bottom:clamp(10px,1.4vh,16px); }
 #sidebar p.bullet { padding-left:12px; color:#b0b0b0; border-left:1px solid #2a2a2a; }
 
+/* connection legend — top-right */
+#connection-legend {
+  position:fixed; top:70px; right:20px; z-index:15;
+  display:flex; flex-direction:column; gap:6px; align-items:flex-end;
+}
+.conn-legend-item {
+  display:flex; align-items:center; gap:8px;
+  font-family:'Space Mono',monospace; font-size:8px;
+  letter-spacing:0.08em; color:#555;
+}
+
 #zoom-controls {
   position:fixed; bottom:20px; right:20px; z-index:15;
   display:flex; flex-direction:column; gap:4px;
@@ -68,19 +79,33 @@ header {
   left:clamp(200px,22vw,320px); right:0; z-index:15;
   background:rgba(10,10,10,0.97); border-top:0.5px solid #1e1e1e;
   padding:12px 20px; transition:left 0.35s ease;
-  align-items:center; gap:16px;
+  align-items:center; gap:16px; flex-wrap:wrap;
 }
 #detail-panel.visible { display:flex; }
 #detail-panel.sidebar-collapsed { left:0; }
-#detail-path { font-family:'Space Mono',monospace; font-size:10px; color:#888; letter-spacing:0.08em; flex:1; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-#detail-path .crumb-arrow { color:#333; margin:0 5px; }
-#detail-path .crumb-active { color:#ccc; }
-#detail-tags { display:flex; gap:8px; flex-shrink:0; }
+#detail-path {
+  font-family:'Space Mono',monospace; font-size:10px; color:#888;
+  letter-spacing:0.08em; flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:4px;
+}
+#crumb-row { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
+.crumb-arrow { color:#333; margin:0 5px; }
+.crumb-active { color:#ccc; }
+#last-seen-row {
+  font-size:9px; color:#333; letter-spacing:0.06em;
+  overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
+}
+#last-seen-row .ls-label { color:#2a2a2a; margin-right:5px; }
+#last-seen-row .ls-value { color:#444; }
+
+#detail-tags { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; align-items:center; }
 .dtag { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; padding:3px 8px; border-radius:2px; border:0.5px solid; }
 .dtag-emotion { color:#888; border-color:#2a2a2a; }
 .dtag-action  { color:#888; border-color:#2a2a2a; }
 .dtag-wave    { color:#4ba3c3; border-color:#4ba3c3; }
 .dtag-zigzag  { color:#E34234; border-color:#E34234; }
+.dtag-person  { color:#b07a4a; border-color:#3d2510; }
+
 #detail-nav { display:flex; gap:6px; flex-shrink:0; }
 .nav-btn { font-family:'Space Mono',monospace; font-size:12px; color:#555; background:none; border:0.5px solid #2a2a2a; padding:4px 10px; cursor:pointer; border-radius:2px; transition:color 0.15s, border-color 0.15s; }
 .nav-btn:hover { color:#ccc; border-color:#555; }
@@ -121,14 +146,49 @@ header {
 <button id="toggle-sidebar">hide</button>
 <div id="canvas-wrap"></div>
 
+<!-- connection type legend, top-right -->
+<div id="connection-legend">
+  <div class="conn-legend-item">
+    <span>emotion</span>
+    <svg width="28" height="8" style="flex-shrink:0">
+      <line x1="0" y1="4" x2="6"  y2="4" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+      <line x1="8" y1="4" x2="14" y2="4" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+      <line x1="16" y1="4" x2="22" y2="4" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+    </svg>
+  </div>
+  <div class="conn-legend-item">
+    <span>action</span>
+    <svg width="28" height="8" style="flex-shrink:0">
+      <line x1="0"  y1="4" x2="10" y2="4" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+      <line x1="14" y1="4" x2="24" y2="4" stroke="rgba(255,255,255,0.4)" stroke-width="0.6"/>
+    </svg>
+  </div>
+  <div class="conn-legend-item">
+    <span>person</span>
+    <svg width="28" height="8" style="flex-shrink:0">
+      <line x1="0"  y1="4" x2="4"  y2="4" stroke="rgba(200,145,80,0.45)" stroke-width="0.6"/>
+      <line x1="6"  y1="4" x2="10" y2="4" stroke="rgba(200,145,80,0.45)" stroke-width="0.6"/>
+      <line x1="12" y1="4" x2="16" y2="4" stroke="rgba(200,145,80,0.45)" stroke-width="0.6"/>
+      <line x1="18" y1="4" x2="22" y2="4" stroke="rgba(200,145,80,0.45)" stroke-width="0.6"/>
+    </svg>
+  </div>
+</div>
+
+<!-- zoom buttons -->
 <div id="zoom-controls">
   <button class="zoom-btn" id="zoom-in">+</button>
   <button class="zoom-btn" id="zoom-reset">⊙</button>
   <button class="zoom-btn" id="zoom-out">−</button>
 </div>
 
+<!-- detail panel -->
 <div id="detail-panel">
-  <div id="detail-path"></div>
+  <div id="detail-path">
+    <div id="crumb-row"></div>
+    <div id="last-seen-row" style="display:none;">
+      <span class="ls-label">last viewed ·</span><span class="ls-value" id="ls-value"></span>
+    </div>
+  </div>
   <div id="detail-tags"></div>
   <div id="detail-nav">
     <button class="nav-btn" id="nav-prev">&#8592;</button>
@@ -146,22 +206,14 @@ header {
 
 <script>
 const ROOT_FOLDER = 'illustrations';
-let leafNodes   = [];
-let myP5        = null;
-let selectedIdx = -1;
+let leafNodes    = [];
+let myP5         = null;
+let selectedIdx  = -1;
+let lastSeenLabel = null; // short label of the previously viewed node
 
-// ── PAN + ZOOM STATE ───────────────────────────────────────────────────────
-// panX/panY: offset of the tree's center from the canvas center (screen pixels)
-let panX = 0, panY = 0;
+// ── ZOOM STATE (no pan) ────────────────────────────────────────────────────
 let zoom = 1;
 const ZOOM_MIN = 0.3, ZOOM_MAX = 4;
-
-// Pan-drag state (only active when NOT over a leaf node)
-let isPanning   = false;
-let panStart    = { x: 0, y: 0 };
-let panMoved    = false;
-
-// Pinch-zoom state
 let lastPinchDist = null;
 
 // ── COLOURS ────────────────────────────────────────────────────────────────
@@ -171,6 +223,25 @@ const COLORS = {
 };
 function getColor(side, perspective) {
   return COLORS[(perspective==='first'?'first':'third')+(side==='high'?'High':'Low')];
+}
+
+// Pale orange shades — all muted, all in the 180-225 R, 120-170 G, 60-100 B range
+const PEOPLE_PALETTE = [
+  [208,152,88],
+  [218,165,105],
+  [198,138,76],
+  [224,175,118],
+  [193,128,68],
+  [212,158,96],
+];
+const peopleColorMap = {};
+let peopleColorCursor = 0;
+function getPersonColor(name) {
+  if (!(name in peopleColorMap)) {
+    peopleColorMap[name] = peopleColorCursor % PEOPLE_PALETTE.length;
+    peopleColorCursor++;
+  }
+  return PEOPLE_PALETTE[peopleColorMap[name]];
 }
 
 // ── SIDEBAR ────────────────────────────────────────────────────────────────
@@ -192,95 +263,131 @@ toggleBtn.addEventListener('click', () => {
 // ── SENSATION / ENTRY ──────────────────────────────────────────────────────
 function sensationOpacity(s) { return s==='zigzag'?0.85:s==='wave'?0.65:0.50; }
 function normaliseEntry(e) {
-  if (typeof e === 'string') return { file:e, sensation:null, link:null, action:null, perspective:'third' };
-  return { file:e.file||e, sensation:e.sensation||null, link:e.link||null, action:e.action||null, perspective:e.perspective||'third' };
+  if (typeof e === 'string') return { file:e, sensation:null, link:null, action:null, perspective:'third', people:[], hidden:false };
+  return {
+    file:        e.file        || '',
+    sensation:   e.sensation   || null,
+    link:        e.link        || null,
+    action:      e.action      || null,
+    perspective: e.perspective || 'third',
+    people:      Array.isArray(e.people) ? e.people : (e.people ? [e.people] : []),
+    hidden:      e.hidden      === true,
+  };
+}
+
+// ── SHORT LABEL for last-seen ──────────────────────────────────────────────
+function nodeShortLabel(node) {
+  const crumbs = node.labelPath || [];
+  const last   = crumbs[crumbs.length - 1] || '';
+  const side   = node.side === 'high' ? 'high' : 'low';
+  return last ? `${last} · ${side}` : side;
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────
 function showDetail(idx) {
   if (idx < 0 || idx >= leafNodes.length) return;
+
+  // Capture last seen before updating selectedIdx
+  if (selectedIdx >= 0 && selectedIdx !== idx && selectedIdx < leafNodes.length) {
+    lastSeenLabel = nodeShortLabel(leafNodes[selectedIdx]);
+  }
+
   selectedIdx = idx;
   const node = leafNodes[idx];
-  const pathEl = document.getElementById('detail-path');
-  const tagsEl = document.getElementById('detail-tags');
 
-  const parts = (node.labelPath||[]).map((l,i,a) =>
-    i===a.length-1 ? `<span class="crumb-active">${l}</span>` : `<span>${l}</span>`
+  // Breadcrumb
+  const crumbEl = document.getElementById('crumb-row');
+  const parts   = (node.labelPath||[]).map((l,i,a) =>
+    i===a.length-1
+      ? `<span class="crumb-active">${l}</span>`
+      : `<span>${l}</span>`
   );
   parts.push(`<span class="crumb-active">${node.perspective==='first'?'1st person':'3rd person'} · ${node.side==='high'?'high activity':'low activity'}</span>`);
-  pathEl.innerHTML = parts.join('<span class="crumb-arrow">›</span>');
+  crumbEl.innerHTML = parts.join('<span class="crumb-arrow">›</span>');
 
+  // Last seen row
+  const lsRow = document.getElementById('last-seen-row');
+  const lsVal = document.getElementById('ls-value');
+  if (lastSeenLabel) {
+    lsRow.style.display = 'block';
+    lsVal.textContent   = lastSeenLabel;
+  } else {
+    lsRow.style.display = 'none';
+  }
+
+  // Tags
+  const tagsEl = document.getElementById('detail-tags');
   tagsEl.innerHTML = '';
-  if (node.link)      { const t=document.createElement('span'); t.className='dtag dtag-emotion'; t.textContent=node.link; tagsEl.appendChild(t); }
-  if (node.action)    { const t=document.createElement('span'); t.className='dtag dtag-action';  t.textContent=node.action; tagsEl.appendChild(t); }
-  if (node.sensation) { const t=document.createElement('span'); t.className=`dtag dtag-${node.sensation}`; t.textContent=node.sensation==='wave'?'∿ wave':'⌇ zigzag'; tagsEl.appendChild(t); }
+  if (node.link) {
+    const t = document.createElement('span'); t.className='dtag dtag-emotion'; t.textContent=node.link; tagsEl.appendChild(t);
+  }
+  if (node.action) {
+    const t = document.createElement('span'); t.className='dtag dtag-action'; t.textContent=node.action; tagsEl.appendChild(t);
+  }
+  if (node.sensation) {
+    const t = document.createElement('span');
+    t.className = `dtag dtag-${node.sensation}`;
+    t.textContent = node.sensation==='wave' ? '∿ wave' : '⌇ zigzag';
+    tagsEl.appendChild(t);
+  }
+  (node.people || []).forEach(person => {
+    const t = document.createElement('span'); t.className='dtag dtag-person'; t.textContent=person; tagsEl.appendChild(t);
+  });
 
   detailPanel.classList.add('visible');
 }
+
 function hideDetail() { detailPanel.classList.remove('visible'); selectedIdx = -1; }
 
 function navigateTo(idx) {
   if (!leafNodes.length) return;
   idx = (idx + leafNodes.length) % leafNodes.length;
   showDetail(idx);
-  if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
+  if (leafNodes[idx].src && !leafNodes[idx].hidden) openLightbox(leafNodes[idx].src);
 }
 
-document.getElementById('nav-prev').addEventListener('click', () => navigateTo(selectedIdx <= 0 ? leafNodes.length-1 : selectedIdx-1));
+document.getElementById('nav-prev').addEventListener('click', () => navigateTo(selectedIdx<=0 ? leafNodes.length-1 : selectedIdx-1));
 document.getElementById('nav-next').addEventListener('click', () => navigateTo((selectedIdx+1) % leafNodes.length));
 
 document.addEventListener('keydown', e => {
-  if (e.key==='Escape')      { document.getElementById('lightbox').classList.remove('open'); hideDetail(); return; }
-  if (e.key==='ArrowRight')  navigateTo(selectedIdx<0 ? 0 : (selectedIdx+1)%leafNodes.length);
-  if (e.key==='ArrowLeft')   navigateTo(selectedIdx<=0 ? leafNodes.length-1 : selectedIdx-1);
+  if (e.key==='Escape')     { document.getElementById('lightbox').classList.remove('open'); hideDetail(); return; }
+  if (e.key==='ArrowRight') navigateTo(selectedIdx<0 ? 0 : (selectedIdx+1)%leafNodes.length);
+  if (e.key==='ArrowLeft')  navigateTo(selectedIdx<=0 ? leafNodes.length-1 : selectedIdx-1);
 });
 
-// ── ZOOM BUTTONS ───────────────────────────────────────────────────────────
+// ── ZOOM ───────────────────────────────────────────────────────────────────
 document.getElementById('zoom-in').addEventListener('click',    () => { zoom = Math.min(zoom*1.25, ZOOM_MAX); });
 document.getElementById('zoom-out').addEventListener('click',   () => { zoom = Math.max(zoom/1.25, ZOOM_MIN); });
-document.getElementById('zoom-reset').addEventListener('click', () => { zoom=1; panX=0; panY=0; });
+document.getElementById('zoom-reset').addEventListener('click', () => { zoom = 1; });
 
-// ── SCROLL TO ZOOM (zoom around canvas center, no pan shift) ───────────────
 canvasWrap.addEventListener('wheel', e => {
   e.preventDefault();
-  const factor = e.deltaY < 0 ? 1.08 : 0.93;
-  zoom = Math.min(Math.max(zoom * factor, ZOOM_MIN), ZOOM_MAX);
+  zoom = Math.min(Math.max(zoom * (e.deltaY < 0 ? 1.08 : 0.93), ZOOM_MIN), ZOOM_MAX);
 }, { passive: false });
 
-// ── TOUCH: pinch zoom ─────────────────────────────────────────────────────
 canvasWrap.addEventListener('touchstart', e => {
   if (e.touches.length === 2) {
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    lastPinchDist = Math.sqrt(dx*dx + dy*dy);
+    const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    lastPinchDist = Math.sqrt(dx*dx+dy*dy);
   }
-}, { passive: true });
-
+}, { passive:true });
 canvasWrap.addEventListener('touchmove', e => {
-  if (e.touches.length === 2 && lastPinchDist != null) {
+  if (e.touches.length===2 && lastPinchDist!=null) {
     e.preventDefault();
-    const dx = e.touches[0].clientX - e.touches[1].clientX;
-    const dy = e.touches[0].clientY - e.touches[1].clientY;
-    const dist = Math.sqrt(dx*dx + dy*dy);
-    zoom = Math.min(Math.max(zoom * (dist / lastPinchDist), ZOOM_MIN), ZOOM_MAX);
-    lastPinchDist = dist;
+    const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
+    const dist=Math.sqrt(dx*dx+dy*dy);
+    zoom=Math.min(Math.max(zoom*(dist/lastPinchDist),ZOOM_MIN),ZOOM_MAX);
+    lastPinchDist=dist;
   }
-}, { passive: false });
+}, { passive:false });
+canvasWrap.addEventListener('touchend', () => { lastPinchDist=null; }, { passive:true });
 
-canvasWrap.addEventListener('touchend', () => { lastPinchDist = null; }, { passive: true });
-
-// ── HELPER: is a canvas point over any leaf node? ─────────────────────────
-// leafNodes store world-space coords (wx, wy) set during draw.
-// Convert screen mouse → world by inverting the transform:
-//   screen = canvasCenter + pan + world * zoom
-//   world  = (screen - canvasCenter - pan) / zoom
+// ── HIT TEST ───────────────────────────────────────────────────────────────
 function hitTestLeaf(screenX, screenY, canvasW, canvasH) {
-  const wx = (screenX - (canvasW/2 + panX)) / zoom;
-  const wy = (screenY - (canvasH/2 + panY)) / zoom;
-  for (let i = 0; i < leafNodes.length; i++) {
-    const n = leafNodes[i];
-    const dx = wx - n.wx, dy = wy - n.wy;
-    if (Math.sqrt(dx*dx + dy*dy) <= n.r + 12/zoom) return i;
+  const wx=(screenX-canvasW/2)/zoom, wy=(screenY-canvasH/2)/zoom;
+  for (let i=0;i<leafNodes.length;i++) {
+    const n=leafNodes[i];
+    if (Math.sqrt((wx-n.wx)**2+(wy-n.wy)**2) <= n.r+12/zoom) return i;
   }
   return -1;
 }
@@ -288,28 +395,28 @@ function hitTestLeaf(screenX, screenY, canvasW, canvasH) {
 // ── BOOT ───────────────────────────────────────────────────────────────────
 async function boot() {
   let tree = null;
-  try { const res = await fetch(`${ROOT_FOLDER}/manifest.json`); if (res.ok) tree = await res.json(); } catch(_) {}
+  try { const res=await fetch(`${ROOT_FOLDER}/manifest.json`); if(res.ok) tree=await res.json(); } catch(_) {}
   if (!tree) {
-    tree = { children: [
-      { label:'being at school', path:'', children: [
+    tree = { children:[
+      { label:'being at school', path:'', children:[
         { label:'lunch', path:'',
-          high:[{file:'',sensation:'zigzag',link:'guilt',action:'eating',perspective:'first'}],
-          low: [{file:'',sensation:'wave', link:'belonging',action:'eating',perspective:'third'}] },
+          high:[{file:'',sensation:'zigzag',link:'guilt',action:'eating',perspective:'first',people:['Amisha']}],
+          low:[{file:'',sensation:'wave',link:'belonging',action:'eating',perspective:'third'}] },
         { label:'sports day', path:'',
-          low: [{file:'',sensation:'wave',link:'pride',action:'competing',perspective:'first'}],
-          high:[{file:'',link:'shame',action:'competing',perspective:'third'}] },
+          low:[{file:'',sensation:'wave',link:'pride',action:'competing',perspective:'first'}],
+          high:[{file:'',link:'shame',action:'competing',perspective:'third',people:['Jatin']}] },
       ]},
-      { label:'hanging out with friends', path:'', children: [
+      { label:'hanging out with friends', path:'', children:[
         { label:'in thane', path:'',
-          low: [{file:'',link:'belonging',action:'eating',perspective:'third'},
-                {file:'',link:'fear',action:'running',perspective:'first'}] },
+          low:[{file:'',link:'belonging',action:'eating',perspective:'third',people:['Amisha','Jatin']},
+               {file:'',link:'fear',action:'running',perspective:'first'}] },
         { label:'first kiss', path:'',
           high:[{file:'',sensation:'zigzag',link:'shame',action:'intimacy',perspective:'first'}],
-          low: [{file:'',sensation:'wave', link:'joy',  action:'intimacy',perspective:'third'}] },
+          low:[{file:'',sensation:'wave',link:'joy',action:'intimacy',perspective:'third',hidden:true}] },
       ]},
-      { label:'home', path:'', children: [
-        { label:'dinner table',  path:'', high:[{file:'',sensation:'zigzag',link:'guilt',action:'eating',perspective:'first'}] },
-        { label:'winning prize', path:'', low: [{file:'',sensation:'zigzag',link:'pride',action:'competing',perspective:'third'}] },
+      { label:'home', path:'', children:[
+        { label:'dinner table', path:'', high:[{file:'',sensation:'zigzag',link:'guilt',action:'eating',perspective:'first'}] },
+        { label:'winning prize', path:'', low:[{file:'',sensation:'zigzag',link:'pride',action:'competing',perspective:'third'}] },
       ]},
     ]};
   }
@@ -318,22 +425,25 @@ async function boot() {
 
 // ── TREE HELPERS ───────────────────────────────────────────────────────────
 function collectSrcs(node, srcs=[]) {
-  if (node.high) node.high.forEach(e => { const n=normaliseEntry(e); if(n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
-  if (node.low)  node.low.forEach(e  => { const n=normaliseEntry(e); if(n.file) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`); });
-  if (node.children) node.children.forEach(c => collectSrcs(c, srcs));
+  ['high','low'].forEach(side => {
+    if (node[side]) node[side].forEach(e => {
+      const n=normaliseEntry(e);
+      if (n.file && !n.hidden) srcs.push(`${ROOT_FOLDER}/${node.path}/${n.file}`);
+    });
+  });
+  if (node.children) node.children.forEach(c => collectSrcs(c,srcs));
   return srcs;
 }
 function annotateTints(node) {
-  const hH = node.high&&node.high.length>0, hL = node.low&&node.low.length>0;
+  const hH=node.high&&node.high.length>0, hL=node.low&&node.low.length>0;
   if (!node.children||!node.children.length) { node.tint=hH&&!hL?-1:!hH&&hL?1:0; node.maxDepth=0; return; }
-  node.children.forEach(c => annotateTints(c));
-  const ct = node.children.map(c => c.tint);
-  if (hH) ct.push(-1); if (hL) ct.push(1);
-  node.tint = ct.every(t=>t===-1)?-1:ct.every(t=>t===1)?1:0;
-  node.maxDepth = Math.max(...node.children.map(c => c.maxDepth)) + 1;
+  node.children.forEach(c=>annotateTints(c));
+  const ct=node.children.map(c=>c.tint);
+  if(hH) ct.push(-1); if(hL) ct.push(1);
+  node.tint=ct.every(t=>t===-1)?-1:ct.every(t=>t===1)?1:0;
+  node.maxDepth=Math.max(...node.children.map(c=>c.maxDepth))+1;
 }
 
-// ── CONFIG ─────────────────────────────────────────────────────────────────
 const CONFIG = {
   trunkRatio:0.205, branchDecay:0.90, spreadBase:100, spreadDecay:0.95,
   splitAngle:35, subAngle:60, neutralColor:[120,120,120],
@@ -341,238 +451,177 @@ const CONFIG = {
 
 // ── SKETCH ─────────────────────────────────────────────────────────────────
 function startSketch(tree) {
-  if (myP5) { myP5.remove(); myP5 = null; }
-  leafNodes = [];
+  if (myP5) { myP5.remove(); myP5=null; }
+  leafNodes=[];
   annotateTints(tree);
-  const totalDepth = tree.maxDepth || 4;
-  const allSrcs = collectSrcs(tree);
+  const totalDepth=tree.maxDepth||4;
+  const allSrcs=collectSrcs(tree);
 
-  const sketch = p => {
-    const allImgs = {};
-    let W, H;
+  const sketch=p=>{
+    const allImgs={};
+    let W,H;
 
-    p.preload = () => {
-      allSrcs.forEach(src => { allImgs[src] = p.loadImage(src, ()=>{}, ()=>{ allImgs[src]=null; }); });
+    p.preload=()=>{ allSrcs.forEach(src=>{ allImgs[src]=p.loadImage(src,()=>{},()=>{allImgs[src]=null;}); }); };
+
+    p.setup=()=>{
+      const wrap=document.getElementById('canvas-wrap');
+      W=wrap.offsetWidth; H=wrap.offsetHeight;
+      p.createCanvas(W,H).parent('canvas-wrap');
+      p.angleMode(p.DEGREES); p.textFont('Space Mono');
     };
 
-    p.setup = () => {
-      const wrap = document.getElementById('canvas-wrap');
-      W = wrap.offsetWidth; H = wrap.offsetHeight;
-      p.createCanvas(W, H).parent('canvas-wrap');
-      p.angleMode(p.DEGREES);
-      p.textFont('Space Mono');
+    p.windowResized=()=>{
+      const wrap=document.getElementById('canvas-wrap');
+      W=wrap.offsetWidth; H=wrap.offsetHeight;
+      if(W>0&&H>0) p.resizeCanvas(W,H);
     };
 
-    p.windowResized = () => {
-      const wrap = document.getElementById('canvas-wrap');
-      W = wrap.offsetWidth; H = wrap.offsetHeight;
-      if (W > 0 && H > 0) p.resizeCanvas(W, H);
-    };
+    p.draw=()=>{
+      p.background(10,10,10);
+      leafNodes=[];
+      const S=Math.min(W,H), botY=S*0.45;
 
-    // ── Mouse pan: only start if NOT over a leaf node ──────────────────────
-    p.mousePressed = () => {
-      const hitIdx = hitTestLeaf(p.mouseX, p.mouseY, W, H);
-      if (hitIdx === -1) {
-        isPanning = true;
-        panMoved  = false;
-        panStart  = { x: p.mouseX, y: p.mouseY };
-      }
-    };
-    p.mouseDragged = () => {
-      if (isPanning) {
-        panX += p.mouseX - panStart.x;
-        panY += p.mouseY - panStart.y;
-        panStart = { x: p.mouseX, y: p.mouseY };
-        panMoved = true;
-      }
-    };
-    p.mouseReleased = () => { isPanning = false; };
+      drawBrainOutline(p,W,H,S);
 
-    p.draw = () => {
-      p.background(10, 10, 10);
-      leafNodes = [];
+      const trunkLen=S*CONFIG.trunkRatio;
+      const sway=Math.sin(p.frameCount*0.008)*1.2;
 
-      const S    = Math.min(W, H);
-      const botY = S * 0.45;   // relative to tree center (0,0 = canvas center)
-
-      // Brain outline: fixed, drawn in screen space (no pan/zoom)
-      drawBrainOutline(p, W, H, S);
-
-      const trunkLen = S * CONFIG.trunkRatio;
-      const sway     = Math.sin(p.frameCount * 0.008) * 1.2;
-
-      // ── Apply pan + zoom, both centered on canvas middle ────────────────
-      // The tree's logical root is at (0, botY) in world space.
-      // World space origin = canvas center + pan offset.
       p.push();
-      p.translate(W/2 + panX, H/2 + panY);   // move origin to canvas center + pan
-      p.scale(zoom);                           // scale around that origin
+      p.translate(W/2,H/2);
+      p.scale(zoom);
+      p.translate(0,botY);
 
-      // Draw trunk base at (0, botY) in world space
-      p.translate(0, botY);
+      p.stroke(...CONFIG.neutralColor); p.strokeWeight(Math.max(S*0.007,2)/zoom); p.noFill();
+      const tc1x=p.noise(0.1)*30-15;
+      p.beginShape(); p.vertex(0,0); p.bezierVertex(tc1x,-trunkLen*0.35,-tc1x,-trunkLen*0.65,0,-trunkLen); p.endShape();
+      p.translate(0,-trunkLen);
 
-      p.stroke(...CONFIG.neutralColor);
-      p.strokeWeight(Math.max(S * 0.007, 2) / zoom);
-      p.noFill();
-      const tc1x = p.noise(0.1) * 30 - 15;
-      p.beginShape(); p.vertex(0,0);
-      p.bezierVertex(tc1x,-trunkLen*0.35, -tc1x,-trunkLen*0.65, 0,-trunkLen);
-      p.endShape();
-      p.translate(0, -trunkLen);
+      const children=tree.children||[];
+      const cn=children.length;
+      const spread=Math.min(cn*CONFIG.spreadBase,120);
+      const step=cn>1?spread/(cn-1):0;
+      const start=-spread/2;
 
-      const children = tree.children || [];
-      const n        = children.length;
-      const spread   = Math.min(n * CONFIG.spreadBase, 120);
-      const step     = n > 1 ? spread / (n-1) : 0;
-      const start    = -spread / 2;
+      p.noStroke(); p.fill(...CONFIG.neutralColor,180); p.ellipse(0,0,S*0.012,S*0.012);
 
-      p.noStroke(); p.fill(...CONFIG.neutralColor, 180);
-      p.ellipse(0, 0, S*0.012, S*0.012);
-
-      children.forEach((child, i) => {
-        const angle = start + i*step + sway;
-        p.push(); p.rotate(angle);
-        drawNode(p, child, trunkLen*CONFIG.branchDecay, 1, totalDepth, allImgs, S, []);
+      children.forEach((child,i)=>{
+        p.push(); p.rotate(start+i*step+sway);
+        drawNode(p,child,trunkLen*CONFIG.branchDecay,1,totalDepth,allImgs,S,[]);
         p.pop();
       });
-
       p.pop();
 
-      // Cross-links drawn after, entirely in screen space
       p.push(); p.resetMatrix(); drawCrossLinks(p); p.pop();
 
-      // Cursor
-      const canvas = document.querySelector('#canvas-wrap canvas');
-      if (canvas) {
-        const hitIdx = hitTestLeaf(p.mouseX, p.mouseY, W, H);
-        canvas.style.cursor = isPanning ? 'grabbing' : hitIdx >= 0 ? 'zoom-in' : 'grab';
-      }
+      const canvas=document.querySelector('#canvas-wrap canvas');
+      if(canvas) canvas.style.cursor=hitTestLeaf(p.mouseX,p.mouseY,W,H)>=0?'zoom-in':'default';
     };
 
-    // ── drawNode: records leaf positions in WORLD space ───────────────────
-    function drawNode(p, node, len, depth, totalDepth, allImgs, S, parentPath) {
-      const hasC = node.children && node.children.length > 0;
-      const hasH = node.high && node.high.length > 0;
-      const hasL = node.low  && node.low.length  > 0;
-
-      const t = Math.min(depth / totalDepth, 1), tint = node.tint || 0;
-      const [nr,ng,nb] = CONFIG.neutralColor;
-      const bH = COLORS.thirdHigh, bL = COLORS.thirdLow;
-      const tr = tint<0?bH[0]:tint>0?bL[0]:nr;
-      const tg = tint<0?bH[1]:tint>0?bL[1]:ng;
-      const tb = tint<0?bH[2]:tint>0?bL[2]:nb;
-      const r = nr+(tr-nr)*t, g = ng+(tg-ng)*t, b = nb+(tb-nb)*t;
-      const alpha = Math.max(210-depth*18, 80);
-      const sw = Math.max((S*0.005 - depth*0.45)/zoom, 0.4);
+    function drawNode(p,node,len,depth,totalDepth,allImgs,S,parentPath){
+      const hasC=node.children&&node.children.length>0;
+      const hasH=node.high&&node.high.length>0;
+      const hasL=node.low&&node.low.length>0;
+      const t=Math.min(depth/totalDepth,1), tint=node.tint||0;
+      const [nr,ng,nb]=CONFIG.neutralColor;
+      const bH=COLORS.thirdHigh,bL=COLORS.thirdLow;
+      const r=nr+(( tint<0?bH[0]:tint>0?bL[0]:nr )-nr)*t;
+      const g=ng+(( tint<0?bH[1]:tint>0?bL[1]:ng )-ng)*t;
+      const b=nb+(( tint<0?bH[2]:tint>0?bL[2]:nb )-nb)*t;
+      const alpha=Math.max(210-depth*18,80);
+      const sw=Math.max((S*0.005-depth*0.45)/zoom,0.4);
 
       p.stroke(r,g,b,alpha); p.strokeWeight(sw); p.noFill();
-      const seed = depth*13.7 + (node.label ? node.label.charCodeAt(0) : 0);
-      const cx1  = p.noise(seed)*len*0.5 - len*0.25;
-      const cx2  = p.noise(seed+1.3)*len*0.5 - len*0.25;
-      p.beginShape(); p.vertex(0,0);
-      p.bezierVertex(cx1,-len*0.33, cx2,-len*0.66, 0,-len);
-      p.endShape();
-      p.noStroke(); p.fill(r,g,b,alpha*0.7);
-      p.ellipse(0, 0, Math.max(sw*2.2,2.5)*2, Math.max(sw*2.2,2.5)*2);
+      const seed=depth*13.7+(node.label?node.label.charCodeAt(0):0);
+      const cx1=p.noise(seed)*len*0.5-len*0.25, cx2=p.noise(seed+1.3)*len*0.5-len*0.25;
+      p.beginShape(); p.vertex(0,0); p.bezierVertex(cx1,-len*0.33,cx2,-len*0.66,0,-len); p.endShape();
+      p.noStroke(); p.fill(r,g,b,alpha*0.7); p.ellipse(0,0,Math.max(sw*2.2,2.5)*2,Math.max(sw*2.2,2.5)*2);
 
-      if (node.label) {
+      if(node.label){
         p.push(); p.noStroke(); p.fill(200,200,200,180-depth*12);
-        p.textFont('Space Mono');
-        p.textSize(Math.max((S*0.007-depth*0.3)/zoom, 4));
-        p.textAlign(p.CENTER, p.BOTTOM);
-        p.translate(0, -len*0.5); p.rotate(-90);
-        p.text(node.label, 0, -4/zoom);
+        p.textFont('Space Mono'); p.textSize(Math.max((S*0.007-depth*0.3)/zoom,4));
+        p.textAlign(p.CENTER,p.BOTTOM); p.translate(0,-len*0.5); p.rotate(-90); p.text(node.label,0,-4/zoom);
         p.pop();
       }
-      p.translate(0, -len);
+      p.translate(0,-len);
 
-      const currentPath = [...parentPath, node.label].filter(Boolean);
-      const childLen    = len * CONFIG.branchDecay;
-      const spread      = CONFIG.spreadBase * Math.pow(CONFIG.spreadDecay, depth);
+      const currentPath=[...parentPath,node.label].filter(Boolean);
+      const childLen=len*CONFIG.branchDecay;
+      const cSpread=CONFIG.spreadBase*Math.pow(CONFIG.spreadDecay,depth);
 
-      if (hasC) {
-        const nc = node.children.length;
-        const total = Math.min(nc * spread, 160);
-        const st    = nc > 1 ? total/(nc-1) : 0;
-        const startA = -total/2;
-        node.children.forEach((child, i) => {
-          p.push(); p.rotate(startA + i*st);
-          drawNode(p, child, childLen, depth+1, totalDepth, allImgs, S, currentPath);
+      if(hasC){
+        const nc=node.children.length, total=Math.min(nc*cSpread,160);
+        const st=nc>1?total/(nc-1):0, startA=-total/2;
+        node.children.forEach((child,i)=>{
+          p.push(); p.rotate(startA+i*st);
+          drawNode(p,child,childLen,depth+1,totalDepth,allImgs,S,currentPath);
           p.pop();
         });
       }
-      if (hasH || hasL) {
-        const leafLen = len * CONFIG.branchDecay * 0.85;
-        if (hasH) {
-          fanAngles(node.high.length, -CONFIG.splitAngle, CONFIG.subAngle).forEach((ang, i) => {
-            const entry = normaliseEntry(node.high[i]);
-            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
-            p.push(); p.rotate(ang);
-            drawLeaf(p, src, src?allImgs[src]:null, leafLen, 'high', depth, S, entry, currentPath);
-            p.pop();
-          });
-        }
-        if (hasL) {
-          fanAngles(node.low.length, CONFIG.splitAngle, CONFIG.subAngle).forEach((ang, i) => {
-            const entry = normaliseEntry(node.low[i]);
-            const src   = entry.file ? `${ROOT_FOLDER}/${node.path}/${entry.file}` : '';
-            p.push(); p.rotate(ang);
-            drawLeaf(p, src, src?allImgs[src]:null, leafLen, 'low', depth, S, entry, currentPath);
-            p.pop();
-          });
-        }
+      if(hasH||hasL){
+        const leafLen=len*CONFIG.branchDecay*0.85;
+        if(hasH) fanAngles(node.high.length,-CONFIG.splitAngle,CONFIG.subAngle).forEach((ang,i)=>{
+          const entry=normaliseEntry(node.high[i]);
+          const src=entry.file?`${ROOT_FOLDER}/${node.path}/${entry.file}`:'';
+          p.push(); p.rotate(ang);
+          drawLeaf(p,src,src&&!entry.hidden?allImgs[src]:null,leafLen,'high',depth,S,entry,currentPath);
+          p.pop();
+        });
+        if(hasL) fanAngles(node.low.length,CONFIG.splitAngle,CONFIG.subAngle).forEach((ang,i)=>{
+          const entry=normaliseEntry(node.low[i]);
+          const src=entry.file?`${ROOT_FOLDER}/${node.path}/${entry.file}`:'';
+          p.push(); p.rotate(ang);
+          drawLeaf(p,src,src&&!entry.hidden?allImgs[src]:null,leafLen,'low',depth,S,entry,currentPath);
+          p.pop();
+        });
       }
     }
 
-    // drawLeaf: stores WORLD-space position (wx, wy) extracted from the matrix
-    function drawLeaf(p, src, img, len, side, depth, S, entry, parentPath) {
-      const col   = getColor(side, entry.perspective);
-      const opacity = sensationOpacity(entry.sensation);
-      const alpha = Math.max(190-depth*15, 90) * opacity;
-      const sw    = Math.max((1.6-depth*0.1)/zoom, 0.4);
+    function drawLeaf(p,src,img,len,side,depth,S,entry,parentPath){
+      const col=getColor(side,entry.perspective);
+      const opacity=sensationOpacity(entry.sensation);
+      const alpha=Math.max(190-depth*15,90)*opacity;
+      const sw=Math.max((1.6-depth*0.1)/zoom,0.4);
+      const isHidden=entry.hidden===true;
 
-      p.stroke(...col, alpha); p.strokeWeight(sw); p.noFill();
-      const seed = depth*7.3 + (src.length % 17);
-      const cx1  = p.noise(seed)*len*0.6 - len*0.3;
-      const cx2  = p.noise(seed+2.1)*len*0.6 - len*0.3;
-      p.beginShape(); p.vertex(0,0);
-      p.bezierVertex(cx1,-len*0.33, cx2,-len*0.66, 0,-len);
-      p.endShape();
-      p.translate(0, -len);
+      p.stroke(...col,alpha); p.strokeWeight(sw); p.noFill();
+      const seed=depth*7.3+(src.length%17);
+      const cx1=p.noise(seed)*len*0.6-len*0.3, cx2=p.noise(seed+2.1)*len*0.6-len*0.3;
+      p.beginShape(); p.vertex(0,0); p.bezierVertex(cx1,-len*0.33,cx2,-len*0.66,0,-len); p.endShape();
+      p.translate(0,-len);
 
-      const nodeSize = Math.max(S*0.035 - depth*3, 20);
-
-      // Extract WORLD-space position from current transform.
-      // The transform is: screen = (W/2+panX, H/2+panY) + zoom * world
-      // getTransform() gives screen-space coords (e, f).
-      // So world = (screenPos - (W/2+panX, H/2+panY)) / zoom
-      const xf = p.drawingContext.getTransform();
-      const screenX = xf.e / (window.devicePixelRatio||1);
-      const screenY = xf.f / (window.devicePixelRatio||1);
-      const worldX  = (screenX - (W/2 + panX)) / zoom;
-      const worldY  = (screenY - (H/2 + panY)) / zoom;
+      const nodeSize=Math.max(S*0.035-depth*3,20);
+      const xf=p.drawingContext.getTransform();
+      const dpr=window.devicePixelRatio||1;
+      const worldX=(xf.e/dpr-W/2)/zoom;
+      const worldY=(xf.f/dpr-H/2)/zoom;
 
       p.noStroke(); p.imageMode(p.CENTER);
-      const seed2 = src.length*0.3 + depth;
+      const seed2=src.length*0.3+depth;
 
-      if (img) {
-        const ctx = p.drawingContext;
-        p.fill(...col, 12*opacity); drawBlob(p,0,0,nodeSize*1.6,nodeSize*1.4,8,seed2,0.32);
-        p.fill(...col, 22*opacity); drawBlob(p,0,0,nodeSize*1.25,nodeSize*1.1,7,seed2+1,0.28);
-        p.noFill(); p.stroke(...col, 50*opacity); p.strokeWeight(0.5/zoom);
+      if(isHidden){
+        // Dim ghost placeholder — just a faint ring and a tiny dot
+        p.noFill();
+        p.stroke(...col,alpha*0.25); p.strokeWeight(0.5/zoom);
+        p.ellipse(0,0,nodeSize*0.30,nodeSize*0.30);
+        p.noStroke(); p.fill(...col,35*opacity);
+        p.ellipse(0,0,nodeSize*0.14,nodeSize*0.14);
+      } else if(img){
+        const ctx=p.drawingContext;
+        p.fill(...col,12*opacity); drawBlob(p,0,0,nodeSize*1.6,nodeSize*1.4,8,seed2,0.32);
+        p.fill(...col,22*opacity); drawBlob(p,0,0,nodeSize*1.25,nodeSize*1.1,7,seed2+1,0.28);
+        p.noFill(); p.stroke(...col,50*opacity); p.strokeWeight(0.5/zoom);
         drawBlob(p,0,0,nodeSize*1.25,nodeSize*1.1,7,seed2+1,0.28);
-        p.stroke(...col, 35*opacity); p.strokeWeight(0.5/zoom);
-        for (let d=0; d<5; d++) {
-          const dA  = (d/5)*360 + p.noise(seed2+d)*40;
-          const dL  = nodeSize*(0.35 + p.noise(seed2+d+5)*0.3);
-          const dR  = nodeSize*0.55;
-          const sx  = p.cos(dA)*dR, sy = p.sin(dA)*dR;
-          const ex  = p.cos(dA)*(dR+dL), ey = p.sin(dA)*(dR+dL);
-          const mx  = (sx+ex)/2 + (p.noise(seed2+d+10)-0.5)*dL*0.5;
-          const my2 = (sy+ey)/2 + (p.noise(seed2+d+15)-0.5)*dL*0.5;
+        p.stroke(...col,35*opacity); p.strokeWeight(0.5/zoom);
+        for(let d=0;d<5;d++){
+          const dA=(d/5)*360+p.noise(seed2+d)*40;
+          const dL=nodeSize*(0.35+p.noise(seed2+d+5)*0.3), dR=nodeSize*0.55;
+          const sx=p.cos(dA)*dR,sy=p.sin(dA)*dR;
+          const ex=p.cos(dA)*(dR+dL),ey=p.sin(dA)*(dR+dL);
+          const mx=(sx+ex)/2+(p.noise(seed2+d+10)-0.5)*dL*0.5;
+          const my2=(sy+ey)/2+(p.noise(seed2+d+15)-0.5)*dL*0.5;
           p.noFill(); p.beginShape(); p.vertex(sx,sy); p.quadraticVertex(mx,my2,ex,ey); p.endShape();
         }
-        const ns=nodeSize*0.52, nr2=ns/2;
+        const ns=nodeSize*0.52,nr2=ns/2;
         ctx.save(); ctx.globalAlpha=opacity;
         ctx.beginPath(); ctx.arc(0,0,nr2,0,Math.PI*2); ctx.clip();
         p.image(img,0,0,ns,ns);
@@ -586,121 +635,117 @@ function startSketch(tree) {
         p.fill(...col,130*opacity); p.ellipse(0,0,nodeSize*0.38,nodeSize*0.38);
       }
 
-      // Store world-space coords for hit testing
       leafNodes.push({
-        wx: worldX, wy: worldY, r: nodeSize*0.85, src,
-        side, link:entry.link||null, action:entry.action||null,
-        sensation:entry.sensation||null, perspective:entry.perspective||'third',
+        wx:worldX, wy:worldY,
+        r: isHidden ? nodeSize*0.16 : nodeSize*0.85,
+        src: isHidden ? '' : src,
+        hidden: isHidden,
+        side,
+        link:      entry.link||null,
+        action:    entry.action||null,
+        sensation: entry.sensation||null,
+        perspective: entry.perspective||'third',
+        people:    entry.people||[],
         labelPath: parentPath,
       });
     }
 
-    function drawCrossLinks(p) {
-      const emotions = {}, actions = {};
-      for (const node of leafNodes) {
-        if (node.link)   { if (!emotions[node.link])  emotions[node.link]  = []; emotions[node.link].push(node);  }
-        if (node.action) { if (!actions[node.action]) actions[node.action] = []; actions[node.action].push(node); }
+    function drawCrossLinks(p){
+      const emotions={}, actions={}, people={};
+      for(const n of leafNodes){
+        if(n.link)   { if(!emotions[n.link])  emotions[n.link]  =[]; emotions[n.link].push(n);  }
+        if(n.action) { if(!actions[n.action]) actions[n.action] =[]; actions[n.action].push(n); }
+        (n.people||[]).forEach(person=>{
+          if(!people[person]) people[person]=[];
+          people[person].push(n);
+        });
       }
-      // Convert world → screen for arc drawing
-      function toScreen(n) {
-        return {
-          x: (W/2 + panX) + n.wx * zoom,
-          y: (H/2 + panY) + n.wy * zoom,
-        };
-      }
-      for (const tag in emotions) { const ns=emotions[tag]; for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,toScreen(ns[i]),toScreen(ns[j]),40,2); }
-      for (const tag in actions)  { const ns=actions[tag];  for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,toScreen(ns[i]),toScreen(ns[j]),14,4); }
+      const ts=n=>({ x:W/2+n.wx*zoom, y:H/2+n.wy*zoom });
 
-      const hE=Object.keys(emotions).length>0, hA=Object.keys(actions).length>0;
-      if (!hE && !hA) return;
-      const px=W-16, lineH=20;
-      let y=H-16-((hE?1:0)+(hA?1:0))*lineH;
-      p.textFont('Space Mono'); p.textSize(8); p.textAlign(p.RIGHT, p.CENTER);
-      if (hE) { p.stroke(255,255,255,100); p.strokeWeight(0.5); for(let s=0;s<6;s+=2) p.line(px-58+s*4,y,px-58+s*4+3,y); p.noStroke(); p.fill(180,180,180,160); p.text('emotion',px,y); y+=lineH; }
-      if (hA) { p.stroke(255,255,255,100); p.strokeWeight(0.5); for(let s=0;s<3;s++)   p.line(px-58+s*10,y,px-58+s*10+6,y); p.noStroke(); p.fill(180,180,180,160); p.text('action',px,y); }
+      // Emotion — short tight dashes, white very faint
+      for(const tag in emotions){ const ns=emotions[tag]; for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),40,2,[255,255,255],55); }
+      // Action — longer dashes, white very faint
+      for(const tag in actions) { const ns=actions[tag];  for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),14,4,[255,255,255],55); }
+      // People — very fine, frequent dashes, pale orange, extremely low opacity
+      for(const person in people){
+        const ns=people[person];
+        const col=getPersonColor(person);
+        for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++)
+          drawArc(p,ts(ns[i]),ts(ns[j]),80,1,col,32);
+      }
     }
 
-    function drawArc(p, a, b, steps, skip) {
-      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2 - Math.abs(b.x-a.x)*0.3;
-      p.noFill(); p.stroke(255,255,255,60); p.strokeWeight(0.6);
-      for (let s=0; s<steps; s+=skip) {
+    function drawArc(p,a,b,steps,skip,col,baseAlpha){
+      const mx=(a.x+b.x)/2, my=(a.y+b.y)/2-Math.abs(b.x-a.x)*0.3;
+      p.noFill(); p.stroke(...col,baseAlpha); p.strokeWeight(0.5);
+      for(let s=0;s<steps;s+=skip){
         const t0=s/steps, t1=(s+skip*0.5)/steps;
         p.line(bp(a.x,mx,mx,b.x,t0),bp(a.y,my,my,b.y,t0),
                bp(a.x,mx,mx,b.x,t1),bp(a.y,my,my,b.y,t1));
       }
     }
-    function bp(a,b,c,d,t) { const mt=1-t; return mt*mt*mt*a+3*mt*mt*t*b+3*mt*t*t*c+t*t*t*d; }
-    function fanAngles(n, centre, spread) {
-      if (n===1) return [centre];
+    function bp(a,b,c,d,t){ const mt=1-t; return mt*mt*mt*a+3*mt*mt*t*b+3*mt*t*t*c+t*t*t*d; }
+    function fanAngles(n,centre,spread){
+      if(n===1) return[centre];
       const h=(spread*(n-1))/2;
-      return Array.from({length:n}, (_,i) => centre-h+i*spread);
+      return Array.from({length:n},(_,i)=>centre-h+i*spread);
     }
-    function drawBlob(p,cx,cy,rw,rh,pts,seed,wobble) {
+    function drawBlob(p,cx,cy,rw,rh,pts,seed,wobble){
       p.beginShape();
-      for (let i=0; i<=pts; i++) {
-        const a=(i/pts)*360, nv=p.noise(seed+i*0.8)*2-1;
+      for(let i=0;i<=pts;i++){
+        const a=(i/pts)*360,nv=p.noise(seed+i*0.8)*2-1;
         const rx=rw*0.5*(1+nv*wobble);
-        p.curveVertex(cx+p.cos(a)*rx, cy+p.sin(a)*(rh*0.5*(1+nv*wobble*0.6)));
+        p.curveVertex(cx+p.cos(a)*rx,cy+p.sin(a)*(rh*0.5*(1+nv*wobble*0.6)));
       }
       const nv0=p.noise(seed)*2-1;
-      p.curveVertex(cx+p.cos(0)*rw*0.5*(1+nv0*wobble), cy+p.sin(0)*rh*0.5*(1+nv0*wobble*0.6));
+      p.curveVertex(cx+p.cos(0)*rw*0.5*(1+nv0*wobble),cy+p.sin(0)*rh*0.5*(1+nv0*wobble*0.6));
       p.endShape(p.CLOSE);
     }
-
-    function drawBrainOutline(p, W, H, S) {
+    function drawBrainOutline(p,W,H,S){
       p.noFill(); p.stroke(60,60,60); p.strokeWeight(Math.max(S*0.004,1.5));
-      const cx=W/2, lw=S*0.54;
-      const topY=H/2-S*0.48, botY=H/2+S*0.45;
+      const cx=W/2,lw=S*0.54,topY=H/2-S*0.48,botY=H/2+S*0.45;
       p.beginShape(); p.vertex(cx-12,botY);
-      p.bezierVertex(cx-lw*0.5,botY+S*0.01,  cx-lw*0.85,botY-S*0.04,  cx-lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx-lw*1.12,botY-S*0.44, cx-lw*0.98,botY-S*0.6,   cx-lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx-lw*1.1,botY-S*0.8,   cx-lw*0.95,topY+S*0.12,  cx-lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx-lw*0.65,topY-S*0.01, cx-lw*0.42,topY+S*0.005, cx-lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx-lw*0.15,topY+S*0.06, cx-lw*0.05,topY+S*0.1,   cx-12,topY+S*0.13);
+      p.bezierVertex(cx-lw*0.5,botY+S*0.01,cx-lw*0.85,botY-S*0.04,cx-lw*0.95,botY-S*0.3);
+      p.bezierVertex(cx-lw*1.12,botY-S*0.44,cx-lw*0.98,botY-S*0.6,cx-lw*1.05,botY-S*0.7);
+      p.bezierVertex(cx-lw*1.1,botY-S*0.8,cx-lw*0.95,topY+S*0.12,cx-lw*0.82,topY+S*0.08);
+      p.bezierVertex(cx-lw*0.65,topY-S*0.01,cx-lw*0.42,topY+S*0.005,cx-lw*0.28,topY+S*0.04);
+      p.bezierVertex(cx-lw*0.15,topY+S*0.06,cx-lw*0.05,topY+S*0.1,cx-12,topY+S*0.13);
       p.endShape();
       p.beginShape(); p.vertex(cx+12,botY);
-      p.bezierVertex(cx+lw*0.5,botY+S*0.01,  cx+lw*0.85,botY-S*0.04,  cx+lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx+lw*1.12,botY-S*0.44, cx+lw*0.98,botY-S*0.6,   cx+lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx+lw*1.1,botY-S*0.8,   cx+lw*0.95,topY+S*0.12,  cx+lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx+lw*0.65,topY-S*0.01, cx+lw*0.42,topY+S*0.005, cx+lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx+lw*0.15,topY+S*0.06, cx+lw*0.05,topY+S*0.1,   cx+12,topY+S*0.13);
+      p.bezierVertex(cx+lw*0.5,botY+S*0.01,cx+lw*0.85,botY-S*0.04,cx+lw*0.95,botY-S*0.3);
+      p.bezierVertex(cx+lw*1.12,botY-S*0.44,cx+lw*0.98,botY-S*0.6,cx+lw*1.05,botY-S*0.7);
+      p.bezierVertex(cx+lw*1.1,botY-S*0.8,cx+lw*0.95,topY+S*0.12,cx+lw*0.82,topY+S*0.08);
+      p.bezierVertex(cx+lw*0.65,topY-S*0.01,cx+lw*0.42,topY+S*0.005,cx+lw*0.28,topY+S*0.04);
+      p.bezierVertex(cx+lw*0.15,topY+S*0.06,cx+lw*0.05,topY+S*0.1,cx+12,topY+S*0.13);
       p.endShape();
     }
   };
 
-  myP5 = new p5(sketch);
+  myP5=new p5(sketch);
   setupInteraction();
 }
 
 // ── INTERACTION ────────────────────────────────────────────────────────────
-function setupInteraction() {
-  const wrap = document.getElementById('canvas-wrap');
-
-  wrap.addEventListener('click', e => {
-    if (panMoved) { panMoved = false; return; }
-    const canvas = wrap.querySelector('canvas');
-    if (!canvas) return;
-    const rect   = canvas.getBoundingClientRect();
-    const scaleX = canvas.width  / rect.width;
-    const scaleY = canvas.height / rect.height;
-    const mx = (e.clientX - rect.left) * scaleX;
-    const my = (e.clientY - rect.top)  * scaleY;
-    const W  = canvas.width  / (window.devicePixelRatio||1);
-    const H  = canvas.height / (window.devicePixelRatio||1);
-
-    const idx = hitTestLeaf(mx / (window.devicePixelRatio||1), my / (window.devicePixelRatio||1), W, H);
-    if (idx >= 0) {
+function setupInteraction(){
+  const wrap=document.getElementById('canvas-wrap');
+  wrap.addEventListener('click',e=>{
+    const canvas=wrap.querySelector('canvas'); if(!canvas) return;
+    const rect=canvas.getBoundingClientRect();
+    const dpr=window.devicePixelRatio||1;
+    const mx=(e.clientX-rect.left)*(canvas.width/rect.width)/dpr;
+    const my=(e.clientY-rect.top)*(canvas.height/rect.height)/dpr;
+    const W=canvas.width/dpr, H=canvas.height/dpr;
+    const idx=hitTestLeaf(mx,my,W,H);
+    if(idx>=0){
       showDetail(idx);
-      if (leafNodes[idx].src) openLightbox(leafNodes[idx].src);
-    } else {
-      hideDetail();
-    }
+      if(leafNodes[idx].src && !leafNodes[idx].hidden) openLightbox(leafNodes[idx].src);
+    } else { hideDetail(); }
   });
 }
 
-function openLightbox(src) { document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
-document.getElementById('lbClose').addEventListener('click', () => document.getElementById('lightbox').classList.remove('open'));
-document.getElementById('lightbox').addEventListener('click', e => { if (e.target===document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('open'); });
+function openLightbox(src){ document.getElementById('lbImg').src=src; document.getElementById('lightbox').classList.add('open'); }
+document.getElementById('lbClose').addEventListener('click',()=>document.getElementById('lightbox').classList.remove('open'));
+document.getElementById('lightbox').addEventListener('click',e=>{ if(e.target===document.getElementById('lightbox')) document.getElementById('lightbox').classList.remove('open'); });
 
 boot();
 </script>
