@@ -275,21 +275,19 @@ function normaliseEntry(e) {
   };
 }
 
-// ── SHORT LABEL for last-seen ──────────────────────────────────────────────
+// ── SHORT LABEL for last-seen — full breadcrumb path only ─────────────────
 function nodeShortLabel(node) {
   const crumbs = node.labelPath || [];
-  const last   = crumbs[crumbs.length - 1] || '';
-  const side   = node.side === 'high' ? 'high' : 'low';
-  return last ? `${last} · ${side}` : side;
+  return crumbs.join(' › ') || '—';
 }
 
 // ── DETAIL PANEL ───────────────────────────────────────────────────────────
 function showDetail(idx) {
   if (idx < 0 || idx >= leafNodes.length) return;
 
-  // Capture last seen before updating selectedIdx
+  // Capture the currently displayed crumb text as "last seen" before switching
   if (selectedIdx >= 0 && selectedIdx !== idx && selectedIdx < leafNodes.length) {
-    lastSeenLabel = nodeShortLabel(leafNodes[selectedIdx]);
+    lastSeenLabel = document.getElementById('crumb-row').innerText || null;
   }
 
   selectedIdx = idx;
@@ -481,14 +479,13 @@ function startSketch(tree) {
       leafNodes=[];
       const S=Math.min(W,H), botY=S*0.45;
 
-      drawBrainOutline(p,W,H,S);
-
       const trunkLen=S*CONFIG.trunkRatio;
       const sway=Math.sin(p.frameCount*0.008)*1.2;
 
       p.push();
       p.translate(W/2,H/2);
       p.scale(zoom);
+      drawBrainOutline(p,S);   // drawn in same transform as tree — never shifts
       p.translate(0,botY);
 
       p.stroke(...CONFIG.neutralColor); p.strokeWeight(Math.max(S*0.007,2)/zoom); p.noFill();
@@ -701,22 +698,26 @@ function startSketch(tree) {
       p.curveVertex(cx+p.cos(0)*rw*0.5*(1+nv0*wobble),cy+p.sin(0)*rh*0.5*(1+nv0*wobble*0.6));
       p.endShape(p.CLOSE);
     }
-    function drawBrainOutline(p,W,H,S){
-      p.noFill(); p.stroke(60,60,60); p.strokeWeight(Math.max(S*0.004,1.5));
-      const cx=W/2,lw=S*0.54,topY=H/2-S*0.48,botY=H/2+S*0.45;
-      p.beginShape(); p.vertex(cx-12,botY);
-      p.bezierVertex(cx-lw*0.5,botY+S*0.01,cx-lw*0.85,botY-S*0.04,cx-lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx-lw*1.12,botY-S*0.44,cx-lw*0.98,botY-S*0.6,cx-lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx-lw*1.1,botY-S*0.8,cx-lw*0.95,topY+S*0.12,cx-lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx-lw*0.65,topY-S*0.01,cx-lw*0.42,topY+S*0.005,cx-lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx-lw*0.15,topY+S*0.06,cx-lw*0.05,topY+S*0.1,cx-12,topY+S*0.13);
+    function drawBrainOutline(p,S){
+      // Origin is already at canvas center (W/2, H/2) and zoom is applied.
+      // Draw relative to (0,0). Tree trunk base is at (0, botY) = (0, S*0.45).
+      p.noFill(); p.stroke(60,60,60); p.strokeWeight(Math.max(S*0.004,1.5)/zoom);
+      const lw=S*0.54, topY=-S*0.48, botY=S*0.45;
+      // Left hemisphere
+      p.beginShape(); p.vertex(-12,botY);
+      p.bezierVertex(-lw*0.5,botY+S*0.01,  -lw*0.85,botY-S*0.04,  -lw*0.95,botY-S*0.3);
+      p.bezierVertex(-lw*1.12,botY-S*0.44, -lw*0.98,botY-S*0.6,   -lw*1.05,botY-S*0.7);
+      p.bezierVertex(-lw*1.1,botY-S*0.8,   -lw*0.95,topY+S*0.12,  -lw*0.82,topY+S*0.08);
+      p.bezierVertex(-lw*0.65,topY-S*0.01, -lw*0.42,topY+S*0.005, -lw*0.28,topY+S*0.04);
+      p.bezierVertex(-lw*0.15,topY+S*0.06, -lw*0.05,topY+S*0.1,   -12,topY+S*0.13);
       p.endShape();
-      p.beginShape(); p.vertex(cx+12,botY);
-      p.bezierVertex(cx+lw*0.5,botY+S*0.01,cx+lw*0.85,botY-S*0.04,cx+lw*0.95,botY-S*0.3);
-      p.bezierVertex(cx+lw*1.12,botY-S*0.44,cx+lw*0.98,botY-S*0.6,cx+lw*1.05,botY-S*0.7);
-      p.bezierVertex(cx+lw*1.1,botY-S*0.8,cx+lw*0.95,topY+S*0.12,cx+lw*0.82,topY+S*0.08);
-      p.bezierVertex(cx+lw*0.65,topY-S*0.01,cx+lw*0.42,topY+S*0.005,cx+lw*0.28,topY+S*0.04);
-      p.bezierVertex(cx+lw*0.15,topY+S*0.06,cx+lw*0.05,topY+S*0.1,cx+12,topY+S*0.13);
+      // Right hemisphere
+      p.beginShape(); p.vertex(12,botY);
+      p.bezierVertex(lw*0.5,botY+S*0.01,   lw*0.85,botY-S*0.04,   lw*0.95,botY-S*0.3);
+      p.bezierVertex(lw*1.12,botY-S*0.44,  lw*0.98,botY-S*0.6,    lw*1.05,botY-S*0.7);
+      p.bezierVertex(lw*1.1,botY-S*0.8,    lw*0.95,topY+S*0.12,   lw*0.82,topY+S*0.08);
+      p.bezierVertex(lw*0.65,topY-S*0.01,  lw*0.42,topY+S*0.005,  lw*0.28,topY+S*0.04);
+      p.bezierVertex(lw*0.15,topY+S*0.06,  lw*0.05,topY+S*0.1,    12,topY+S*0.13);
       p.endShape();
     }
   };
