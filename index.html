@@ -92,11 +92,13 @@ header {
 .crumb-arrow { color:#333; margin:0 5px; }
 .crumb-active { color:#ccc; }
 #last-seen-row {
-  font-size:9px; color:#333; letter-spacing:0.06em;
+  font-size:10px; color:#888; letter-spacing:0.08em;
   overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
 }
-#last-seen-row .ls-label { color:#2a2a2a; margin-right:5px; }
-#last-seen-row .ls-value { color:#444; }
+#last-seen-row .ls-label { color:#444; margin-right:5px; }
+#last-seen-row .ls-value { color:#888; }
+#last-seen-row .crumb-arrow { color:#333; margin:0 5px; }
+#last-seen-row .crumb-active { color:#ccc; }
 
 #detail-tags { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; align-items:center; }
 .dtag { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; padding:3px 8px; border-radius:2px; border:0.5px solid; }
@@ -213,7 +215,8 @@ let lastSeenLabel = null; // short label of the previously viewed node
 
 // ── ZOOM STATE (no pan) ────────────────────────────────────────────────────
 let zoom = 1;
-const ZOOM_MIN = 0.3, ZOOM_MAX = 4;
+let zoomOriginX = 0, zoomOriginY = 0; // canvas-center-relative point to zoom toward
+const ZOOM_MIN = 0.15, ZOOM_MAX = 8;
 let lastPinchDist = null;
 
 // ── COLOURS ────────────────────────────────────────────────────────────────
@@ -285,33 +288,18 @@ function nodeShortLabel(node) {
 function showDetail(idx) {
   if (idx < 0 || idx >= leafNodes.length) return;
 
-  // Capture the currently displayed crumb text as "last seen" before switching
-  if (selectedIdx >= 0 && selectedIdx !== idx && selectedIdx < leafNodes.length) {
-    lastSeenLabel = document.getElementById('crumb-row').innerText || null;
-  }
-
   selectedIdx = idx;
   const node = leafNodes[idx];
 
-  // Breadcrumb
-  const crumbEl = document.getElementById('crumb-row');
-  const parts   = (node.labelPath||[]).map((l,i,a) =>
-    i===a.length-1
-      ? `<span class="crumb-active">${l}</span>`
-      : `<span>${l}</span>`
-  );
-  parts.push(`<span class="crumb-active">${node.perspective==='first'?'1st person':'3rd person'} · ${node.side==='high'?'high activity':'low activity'}</span>`);
-  crumbEl.innerHTML = parts.join('<span class="crumb-arrow">›</span>');
-
-  // Last seen row
+  // Last viewed = this node's own full path, styled like the crumb row
   const lsRow = document.getElementById('last-seen-row');
   const lsVal = document.getElementById('ls-value');
-  if (lastSeenLabel) {
-    lsRow.style.display = 'block';
-    lsVal.textContent   = lastSeenLabel;
-  } else {
-    lsRow.style.display = 'none';
-  }
+  const allCrumbs = [...(node.labelPath||[])];
+  const lastSegment = `${node.perspective==='first'?'1st person':'3rd person'} · ${node.side==='high'?'high activity':'low activity'}`;
+  const lsParts = allCrumbs.map(l => `<span>${l}</span>`);
+  lsParts.push(`<span class="crumb-active">${lastSegment}</span>`);
+  lsRow.style.display = 'block';
+  lsVal.innerHTML = lsParts.join('<span class="crumb-arrow">›</span>');
 
   // Tags
   const tagsEl = document.getElementById('detail-tags');
@@ -354,13 +342,21 @@ document.addEventListener('keydown', e => {
 });
 
 // ── ZOOM ───────────────────────────────────────────────────────────────────
-document.getElementById('zoom-in').addEventListener('click',    () => { zoom = Math.min(zoom*1.25, ZOOM_MAX); });
-document.getElementById('zoom-out').addEventListener('click',   () => { zoom = Math.max(zoom/1.25, ZOOM_MIN); });
-document.getElementById('zoom-reset').addEventListener('click', () => { zoom = 1; });
+document.getElementById('zoom-in').addEventListener('click',    () => { zoom = Math.min(zoom*1.4, ZOOM_MAX); });
+document.getElementById('zoom-out').addEventListener('click',   () => { zoom = Math.max(zoom/1.4, ZOOM_MIN); });
+document.getElementById('zoom-reset').addEventListener('click', () => { zoom = 1; zoomOriginX = 0; zoomOriginY = 0; });
 
 canvasWrap.addEventListener('wheel', e => {
   e.preventDefault();
-  zoom = Math.min(Math.max(zoom * (e.deltaY < 0 ? 1.08 : 0.93), ZOOM_MIN), ZOOM_MAX);
+  const rect  = canvasWrap.getBoundingClientRect();
+  const mouseX = e.clientX - rect.left - rect.width  / 2;
+  const mouseY = e.clientY - rect.top  - rect.height / 2;
+  const factor = e.deltaY < 0 ? 1.12 : 0.90;
+  const newZoom = Math.min(Math.max(zoom * factor, ZOOM_MIN), ZOOM_MAX);
+  // Shift origin so the point under the cursor stays fixed
+  zoomOriginX = mouseX - (mouseX - zoomOriginX) * (newZoom / zoom);
+  zoomOriginY = mouseY - (mouseY - zoomOriginY) * (newZoom / zoom);
+  zoom = newZoom;
 }, { passive: false });
 
 canvasWrap.addEventListener('touchstart', e => {
@@ -374,7 +370,14 @@ canvasWrap.addEventListener('touchmove', e => {
     e.preventDefault();
     const dx=e.touches[0].clientX-e.touches[1].clientX, dy=e.touches[0].clientY-e.touches[1].clientY;
     const dist=Math.sqrt(dx*dx+dy*dy);
-    zoom=Math.min(Math.max(zoom*(dist/lastPinchDist),ZOOM_MIN),ZOOM_MAX);
+    const rect=canvasWrap.getBoundingClientRect();
+    const pinchX=(e.touches[0].clientX+e.touches[1].clientX)/2 - rect.left - rect.width/2;
+    const pinchY=(e.touches[0].clientY+e.touches[1].clientY)/2 - rect.top  - rect.height/2;
+    const factor=dist/lastPinchDist;
+    const newZoom=Math.min(Math.max(zoom*factor,ZOOM_MIN),ZOOM_MAX);
+    zoomOriginX = pinchX - (pinchX - zoomOriginX) * (newZoom / zoom);
+    zoomOriginY = pinchY - (pinchY - zoomOriginY) * (newZoom / zoom);
+    zoom=newZoom;
     lastPinchDist=dist;
   }
 }, { passive:false });
@@ -382,7 +385,8 @@ canvasWrap.addEventListener('touchend', () => { lastPinchDist=null; }, { passive
 
 // ── HIT TEST ───────────────────────────────────────────────────────────────
 function hitTestLeaf(screenX, screenY, canvasW, canvasH) {
-  const wx=(screenX-canvasW/2)/zoom, wy=(screenY-canvasH/2)/zoom;
+  const wx=(screenX - canvasW/2 - zoomOriginX)/zoom;
+  const wy=(screenY - canvasH/2 - zoomOriginY)/zoom;
   for (let i=0;i<leafNodes.length;i++) {
     const n=leafNodes[i];
     if (Math.sqrt((wx-n.wx)**2+(wy-n.wy)**2) <= n.r+12/zoom) return i;
@@ -483,7 +487,7 @@ function startSketch(tree) {
       const sway=Math.sin(p.frameCount*0.008)*1.2;
 
       p.push();
-      p.translate(W/2,H/2);
+      p.translate(W/2 + zoomOriginX, H/2 + zoomOriginY);
       p.scale(zoom);
       drawBrainOutline(p,S);   // drawn in same transform as tree — never shifts
       p.translate(0,botY);
@@ -587,10 +591,10 @@ function startSketch(tree) {
       p.translate(0,-len);
 
       const nodeSize=Math.max(S*0.035-depth*3,20);
-      const xf=p.drawingContext.getTransform();
-      const dpr=window.devicePixelRatio||1;
-      const worldX=(xf.e/dpr-W/2)/zoom;
-      const worldY=(xf.f/dpr-H/2)/zoom;
+      const xf      = p.drawingContext.getTransform();
+      const dpr     = window.devicePixelRatio || 1;
+      const worldX  = (xf.e/dpr - W/2 - zoomOriginX) / zoom;
+      const worldY  = (xf.f/dpr - H/2 - zoomOriginY) / zoom;
 
       p.noStroke(); p.imageMode(p.CENTER);
       const seed2=src.length*0.3+depth;
@@ -657,7 +661,7 @@ function startSketch(tree) {
           people[person].push(n);
         });
       }
-      const ts=n=>({ x:W/2+n.wx*zoom, y:H/2+n.wy*zoom });
+      const ts=n=>({ x: W/2 + zoomOriginX + n.wx*zoom, y: H/2 + zoomOriginY + n.wy*zoom });
 
       // Emotion — short tight dashes, white very faint
       for(const tag in emotions){ const ns=emotions[tag]; for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),40,2,[255,255,255],55); }
