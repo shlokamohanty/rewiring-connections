@@ -54,7 +54,7 @@ header {
 /* info panel — top-right */
 #info-panel {
   position:fixed; top:0; right:0; z-index:25;
-  width:clamp(220px,22vw,300px);
+  width:clamp(260px,26vw,360px);
   background:rgba(10,10,10,0.96); border-left:0.5px solid #1e1e1e; border-bottom:0.5px solid #1e1e1e; border-radius:0;
 }
 #info-toggle {
@@ -67,26 +67,26 @@ header {
 #info-toggle:hover { color:#fff; }
 #info-toggle .arrow { font-size:7px; transition:transform 0.2s; display:inline-block; }
 #info-toggle.open .arrow { transform:rotate(180deg); }
-#info-body { display:none; flex-direction:column; gap:10px; padding:12px; }
+#info-body { display:none; flex-direction:column; gap:14px; padding:16px; max-height:calc(100vh - 60px); overflow-y:auto; }
 #info-body.visible { display:flex; }
 .info-text {
-  font-family:'Space Mono',monospace; font-size:8px; line-height:1.85;
-  color:#c0c0c0; letter-spacing:0.02em;
+  font-family:'Space Mono',monospace; font-size:10px; line-height:2;
+  color:#d8d8d8; letter-spacing:0.02em;
 }
-.info-text.warn { border-left:1px solid #2a2a2a; padding-left:8px; color:#b0b0b0; }
+.info-text.warn { border-left:1px solid #333; padding-left:10px; color:#c8c8c8; }
 .info-divider { height:0.5px; background:#1a1a1a; }
 .info-section-label {
-  font-family:'Space Mono',monospace; font-size:7px; letter-spacing:0.14em;
-  color:#666; text-transform:uppercase; margin-bottom:4px;
+  font-family:'Space Mono',monospace; font-size:8px; letter-spacing:0.14em;
+  color:#888; text-transform:uppercase; margin-bottom:6px;
 }
 .info-legend-row { display:flex; flex-wrap:wrap; gap:6px 10px; }
 .info-legend-dot {
-  font-family:'Space Mono',monospace; font-size:8px; letter-spacing:0.06em; color:#aaa;
+  font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#ccc;
   display:flex; align-items:center; gap:4px;
 }
 .conn-legend-item {
   display:flex; align-items:center; justify-content:space-between;
-  font-family:'Space Mono',monospace; font-size:8px; letter-spacing:0.06em; color:#aaa;
+  font-family:'Space Mono',monospace; font-size:10px; letter-spacing:0.06em; color:#ccc;
 }
 
 #zoom-controls {
@@ -731,15 +731,15 @@ function startSketch(tree) {
       const ts=n=>({ x: W/2 + zoomOriginX + n.wx*zoom, y: H/2 + zoomOriginY + n.wy*zoom });
 
       // Emotion — short dashes, soft white
-      for(const tag in emotions){ const ns=emotions[tag]; for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),40,2,[255,180,200],110,1.2); }
+      for(const tag in emotions){ const ns=emotions[tag]; for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),40,2,[255,180,200],38,1.0); }
       // Action — longer dashes, warm yellow-white
-      for(const tag in actions) { const ns=actions[tag];  for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),14,4,[240,240,240],120,1.5); }
+      for(const tag in actions) { const ns=actions[tag];  for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++) drawArc(p,ts(ns[i]),ts(ns[j]),14,4,[240,240,240],42,1.2); }
       // People — tight dashes, saturated pale orange
       for(const person in people){
         const ns=people[person];
         const col=getPersonColor(person);
         for(let i=0;i<ns.length;i++) for(let j=i+1;j<ns.length;j++)
-          drawArc(p,ts(ns[i]),ts(ns[j]),60,1,col,90,0.8);
+          drawArc(p,ts(ns[i]),ts(ns[j]),60,1,col,30,0.7);
       }
     }
 
