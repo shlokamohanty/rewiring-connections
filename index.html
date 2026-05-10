@@ -565,8 +565,8 @@ function countEntries(node) {
 }
 
 const CONFIG = {
-  trunkRatio:0.205, branchDecay:0.90, spreadBase:100, spreadDecay:0.95,
-  splitAngle:35, subAngle:60, neutralColor:[120,120,120],
+  trunkRatio:0.205, branchDecay:0.82, spreadBase:130, spreadDecay:0.88,
+  splitAngle:42, subAngle:70, neutralColor:[120,120,120],
 };
 
 // ── SKETCH ─────────────────────────────────────────────────────────────────
@@ -625,7 +625,7 @@ function startSketch(tree) {
 
       const children=tree.children||[];
       const cn=children.length;
-      const spread=Math.min(cn*CONFIG.spreadBase,120);
+      const spread=Math.min(cn*CONFIG.spreadBase,160);
       const step=cn>1?spread/(cn-1):0;
       const start=-spread/2;
 
