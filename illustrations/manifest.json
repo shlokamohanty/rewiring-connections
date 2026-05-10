@@ -7,8 +7,8 @@
         {
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
-          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third", "hidden": true} ],
-          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third", "hidden": true} ]
+          "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third", "hidden": true, "people": ["Amisha"]} ],
+          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third", "hidden": true, "people": ["Amisha", "Jatin", "Aaranyah"]} ]
         },
         {
           "label": "by the cubbies",
@@ -18,12 +18,17 @@
         {
           "label": "in classrooms",
           "path": "1_being-at-school/3_in-classrooms",
-          "high": [ { "file": "1_cheesecake.jpg", "link": "belonging", "action": "eating", "perspective": "third"} ]
+          "high": [ { "file": "1_cheesecake.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Jatin"]} ]
         },
          {
           "label": "and being part of student council",
           "path": "1_being-at-school/4_student-council",
-          "high": [ { "file": "1_council-meeting.jpg", "link": "annoyance", "action": "sitting", "perspective": "third"} ]
+          "high": [ { "file": "1_council-meeting.jpg", "link": "annoyance", "action": "sitting", "perspective": "third", "people": ["Jatin"]} ]
+        },
+        {
+          "label": "online",
+          "path": "1_being-at-school/5_online",
+          "high": [ { "file": "physical-education.jpg", "link": "fun", "action": "exercising", "perspective": "first", "people": ["Jatin"]} ]
         }
       ]
     },
@@ -64,7 +69,8 @@
         {
           "label": "in transit",
           "path": "5_hanging-out-with-family/3_in-transit",
-          "high": [ { "file": "sid_mom_looking_high.jpg", "link": "awe", "action": "watching", "perspective": "first", "people": ["Sid", "Mama"]}]
+          "high": [ { "file": "sid_mom_looking_high.jpg", "link": "awe", "action": "watching", "perspective": "first", "people": ["Sid", "Mama"]},
+            { "file": "sid_laughing.jpg", "link": "sad", "action": "crying", "perspective": "third", "people": ["Sid"]}]
         },
           {
             "label": "somewhere",
@@ -82,7 +88,9 @@
           "path": "2_hanging-out-with-friends/2_in-thane",
           "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Amisha", "Sarah"]},
             { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running", "perspective": "third", "people": ["Amisha"]}],
-          "high": [ { "file": "5_playing-badminton_high.jpg", "link": "belonging", "action": "playing", "perspective": "first"}]
+          "high": [ { "file": "5_playing-badminton_high.jpg", "link": "belonging", "action": "playing", "perspective": "first", "people": ["Amisha"]},
+            { "file": "amisha_pani_puri.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Amisha"]}, 
+            { "file": "cooking.jpg", "link": "belonging", "action": "cooking", "perspective": "third", "people": ["Amisha"]}]
         },
         {
           "label": "in powai",
