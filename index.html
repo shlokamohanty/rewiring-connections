@@ -90,45 +90,44 @@ header {
 }
 
 #zoom-controls {
-  position:fixed; bottom:20px; right:20px; z-index:15;
-  display:flex; flex-direction:column; gap:4px;
+  display:flex; flex-direction:row; align-items:center; gap:6px;
 }
 .zoom-btn {
-  width:30px; height:30px; background:#111; border:0.5px solid #2a2a2a;
-  color:#666; font-size:16px; cursor:pointer; border-radius:2px;
+  width:38px; height:38px; background:none; border:1px solid #444;
+  color:#ccc; font-size:18px; cursor:pointer; border-radius:3px;
   font-family:'Space Mono',monospace; display:flex; align-items:center; justify-content:center;
-  transition:color 0.15s, border-color 0.15s;
+  transition:color 0.15s, border-color 0.15s, background 0.15s;
 }
-.zoom-btn:hover { color:#ccc; border-color:#555; }
+.zoom-btn:hover { color:#fff; border-color:#aaa; background:#1a1a1a; }
 
 #detail-panel {
   display:none; position:fixed; bottom:0;
   left:clamp(200px,22vw,320px); right:0; z-index:15;
   background:rgba(10,10,10,0.97); border-top:0.5px solid #1e1e1e;
-  padding:12px 20px; transition:left 0.35s ease;
+  padding:16px 24px; transition:left 0.35s ease;
   align-items:center; gap:16px; flex-wrap:wrap;
 }
 #detail-panel.visible { display:flex; }
 #detail-panel.sidebar-collapsed { left:0; }
 #detail-path {
-  font-family:'Space Mono',monospace; font-size:13px; color:#bbb;
-  letter-spacing:0.06em; flex:1; min-width:0;
-  display:flex; flex-direction:column; gap:6px;
+  font-family:'Space Mono',monospace; font-size:15px; color:#ccc;
+  letter-spacing:0.05em; flex:1; min-width:0;
+  display:flex; flex-direction:column; gap:7px;
 }
-#crumb-row { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:12px; color:#bbb; }
-.crumb-arrow { color:#666; margin:0 7px; font-size:13px; }
-.crumb-active { color:#fff; font-size:12px; }
+#crumb-row { overflow:hidden; white-space:nowrap; text-overflow:ellipsis; font-size:15px; color:#ccc; }
+.crumb-arrow { color:#888; margin:0 8px; font-size:15px; }
+.crumb-active { color:#fff; font-size:15px; }
 #last-seen-row {
-  font-size:11px; color:#999; letter-spacing:0.06em;
+  font-size:13px; color:#aaa; letter-spacing:0.05em;
   overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
 }
-#last-seen-row .ls-label { color:#666; margin-right:6px; }
-#last-seen-row .ls-value { color:#aaa; }
-#last-seen-row .crumb-arrow { color:#666; margin:0 7px; font-size:13px; }
-#last-seen-row .crumb-active { color:#fff; font-size:12px; }
+#last-seen-row .ls-label { color:#888; margin-right:8px; }
+#last-seen-row .ls-value { color:#ccc; }
+#last-seen-row .crumb-arrow { color:#888; margin:0 8px; font-size:15px; }
+#last-seen-row .crumb-active { color:#fff; font-size:15px; }
 
 #detail-tags { display:flex; gap:8px; flex-shrink:0; flex-wrap:wrap; align-items:center; }
-.dtag { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:0.1em; padding:3px 8px; border-radius:2px; border:0.5px solid; }
+.dtag { font-family:'Space Mono',monospace; font-size:12px; letter-spacing:0.08em; padding:5px 12px; border-radius:2px; border:0.5px solid; }
 .dtag-emotion { color:#bbb; border-color:#444; }
 .dtag-action  { color:#bbb; border-color:#444; }
 .dtag-wave    { color:#4ba3c3; border-color:#4ba3c3; }
@@ -136,8 +135,8 @@ header {
 .dtag-person  { color:#b07a4a; border-color:#3d2510; }
 
 #detail-nav { display:flex; gap:6px; flex-shrink:0; }
-.nav-btn { font-family:'Space Mono',monospace; font-size:16px; color:#aaa; background:none; border:0.5px solid #444; padding:6px 14px; cursor:pointer; border-radius:2px; transition:color 0.15s, border-color 0.15s; }
-.nav-btn:hover { color:#fff; border-color:#888; }
+.nav-btn { font-family:'Space Mono',monospace; font-size:22px; color:#ccc; background:none; border:1px solid #666; padding:8px 18px; cursor:pointer; border-radius:2px; transition:color 0.15s, border-color 0.15s; }
+.nav-btn:hover { color:#fff; border-color:#bbb; }
 
 .lightbox { display:none; position:fixed; inset:0; z-index:100; background:rgba(10,10,10,0.96); align-items:center; justify-content:center; cursor:zoom-out; }
 .lightbox.open { display:flex; }
@@ -153,7 +152,11 @@ header {
 
 <header>
   <p class="title">Rewiring Connections</p>
-
+  <div id="zoom-controls">
+    <button class="zoom-btn" id="zoom-in">+</button>
+    <button class="zoom-btn" id="zoom-reset">&#8857;</button>
+    <button class="zoom-btn" id="zoom-out">&minus;</button>
+  </div>
 </header>
 
 <div id="sidebar">
@@ -217,12 +220,7 @@ header {
   </div>
 </div>
 
-<!-- zoom buttons -->
-<div id="zoom-controls">
-  <button class="zoom-btn" id="zoom-in">+</button>
-  <button class="zoom-btn" id="zoom-reset">⊙</button>
-  <button class="zoom-btn" id="zoom-out">−</button>
-</div>
+
 
 <!-- detail panel -->
 <div id="detail-panel">
@@ -388,28 +386,20 @@ document.getElementById('zoom-out').addEventListener('click',   () => { zoom = M
 document.getElementById('zoom-reset').addEventListener('click', () => { zoom = 1; zoomOriginX = 0; zoomOriginY = 0; });
 
 // Smooth zoom with velocity
-let zoomVelocity = 0;
-let zoomRafId = null;
-function applyZoomStep() {
-  if (Math.abs(zoomVelocity) < 0.0001) { zoomVelocity = 0; zoomRafId = null; return; }
-  const newZoom = Math.min(Math.max(zoom * (1 + zoomVelocity), ZOOM_MIN), ZOOM_MAX);
-  zoomOriginX = _zoomMouseX - (_zoomMouseX - zoomOriginX) * (newZoom / zoom);
-  zoomOriginY = _zoomMouseY - (_zoomMouseY - zoomOriginY) * (newZoom / zoom);
-  zoom = newZoom;
-  zoomVelocity *= 0.82; // decay
-  zoomRafId = requestAnimationFrame(applyZoomStep);
-}
+// Magic Mouse sends many small deltaY events — use gentle direct zoom, no momentum
 let _zoomMouseX = 0, _zoomMouseY = 0;
 canvasWrap.addEventListener('wheel', e => {
   e.preventDefault();
   const rect = canvasWrap.getBoundingClientRect();
   _zoomMouseX = e.clientX - rect.left - rect.width  / 2;
   _zoomMouseY = e.clientY - rect.top  - rect.height / 2;
-  // Variable speed based on scroll amount, capped
-  const delta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 200);
-  zoomVelocity += delta < 0 ? 0.06 : -0.055;
-  zoomVelocity = Math.max(-0.25, Math.min(0.25, zoomVelocity));
-  if (!zoomRafId) zoomRafId = requestAnimationFrame(applyZoomStep);
+  // Gentle factor — Magic Mouse fires many small events so keep per-event step small
+  const delta = Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 30);
+  const factor = 1 - delta * 0.003;
+  const newZoom = Math.min(Math.max(zoom * factor, ZOOM_MIN), ZOOM_MAX);
+  zoomOriginX = _zoomMouseX - (_zoomMouseX - zoomOriginX) * (newZoom / zoom);
+  zoomOriginY = _zoomMouseY - (_zoomMouseY - zoomOriginY) * (newZoom / zoom);
+  zoom = newZoom;
 }, { passive: false });
 
 // ── TOUCH: pinch-zoom + single-finger pan + double-tap zoom ──────────────
