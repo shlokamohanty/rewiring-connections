@@ -111,6 +111,10 @@
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
               "high": [{ "file": "5_after-breakfast.jpg", "link": "love", "action": "talking", "perspective": "third", "people": ["Aaranyah"]},
                 { "file": "6_talking.jpg", "link": "love", "action": "talking", "perspective": "third", "people": ["Aaranyah"]}]
+              },{
+              "label": "at shops",
+              "path": "2_hanging-out-with-friends/2_in-powai/2_at-shops",
+              "high": [{ "file": "2_forest-essentials.jpg", "link": "belonging", "action": "smelling", "perspective": "third", "people": ["Aaranyah", "Amisha"]}]
               }]
           },
         {
