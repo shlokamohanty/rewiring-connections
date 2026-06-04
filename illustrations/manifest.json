@@ -114,7 +114,8 @@
               },{
               "label": "at shops",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-shops",
-              "high": [{ "file": "2_forest-essentials.jpg", "link": "belonging", "action": "smelling", "perspective": "third", "people": ["Aaranyah", "Amisha"]}]
+              "high": [{ "file": "2_forest-essentials.jpg", "link": "belonging", "action": "smelling", "perspective": "third", "people": ["Aaranyah", "Amisha"]},
+            {"file": "3_kombucha.jpg", "link": "belonging", "action": "watching", "perspective": "third", "people": ["Aaranyah", "Amisha"]}]
               }]
           },
         {
