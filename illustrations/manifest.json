@@ -8,7 +8,7 @@
           "label": "during lunch",
           "path": "1_being-at-school/1_lunch",
           "high": [ { "file": "1_lunch-at-school_high.jpg", "link": "guilt", "action": "eating", "perspective": "third", "hidden": true, "people": ["Amisha"]} ],
-          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "belonging", "action": "eating", "perspective": "third", "hidden": true, "people": ["Amisha", "Jatin", "Aaranyah"]} ]
+          "low":  [ { "file": "1_lunch-at-school_low.jpg", "sensation": "wave", "link": "warmth", "action": "eating", "perspective": "third", "hidden": true, "people": ["Amisha", "Jatin", "Aaranyah"]} ]
         },
         {
           "label": "by the cubbies",
@@ -18,7 +18,7 @@
         {
           "label": "in classrooms",
           "path": "1_being-at-school/3_in-classrooms",
-          "high": [ { "file": "1_cheesecake.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Jatin"]} ]
+          "high": [ { "file": "1_cheesecake.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Jatin"]} ]
         },
          {
           "label": "and being part of student council",
@@ -86,11 +86,11 @@
         {
           "label": "in thane",
           "path": "2_hanging-out-with-friends/2_in-thane",
-          "low": [{ "file": "2_subway_low.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Amisha", "Sarah"]},
+          "low": [{ "file": "2_subway_low.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Amisha", "Sarah"]},
             { "file": "4_dog_chasing_low.jpg", "sensation": "wave", "link": "fear", "action": "running", "perspective": "third", "people": ["Amisha"]}],
-          "high": [ { "file": "5_playing-badminton_high.jpg", "link": "belonging", "action": "playing", "perspective": "first", "people": ["Amisha"]},
-            { "file": "amisha_pani_puri.jpg", "link": "belonging", "action": "eating", "perspective": "third", "people": ["Amisha"]}, 
-            { "file": "cooking.jpg", "link": "belonging", "action": "cooking", "perspective": "third", "people": ["Amisha"]}]
+          "high": [ { "file": "5_playing-badminton_high.jpg", "link": "warmth", "action": "playing", "perspective": "first", "people": ["Amisha"]},
+            { "file": "amisha_pani_puri.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Amisha"]}, 
+            { "file": "cooking.jpg", "link": "warmth", "action": "cooking", "perspective": "third", "people": ["Amisha"]}]
         },
         {
           "label": "in powai",
@@ -98,14 +98,14 @@
           "children" : [{
             "label": "at some food joint",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-some-food-joint",
-            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "belonging", "action": "taking a photo", "perspective": "first", "people": ["Amisha", "Aaranyah"]}],
-            "low":  [ { "file": "3_subway_low.jpg", "link": "belonging", "action": "asking", "perspective": "third"} ]
+            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "warmth", "action": "taking a photo", "perspective": "first", "people": ["Amisha", "Aaranyah"]}],
+            "low":  [ { "file": "3_subway_low.jpg", "link": "warmth", "action": "asking", "perspective": "third"} ]
             },{
             "label": "at someone's house",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-someones-house",
-            "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "belonging", "action": "wrapping", "perspective": "third", "people": ["Amisha"]},
-              {"file": "5_jatin-man-united.jpg", "link": "belonging", "action": "walking", "perspective": "third", "people": ["Jatin"]},
-            {"file": "6_cooking_high.jpg", "link": "belonging", "action": "cooking", "perspective": "third"}]
+            "high": [ { "file": "4_wrapping-gift_high.jpg", "link": "warmth", "action": "wrapping", "perspective": "third", "people": ["Amisha"]},
+              {"file": "5_jatin-man-united.jpg", "link": "warmth", "action": "walking", "perspective": "third", "people": ["Jatin"]},
+            {"file": "6_cooking_high.jpg", "link": "warmth", "action": "cooking", "perspective": "third"}]
             },{
               "label": "at parks",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-parks",
@@ -114,28 +114,28 @@
               },{
               "label": "at shops",
               "path": "2_hanging-out-with-friends/2_in-powai/2_at-shops",
-              "high": [{ "file": "2_forest-essentials.jpg", "link": "belonging", "action": "smelling", "perspective": "third", "people": ["Aaranyah", "Amisha"]},
-            {"file": "3_kombucha.jpg", "link": "belonging", "action": "watching", "perspective": "third", "people": ["Aaranyah", "Amisha"]}]
+              "high": [{ "file": "2_forest-essentials.jpg", "link": "warmth", "action": "smelling", "perspective": "third", "people": ["Aaranyah", "Amisha"]},
+            {"file": "3_kombucha.jpg", "link": "warmth", "action": "watching", "perspective": "third", "people": ["Aaranyah", "Amisha"]}]
               }]
           },
         {
           "label": "in transit",
           "path": "2_hanging-out-with-friends/2_in-transit",
-          "high": [ { "file": "2_getting-stuck_high.jpg", "sensation": "wave", "link": "belonging", "action": "waiting", "perspective": "third", "people": ["Amisha"]},
+          "high": [ { "file": "2_getting-stuck_high.jpg", "sensation": "wave", "link": "warmth", "action": "waiting", "perspective": "third", "people": ["Amisha"]},
             { "file": "3_brain-tumor.jpg", "sensation": "zigzag", "link": "fear", "action": "waiting", "perspective": "first", "people": ["Amisha", "Sarah"]}]
         },
         {
           "label": "in unexpected places",
           "path": "2_hanging-out-with-friends/2_unexpected-places",
-          "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "belonging", "action": "praying", "perspective": "third", "people": ["Amisha", "Jatin"]}, 
+          "high": [ { "file": "2_mahalaxmi-mandir.jpg", "sensation": "wave", "link": "warmth", "action": "praying", "perspective": "third", "people": ["Amisha", "Jatin"]}, 
           { "file": "3_imagica.jpg", "link": "annoyance", "action": "taking a photo", "perspective": "first", "hidden": true, "people": ["Amisha", "Jatin"]},
-          { "file": "4_hey-guys-high.jpg", "link": "belonging", "action": "watching a video", "perspective": "first", "people": ["Amisha"]},
-          { "file": "5_versova-beach-birthday-high.jpg", "link": "belonging", "action": "painting", "perspective": "third", "hidden": true, "people": ["Amisha", "Jatin"]}]
+          { "file": "4_hey-guys-high.jpg", "link": "warmth", "action": "watching a video", "perspective": "first", "people": ["Amisha"]},
+          { "file": "5_versova-beach-birthday-high.jpg", "link": "warmth", "action": "painting", "perspective": "third", "hidden": true, "people": ["Amisha", "Jatin"]}]
         },
         {
           "label": "online",
           "path": "2_hanging-out-with-friends/2_online",
-          "high": [ { "file": "2_playing-broforce.jpg", "link": "belonging", "action": "playing", "perspective": "first"}]
+          "high": [ { "file": "2_playing-broforce.jpg", "link": "warmth", "action": "playing", "perspective": "first"}]
         }
       ]
     },
