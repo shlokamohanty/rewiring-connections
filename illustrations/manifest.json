@@ -98,8 +98,9 @@
           "children" : [{
             "label": "at some food joint",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-some-food-joint",
-            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "warmth", "action": "taking a photo", "perspective": "first", "people": ["Amisha", "Aaranyah"]}],
-            "low":  [ { "file": "3_subway_low.jpg", "link": "warmth", "action": "asking", "perspective": "third"} ]
+            "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "warmth", "action": "taking a photo", "perspective": "first", "people": ["Amisha", "Aaranyah"]}, 
+            {"file": "jamun_ice_cream_high.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Amisha"]}],
+            "low":  [ { "file": "3_subway_low.jpg", "link": "warmth", "action": "asking", "perspective": "third"}]
             },{
             "label": "at someone's house",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-someones-house",
@@ -150,6 +151,11 @@
             { "file": "4_partner-vir-das_high.jpg", "link": "love", "action": "getting caught", "perspective": "third", "people": ["Aaranyah"]},
              { "file": "6_first-kiss_high.jpg", "link": "love", "action": "kissing", "perspective": "third", "people": ["Aananya"]}],
           "low":  [ { "file": "5_first-date_low.jpg", "link": "love", "action": "pulling nose", "perspective": "third", "people": ["Aananya"]}]
+        },
+        {
+          "label": "online",
+          "path": "3_hanging-out-with-partners/3_online",
+          "low": [ { "file": "electrocuted_low.jpg", "link": "pain", "action": "calling", "perspective": "third", "people": ["Anish"]}]
         }
       ]
     }
