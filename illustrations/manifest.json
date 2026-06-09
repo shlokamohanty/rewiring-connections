@@ -99,7 +99,7 @@
             "label": "at some food joint",
             "path": "2_hanging-out-with-friends/2_in-powai/2_at-some-food-joint",
             "high": [ { "file": "3_subway_high.jpg", "sensation": "wave", "link": "warmth", "action": "taking a photo", "perspective": "first", "people": ["Amisha", "Aaranyah"]}, 
-            {"file": "jamun_ice_cream_high.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Amisha"]}],
+            {"file": "jamun_ice_cream_high.jpg", "link": "warmth", "action": "eating", "perspective": "third", "people": ["Amisha"], "sensation": "wave"}],
             "low":  [ { "file": "3_subway_low.jpg", "link": "warmth", "action": "asking", "perspective": "third"}]
             },{
             "label": "at someone's house",
